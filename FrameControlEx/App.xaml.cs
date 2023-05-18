@@ -20,6 +20,7 @@ using FrameControlEx.Shortcuts.Dialogs;
 using FrameControlEx.Shortcuts.Views;
 using FrameControlEx.Utils;
 using FrameControlEx.Views.FilePicking;
+using FrameControlEx.Views.Main;
 using FrameControlEx.Views.Message;
 using FrameControlEx.Views.UserInputs;
 
