@@ -1,0 +1,323 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{7DE72580-9AA4-45E9-B688-184DB2164C9B}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>FrameControlEx</RootNamespace>
+    <AssemblyName>FrameControlEx</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="PresentationFramework.Aero2" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="AdvancedContextService\AdvancedActionMenuItem.cs" />
+    <Compile Include="AdvancedContextService\AdvancedContextMenu.cs" />
+    <Compile Include="AdvancedContextService\AdvancedMenuItem.cs" />
+    <Compile Include="AdvancedContextService\AdvancedMenuItemStyleSelector.cs" />
+    <Compile Include="AdvancedContextService\AdvancedShortcutMenuItem.cs" />
+    <Compile Include="AdvancedContextService\IWPFContextGenerator.cs" />
+    <Compile Include="AdvancedContextService\Static\StaticActionMenuItem.cs" />
+    <Compile Include="AdvancedContextService\Static\StaticBaseMenuItem.cs" />
+    <Compile Include="AdvancedContextService\Static\StaticMenu.cs" />
+    <Compile Include="AdvancedContextService\Static\StaticMenuElement.cs" />
+    <Compile Include="AdvancedContextService\Static\StaticMenuItemCollection.cs" />
+    <Compile Include="AdvancedContextService\Static\StaticMenuSeparator.cs" />
+    <Compile Include="AdvancedContextService\Static\StaticShortcutMenuItem.cs" />
+    <Compile Include="Resources\IconTypeToImageSourceConverter.cs" />
+    <Compile Include="Services\ClipboardService.cs" />
+    <Compile Include="Services\WinExplorerService.cs" />
+    <Compile Include="Settings\SettingsViewModel.cs" />
+    <Compile Include="Settings\SettingsWindow.xaml.cs">
+      <DependentUpon>SettingsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Shortcuts\ActivationHandlerReference.cs" />
+    <Compile Include="Shortcuts\Bindings\ContextualShortcutCommandBinding.cs" />
+    <Compile Include="Shortcuts\Bindings\ShortcutActionBinding.cs" />
+    <Compile Include="Shortcuts\Bindings\ShortcutCommandBinding.cs" />
+    <Compile Include="Shortcuts\Converters\ActionIdToGestureConverter.cs" />
+    <Compile Include="Shortcuts\Converters\GlobalUpdateShortcutGestureConverter.cs" />
+    <Compile Include="Shortcuts\Converters\KeyStrokeStringConverter.cs" />
+    <Compile Include="Shortcuts\Converters\MouseStrokeStringConverter.cs" />
+    <Compile Include="Shortcuts\Converters\ShortcutIdToGestureConverter.cs" />
+    <Compile Include="Shortcuts\Converters\ShortcutIdToHeaderConverter.cs" />
+    <Compile Include="Shortcuts\Converters\ShortcutIdToToolTipConverter.cs" />
+    <Compile Include="Shortcuts\Converters\ShortcutPathToInputGestureTextConverter.cs" />
+    <Compile Include="Shortcuts\Dialogs\KeyboardDialogService.cs" />
+    <Compile Include="Shortcuts\Dialogs\KeyStrokeInputWindow.xaml.cs">
+      <DependentUpon>KeyStrokeInputWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Shortcuts\Dialogs\MouseDialogService.cs" />
+    <Compile Include="Shortcuts\Dialogs\MouseStrokeInputWindow.xaml.cs">
+      <DependentUpon>MouseStrokeInputWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Shortcuts\ShortcutActivateHandler.cs" />
+    <Compile Include="Shortcuts\ShortcutUtils.cs" />
+    <Compile Include="Shortcuts\UIFocusGroup.cs" />
+    <Compile Include="Shortcuts\Views\ShortcutEditorWindow.xaml.cs">
+      <DependentUpon>ShortcutEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Shortcuts\Views\ShortcutManagerDialogService.cs" />
+    <Compile Include="Shortcuts\VisualTreeUtils.cs" />
+    <Compile Include="Shortcuts\WPFKeyMapSerialiser.cs" />
+    <Compile Include="Shortcuts\WPFShortcutManager.cs" />
+    <Compile Include="Shortcuts\WPFShortcutProcessor.cs" />
+    <Compile Include="Themes\Attached\CornerHelper.cs" />
+    <Compile Include="Themes\Attached\MenuHelper.cs" />
+    <Compile Include="Themes\Attached\PasswordBoxHelper.cs" />
+    <Compile Include="Themes\Attached\TextBoxAutoSelect.cs" />
+    <Compile Include="Themes\Attached\TextHinting.cs" />
+    <Compile Include="Themes\ColourKeys.cs" />
+    <Compile Include="Themes\Controls.xaml.cs">
+      <DependentUpon>Controls.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Themes\Converters\TreeViewLineConverter.cs" />
+    <Compile Include="Themes\ThemesController.cs" />
+    <Compile Include="Themes\ThemeTypes.cs" />
+    <Compile Include="Utils\DispatcherDelegate.cs" />
+    <Compile Include="Utils\DispatcherUtils.cs" />
+    <Compile Include="Utils\KeyUtils.cs" />
+    <Compile Include="Utils\TextPointerUtils.cs" />
+    <Compile Include="Views\BaseDialog.cs" />
+    <Compile Include="Views\BaseWindow.cs" />
+    <Compile Include="Views\FilePicking\FilePickDialogService.cs" />
+    <Compile Include="Views\FilePicking\FolderPicker.cs" />
+    <Compile Include="Views\Message\MessageDialogService.cs" />
+    <Compile Include="Views\Message\MessageWindow.xaml.cs">
+      <DependentUpon>MessageWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Message\ThingyConverter.cs" />
+    <Compile Include="Views\Modal\BaseDialogEx.xaml.cs">
+      <DependentUpon>BaseDialogEx.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserInputs\DoubleUserInputWindow.xaml.cs">
+      <DependentUpon>DoubleUserInputWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserInputs\SimpleInputValidationRule.cs" />
+    <Compile Include="Views\UserInputs\SingleUserInputWindow.xaml.cs">
+      <DependentUpon>SingleUserInputWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\UserInputs\UserInputDialogService.cs" />
+    <Compile Include="Views\WindowEx.cs" />
+    <Compile Include="Views\WindowViewBase.cs" />
+    <Page Include="AdvancedContextService\ContextStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\ControlStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Controls\FileMenu\SaveMenuItem.cs" />
+    <Compile Include="Controls\FocusHelper.cs" />
+    <Compile Include="Controls\Helpers\ActionControlHelper.cs" />
+    <Compile Include="Controls\Helpers\AttachedInteractivity.cs" />
+    <Compile Include="Controls\Helpers\GridLatchSplitter.cs" />
+    <Compile Include="Controls\Helpers\ScrollViewerHelper.cs" />
+    <Compile Include="Controls\Helpers\TextBlockHelper.cs" />
+    <Compile Include="Controls\Helpers\TextBoxHelper.cs" />
+    <Compile Include="Controls\Helpers\ToggleButtonHelper.cs" />
+    <Compile Include="Controls\Helpers\TopmostFocus.cs" />
+    <Compile Include="Controls\HighlightableTextBlock.cs" />
+    <Compile Include="Controls\IconTextPair.cs" />
+    <Compile Include="Controls\SelectionAdorder.cs" />
+    <Compile Include="Converters\BoolConverter.cs" />
+    <Compile Include="Converters\BoolConverterAND.cs" />
+    <Compile Include="Converters\ChainValueConverter.cs" />
+    <Compile Include="Converters\EmptyStringToBoolConverter.cs" />
+    <Compile Include="Converters\EnumConverter.cs" />
+    <Compile Include="Converters\NullConverter.cs" />
+    <Compile Include="Converters\SingletonValueConverter.cs" />
+    <Compile Include="Highlighting\HighlightableString.cs" />
+    <Compile Include="Highlighting\InlineHelper.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Settings\SettingsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Shortcuts\Dialogs\KeyStrokeInputWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Shortcuts\Dialogs\MouseStrokeInputWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Shortcuts\Views\ShortcutEditorWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ColourDictionaries\DeepDark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ColourDictionaries\RedBlackTheme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ColourDictionaries\SoftDark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ColourDictionaries\VeryDarkTheme.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ControlColours.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ControlColoursSoftDarkBlue.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Controls.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Message\MessageWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Modal\BaseDialogEx.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserInputs\DoubleUserInputWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\UserInputs\SingleUserInputWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Keymap.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Resources\Icons\FileIcon.psd" />
+    <None Include="Resources\Icons\TagArrayIcon.psd" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Keymap.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <SplashScreen Include="Views\StartupSplashScreen.png" />
+    <Resource Include="Resources\AppIcon.ico" />
+    <Resource Include="Resources\Icons\Credits.txt" />
+    <Resource Include="Resources\Icons\FileIcon-Region.png" />
+    <Resource Include="Resources\Icons\FileIcon-TagByte8.png" />
+    <Resource Include="Resources\Icons\FileIcon-TagByteArray.png" />
+    <Resource Include="Resources\Icons\FileIcon-TagDouble64.png" />
+    <Resource Include="Resources\Icons\FileIcon-TagFloat32.png" />
+    <Resource Include="Resources\Icons\FileIcon-TagInt32.png" />
+    <Resource Include="Resources\Icons\FileIcon-TagIntArray.png" />
+    <Resource Include="Resources\Icons\FileIcon-TagLong64.png" />
+    <Resource Include="Resources\Icons\FileIcon-TagLongArray.png" />
+    <Resource Include="Resources\Icons\FileIcon-TagShort16.png" />
+    <Resource Include="Resources\Icons\FileIcon-TagString.png" />
+    <Resource Include="Resources\Icons\icons8-bulleted-list-48.png" />
+    <Resource Include="Resources\Icons\icons8-closed-box-48.png" />
+    <Resource Include="Resources\Icons\icons8-empty-box-48.png" />
+    <Resource Include="Resources\Icons\icons8-open-box-48.png" />
+    <Resource Include="Resources\Icons\TagArrayIcon.png" />
+    <Resource Include="Resources\Icons\UIGeneral\icons8-copy-48.png" />
+    <Resource Include="Resources\Icons\UIGeneral\icons8-copy-to-clipboard-48.png" />
+    <Resource Include="Resources\Icons\UIGeneral\icons8-edit-48.png" />
+    <Resource Include="Resources\Icons\UIGeneral\icons8-paste-48.png" />
+    <Resource Include="Resources\Icons\UIGeneral\icons8-sync-48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Settings\Pages\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FrameControlEx.Core\FrameControlEx.Core.csproj">
+      <Project>{abd8e759-682d-4038-a2c2-1b2a72c7b52a}</Project>
+      <Name>FrameControlEx.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
