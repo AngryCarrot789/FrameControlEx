@@ -1,0 +1,83 @@
+﻿<views:WindowEx x:Class="FrameControlEx.MainWindow"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:local="clr-namespace:FrameControlEx"
+                xmlns:views="clr-namespace:FrameControlEx.Views"
+                xmlns:helpers="clr-namespace:FrameControlEx.Controls.Helpers"
+                mc:Ignorable="d"
+                Title="MainWindow" Height="576" Width="1024"
+                TitlebarBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}"
+                Style="{DynamicResource CustomWindowStyleEx}">
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30*"/>
+                <RowDefinition Height="150"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="250" x:Name="Col0"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid>
+
+                </Grid>
+                <Border Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}" Grid.Column="2">
+                    <Viewbox>
+                        <Image Width="1920" Height="1080"/>
+                    </Viewbox>
+                </Border>
+                <Border Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
+                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" 
+                              Margin="-3,0,-5,0"
+                              helpers:GridLatchSplitter.IsEnabled="True" 
+                              helpers:GridLatchSplitter.ClosedSize="0" 
+                              helpers:GridLatchSplitter.TargetColumn="{Binding ElementName=Col0}"
+                              helpers:GridLatchSplitter.MinimumSize="150"
+                              helpers:GridLatchSplitter.MaximumSize="400"
+                              helpers:GridLatchSplitter.ThresholdSizeToClose="40"
+                              helpers:GridLatchSplitter.ThresholdSizeToOpen="80"/>
+            </Grid>
+            <Grid Grid.Row="1" UseLayoutRounding="True" SnapsToDevicePixels="True">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="16*"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="16*"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="30*"/>
+                    <ColumnDefinition Width="3"/>
+                    <ColumnDefinition Width="20*"/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Column="0" Style="{DynamicResource NoBorderGroupBox}" Header="Scenes" BorderThickness="0" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True">
+                    <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
+
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="2" Style="{DynamicResource NoBorderGroupBox}" Header="Inputs (aka sources)" BorderThickness="0" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True">
+                    <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
+
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="4" Style="{DynamicResource NoBorderGroupBox}" Header="Audio Mixer" BorderThickness="0" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True">
+                    <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
+
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="6" Style="{DynamicResource NoBorderGroupBox}" Header="Outputs" BorderThickness="0" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True">
+                    <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
+
+                    </Grid>
+                </GroupBox>
+                <Border Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
+                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="-2,0"/>
+                <Border Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
+                <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="-2,0"/>
+                <Border Grid.Column="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
+                <GridSplitter Grid.Column="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="-2,0"/>
+            </Grid>
+        </Grid>
+    </Grid>
+</views:WindowEx>
