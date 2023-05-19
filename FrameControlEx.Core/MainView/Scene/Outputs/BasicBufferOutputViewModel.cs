@@ -5,11 +5,14 @@ using FrameControlEx.Core.Views.Dialogs.UserInputs;
 using SkiaSharp;
 
 namespace FrameControlEx.Core.MainView.Scene.Outputs {
-    public class SameInstanceOutputViewModel : VisualOutputViewModel {
+    /// <summary>
+    /// A visual output that just takes a snapshot of the fully rendered output
+    /// </summary>
+    public class BasicBufferOutputViewModel : VisualOutputViewModel {
         public SKImage lastFrame;
 
-        public SameInstanceOutputViewModel(OutputDeckViewModel deck) : base(deck) {
-            
+        public BasicBufferOutputViewModel(OutputDeckViewModel deck) : base(deck) {
+
         }
 
         public override void OnAcceptFrame(SKSurface surface) {

@@ -5,6 +5,7 @@ namespace FrameControlEx.Core.Views.Dialogs.Message {
     public static class Dialogs {
         public static readonly MessageDialog OkDialog;
         public static readonly MessageDialog OkCancelDialog;
+        public static readonly MessageDialog YesCancelDialog;
         public static readonly MessageDialog YesNoDialog;
         public static readonly MessageDialog YesNoCancelDialog;
 
@@ -36,6 +37,11 @@ namespace FrameControlEx.Core.Views.Dialogs.Message {
             OkCancelDialog.AddButton("OK", "ok");
             OkCancelDialog.AddButton("Cancel", "cancel", false);
             OkCancelDialog.MarkReadOnly();
+
+            YesCancelDialog = new MessageDialog("yes");
+            YesCancelDialog.AddButton("Yes", "yes");
+            YesCancelDialog.AddButton("Cancel", "cancel", false);
+            YesCancelDialog.MarkReadOnly();
 
             ClipboardUnavailableDialog = OkDialog.Clone();
             ClipboardUnavailableDialog.ShowAlwaysUseNextResultOption = true;

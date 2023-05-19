@@ -6,6 +6,17 @@ namespace FrameControlEx.Core.Views.Dialogs.Message {
     /// A helper view model for managing message dialogs that can have multiple buttons
     /// </summary>
     public partial class MessageDialog : BaseDynamicDialogViewModel {
+        /// <summary>
+        /// Creates a new instance of <see cref="MessageDialog"/>
+        /// </summary>
+        /// <param name="primaryResult">
+        /// The resulting action ID that gets returned when the dialog closes with a successful
+        /// result but no button was explicitly clicked (due to custom window closing functionality setting the dialog result to true).
+        /// Realistically, this should be the recommended result (e.g. "confirm")
+        /// </param>
+        /// <param name="defaultResult">
+        /// This dialog's default result, which is the result used if the dialog closed without a button (e.g. clicking esc or some dodgy Win32 usage)
+        /// </param>
         public MessageDialog(string primaryResult = null, string defaultResult = null) : base(primaryResult, defaultResult) {
         }
 

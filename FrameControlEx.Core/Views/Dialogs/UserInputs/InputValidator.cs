@@ -37,8 +37,8 @@ namespace FrameControlEx.Core.Views.Dialogs.UserInputs {
     }
 
     public static class Validators {
-        public static InputValidator ForNonEmptyString(string nullMessage) {
-            return InputValidator.FromFunc((x) => string.IsNullOrEmpty(x) ? (nullMessage ?? "Input value cannot be null") : null);
+        public static InputValidator ForNonEmptyString(string nullOrEmptyMessage) {
+            return InputValidator.FromFunc((x) => string.IsNullOrEmpty(x) ? (nullOrEmptyMessage ?? "Input value cannot be null") : null);
         }
     }
 }

@@ -1,4 +1,17 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mainView="clr-namespace:FrameControlEx.MainView"
+                    xmlns:scene="clr-namespace:FrameControlEx.Core.MainView.Scene;assembly=FrameControlEx.Core">
+    <mainView:IOItemTemplateSelector x:Key="IoItemTemplateSelector">
+        <mainView:IOItemTemplateSelector.SourceTemplate>
+            <DataTemplate DataType="{x:Type scene:SourceViewModel}">
+                <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            </DataTemplate>
+        </mainView:IOItemTemplateSelector.SourceTemplate>
+        <mainView:IOItemTemplateSelector.OutputTemplate>
+            <DataTemplate DataType="{x:Type scene:OutputViewModel}">
+                <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            </DataTemplate>
+        </mainView:IOItemTemplateSelector.OutputTemplate>
+    </mainView:IOItemTemplateSelector>
 </ResourceDictionary>

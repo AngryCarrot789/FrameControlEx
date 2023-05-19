@@ -1,5 +1,7 @@
+using System;
+
 namespace FrameControlEx.Core.Imaging {
-    public class IImage {
-        
+    public interface IImage : IDisposable {
+
     }
 }

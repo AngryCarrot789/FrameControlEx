@@ -31,9 +31,16 @@ namespace FrameControlEx.Core.Utils {
         /// </summary>
         public bool ThrowOnDispose { get; set; }
 
-        private ExceptionStack(string message) {
+        public bool IsGlobalStack { get; }
+
+        private ExceptionStack(string message, bool isGlobalStack) {
             this.Message = message;
             this.Exceptions = new List<Exception>();
+            this.IsGlobalStack = isGlobalStack;
+        }
+
+        public ExceptionStack(string message) : this(message, false) {
+
         }
 
         /// <summary>
@@ -43,7 +50,7 @@ namespace FrameControlEx.Core.Utils {
         /// <param name="throwOnDispose">Whenther to actually throw the final exception in <see cref="Dispose"/></param>
         /// <returns>The pushed stack</returns>
         public static ExceptionStack Push(string exceptionMessage = null, bool throwOnDispose = true) {
-            ExceptionStack es = new ExceptionStack(exceptionMessage) {
+            ExceptionStack es = new ExceptionStack(exceptionMessage, true) {
                 ThrowOnDispose = throwOnDispose
             };
             Stack<ExceptionStack> stack = ThreadStackStorage.Value;
@@ -76,10 +83,10 @@ namespace FrameControlEx.Core.Utils {
                 throw ex;
             }
 
-            stack.Add(exception);
+            stack.Push(exception);
         }
 
-        public void Add(Exception exception) {
+        public void Push(Exception exception) {
             if (exception != null) {
                 this.Exceptions.Add(exception);
             }
@@ -112,12 +119,15 @@ namespace FrameControlEx.Core.Utils {
         }
 
         public void Dispose() {
-            Pop(this);
+            if (this.IsGlobalStack) {
+                Pop(this);
+            }
+
             if (this.Exceptions.Count > 0) {
-                Exception ex = new Exception(this.Message ?? "Exceptions occourred during operation");
+                Exception ex = new Exception(this.Message ?? "Exceptions occurred during operation");
                 foreach (Exception item in this.Exceptions) {
                     if (item != null) { // just in case
-                        ExceptionUtils.AddSuppressed(ex, item);
+                        ex.AddSuppressed(item);
                     }
                 }
 

@@ -2,6 +2,8 @@ using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Media;
+using FrameControlEx.Core.Utils;
 
 namespace FrameControlEx.Converters {
     public class BoolConverter : IValueConverter {
@@ -58,8 +60,8 @@ namespace FrameControlEx.Converters {
 
     public class InvertBoolConverter : BoolConverter {
         public InvertBoolConverter() {
-            this.TrueValue = false;
-            this.FalseValue = true;
+            this.TrueValue = BoolBox.False;
+            this.FalseValue = BoolBox.True;
         }
     }
 
@@ -87,6 +89,33 @@ namespace FrameControlEx.Converters {
         public BoolToVisibilityConverter() {
             this.TrueValue = Visibility.Visible;
             this.FalseValue = Visibility.Collapsed;
+        }
+    }
+
+    public class BoolToBrushConverter : BoolConverter {
+        public new Brush TrueValue {
+            get => (Brush) base.TrueValue;
+            set => base.TrueValue = value;
+        }
+
+        public new Brush FalseValue {
+            get => (Brush) base.FalseValue;
+            set => base.FalseValue = value;
+        }
+
+        public new Brush UnsetValue {
+            get => (Brush) base.UnsetValue;
+            set => base.UnsetValue = value;
+        }
+
+        public new Brush NonBoolValue {
+            get => (Brush) base.NonBoolValue;
+            set => base.NonBoolValue = value;
+        }
+
+        public BoolToBrushConverter() {
+            this.TrueValue = null;
+            this.FalseValue = null;
         }
     }
 }

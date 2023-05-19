@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace FramePFX.Render {
+namespace FrameControlEx.Core.Async {
     /// <summary>
     /// Represents a thread that actions can be dispatched to
     /// </summary>

@@ -2049,6 +2049,7 @@
         <Setter Property="Background" Value="{DynamicResource Popup.Static.Background}" />
         <Setter Property="BorderBrush" Value="{DynamicResource Popup.Static.Border}" />
         <Setter Property="Foreground" Value="{DynamicResource AREghZyBrush.Foreground.Static}" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Grid.IsSharedSizeScope" Value="true" />
@@ -2057,7 +2058,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ContextMenu}">
                     <Themes:SystemDropShadowChrome Name="CONTEXT_ROOT_SHADOW" Color="Transparent" CornerRadius="0" SnapsToDevicePixels="True">
-                        <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="2">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                             <ScrollViewer x:Name="ScrollViewer" VerticalScrollBarVisibility="Hidden">
                                 <ItemsPresenter />
                             </ScrollViewer>

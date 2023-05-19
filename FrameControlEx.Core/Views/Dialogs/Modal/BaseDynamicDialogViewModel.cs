@@ -114,17 +114,6 @@ namespace FrameControlEx.Core.Views.Dialogs.Modal {
         }
 
         /// <summary>
-        /// This dialog's default result, which is the result used if the dialog closed without a button (e.g. clicking esc or some dodgy Win32 usage)
-        /// </summary>
-        public string DefaultResult {
-            get => this.defaultResult;
-            set {
-                this.EnsureNotReadOnly();
-                this.RaisePropertyChanged(ref this.defaultResult, value);
-            }
-        }
-
-        /// <summary>
         /// The resulting action ID that gets returned when the dialog closes with a successful result but no button was explicitly clicked
         /// </summary>
         public string PrimaryResult {
@@ -132,6 +121,17 @@ namespace FrameControlEx.Core.Views.Dialogs.Modal {
             set {
                 this.EnsureNotReadOnly();
                 this.RaisePropertyChanged(ref this.primaryResult, value);
+            }
+        }
+
+        /// <summary>
+        /// This dialog's default result, which is the result used if the dialog closed without a button (e.g. clicking esc or some dodgy Win32 usage)
+        /// </summary>
+        public string DefaultResult {
+            get => this.defaultResult;
+            set {
+                this.EnsureNotReadOnly();
+                this.RaisePropertyChanged(ref this.defaultResult, value);
             }
         }
 
@@ -293,7 +293,7 @@ namespace FrameControlEx.Core.Views.Dialogs.Modal {
         /// <summary>
         /// Marks this dialog as read-only, meaning most properties cannot be modified (apart from header, message, etc)
         /// </summary>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="InvalidOperationException"><see cref="ShowAlwaysUseNextResultOption"/> is true</exception>
         public void MarkReadOnly() {
             if (this.ShowAlwaysUseNextResultOption) {
                 throw new InvalidOperationException($"Cannot set read-only when {nameof(this.ShowAlwaysUseNextResultOption)}");

@@ -4,5 +4,6 @@ using System.Text;
 
 namespace FrameControlEx.Core.MainView {
     public interface IRenderSurface {
+        void Render();
     }
 }

@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using FramePFX.Utils;
 
-namespace FramePFX.Render {
+namespace FrameControlEx.Core.Async {
     public abstract class DispatchReceiver {
         protected readonly CASLock actionLock;
         protected readonly CASLock taskLock;

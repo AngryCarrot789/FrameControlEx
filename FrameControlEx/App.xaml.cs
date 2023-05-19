@@ -11,8 +11,11 @@ using System.Windows.Media;
 using FrameControlEx.Core;
 using FrameControlEx.Core.Actions;
 using FrameControlEx.Core.Actions.Helpers;
+using FrameControlEx.Core.Imaging;
 using FrameControlEx.Core.Shortcuts.Managing;
 using FrameControlEx.Core.Shortcuts.ViewModels;
+using FrameControlEx.Imaging;
+using FrameControlEx.MainView;
 using FrameControlEx.Services;
 using FrameControlEx.Shortcuts;
 using FrameControlEx.Shortcuts.Converters;
@@ -65,6 +68,8 @@ namespace FrameControlEx {
             IoC.BroadcastShortcutActivity = (x) => {
             };
 
+            IoC.BufferSelector = new OutputSelector();
+
             string keymapFilePath = Path.GetFullPath(@"Keymap.xml");
             if (File.Exists(keymapFilePath)) {
                 using (FileStream stream = File.OpenRead(keymapFilePath)) {
@@ -97,6 +102,9 @@ namespace FrameControlEx {
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             MainWindow window = new MainWindow();
             this.MainWindow = window;
+
+            ImageFactory.Factory = new SkiaImageFactory();
+
             window.Show();
 
             // string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "WPFStyles.xaml");

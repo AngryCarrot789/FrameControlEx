@@ -9,11 +9,10 @@
                   xmlns:attached="clr-namespace:FrameControlEx.Themes.Attached"
                   mc:Ignorable="d"
                   d:DataContext="{d:DesignInstance userInputsCore:SingleInputViewModel}"
-                  Title="{Binding Title}" Height="196" Width="320"
+                  Title="{Binding Title}" Height="148" Width="320"
                   WindowStartupLocation="CenterOwner" 
                   WindowStyle="ToolWindow" ResizeMode="NoResize"
-                  Style="{DynamicResource CustomWindowStyleEx}"
-                  SizeToContent="Height">
+                  Style="{DynamicResource CustomWindowStyleEx}">
     <Window.Resources>
         <userInputs:SimpleInputValidationRule x:Key="ValidatorInput"/>
     </Window.Resources>
@@ -23,7 +22,7 @@
     </Window.InputBindings>
     <Grid>
         <TextBlock Margin="10,10,10,0" VerticalAlignment="Top" Text="{Binding Message, Mode=OneTime}"/>
-        <TextBox x:Name="InputBox" Padding="1" VerticalContentAlignment="Center" Margin="10,31,10,0" VerticalAlignment="Top" Height="24">
+        <TextBox x:Name="InputBox" Padding="5,1" VerticalContentAlignment="Center" Margin="10,31,10,0" VerticalAlignment="Top" Height="29">
             <TextBox.Text>
                 <Binding Path="Input" UpdateSourceTrigger="PropertyChanged" NotifyOnValidationError="True">
                     <Binding.ValidationRules>

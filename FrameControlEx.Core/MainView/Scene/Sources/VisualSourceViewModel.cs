@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace FrameControlEx.Core.MainView.Scene {
+namespace FrameControlEx.Core.MainView.Scene.Sources {
     /// <summary>
     /// Base class for visual sources (videos, images, but not audio)
     /// </summary>

@@ -25,5 +25,6 @@ namespace FrameControlEx.Core {
         public static IExplorerService ExplorerService { get; set; }
         public static IKeyboardDialogService KeyboardDialogs { get; set; }
         public static IMouseDialogService MouseDialogs { get; set; }
+        public static IOutputSelector BufferSelector { get; set; }
     }
 }
