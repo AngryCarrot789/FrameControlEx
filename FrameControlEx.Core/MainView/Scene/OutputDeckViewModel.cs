@@ -1,26 +1,24 @@
 using System.Threading.Tasks;
 using FrameControlEx.Core.MainView.Scene.Outputs;
-using FrameControlEx.Core.MainView.Scene.Sources;
 using FrameControlEx.Core.Views.Dialogs.Message;
 
 namespace FrameControlEx.Core.MainView.Scene {
     /// <summary>
     /// A view model for storing all outputs for a specific scene
-    /// A view model for storing all outputs for a specific scene
     /// </summary>
     public class OutputDeckViewModel : BaseListDeckViewModel<OutputViewModel> {
         public static readonly MessageDialog ConfirmRemoveDialog;
 
-        public SceneViewModel Scene { get; }
+        public FrameControlViewModel FrameControl { get; }
 
         // not sure how else to bypass dialogs :/
         public bool InternalBypassDialog { get; set; }
 
-        public AsyncRelayCommand AddSameInstanceOutputCommand { get; }
+        public AsyncRelayCommand AddBufferedOutputCommand { get; }
 
-        public OutputDeckViewModel(SceneViewModel scene) {
-            this.Scene = scene;
-            this.AddSameInstanceOutputCommand = new AsyncRelayCommand(this.AddSameInstanceOutputAction);
+        public OutputDeckViewModel(FrameControlViewModel frameControl) {
+            this.FrameControl = frameControl;
+            this.AddBufferedOutputCommand = new AsyncRelayCommand(this.AddBufferedOutputAction);
         }
 
         static OutputDeckViewModel() {
@@ -28,12 +26,12 @@ namespace FrameControlEx.Core.MainView.Scene {
             ConfirmRemoveDialog.ShowAlwaysUseNextResultOption = true;
         }
 
-        private async Task AddSameInstanceOutputAction() {
-            BasicBufferOutputViewModel source = new BasicBufferOutputViewModel(this) {
-                ReadableName = $"SIOutput {this.items.Count + 1}"
+        private async Task AddBufferedOutputAction() {
+            BasicBufferOutputViewModel source = new BasicBufferOutputViewModel() {
+                ReadableName = $"SIOutput {this.Items.Count + 1}"
             };
 
-            this.items.Add(source);
+            this.Add(source);
         }
 
         public override async Task AddActionAsync() {
@@ -41,7 +39,7 @@ namespace FrameControlEx.Core.MainView.Scene {
         }
 
         public override async Task RemoveItemAction(OutputViewModel item) {
-            if (!this.items.Contains(item)) {
+            if (!this.Contains(item)) {
                 return;
             }
 
@@ -53,6 +51,11 @@ namespace FrameControlEx.Core.MainView.Scene {
             }
 
             await base.RemoveItemAction(item);
+        }
+
+        protected override void EnsureItem(OutputViewModel item, bool valid) {
+            base.EnsureItem(item, valid);
+            item.Deck = valid ? this : null;
         }
     }
 }

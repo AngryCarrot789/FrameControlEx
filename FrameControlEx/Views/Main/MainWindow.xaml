@@ -13,7 +13,7 @@
                 xmlns:wpf="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
                 xmlns:controls="clr-namespace:FrameControlEx.Scenes.Controls"
                 xmlns:sources="clr-namespace:FrameControlEx.Core.MainView.Scene.Sources;assembly=FrameControlEx.Core"
-                xmlns:outputs="clr-namespace:FrameControlEx.Core.MainView.Scene.Outputs;assembly=FrameControlEx.Core"
+                xmlns:outputs="clr-namespace:FrameControlEx.Core.MainView.Scene.Outputs;assembly=FrameControlEx.Core" xmlns:controls1="clr-namespace:FrameControlEx.Controls"
                 mc:Ignorable="d"
                 Title="MainWindow" Height="650" Width="1024"
                 TitlebarBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}"
@@ -34,11 +34,11 @@
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200" x:Name="Col0"/>
+                    <ColumnDefinition Width="250" x:Name="Col0"/>
                     <ColumnDefinition Width="3"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid x:Name="SettingsPanel">
+                <Grid x:Name="SettingsPanel" d:DataContext="{d:DesignInstance sources:LoopbackSourceViewModel}" Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
                     <ContentPresenter Content="{Binding}">
                         <ContentPresenter.Resources>
                             <DataTemplate DataType="{x:Type mainView:FrameControlViewModel}">
@@ -49,7 +49,7 @@
                             <DataTemplate DataType="{x:Type sources:ImageSourceViewModel}">
                                 <controls:ImageSourceSettingsControl DataContext="{Binding}"/>
                             </DataTemplate>
-                            <DataTemplate DataType="{x:Type sources:SameInstanceInputViewModel}">
+                            <DataTemplate DataType="{x:Type sources:LoopbackSourceViewModel}">
                                 <controls:SIInputSettingsControl DataContext="{Binding}"/>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type outputs:BasicBufferOutputViewModel}">
@@ -60,7 +60,7 @@
                 </Grid>
                 <Border Background="{DynamicResource AREghZyBrush.Tone1.Background.Static}" Grid.Column="2">
                     <Viewbox>
-                        <wpf:SKElement Width="1920" Height="1080" x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
+                        <wpf:SKElement Width="{Binding Width, FallbackValue=500}" Height="{Binding Height, FallbackValue=500}" x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
                     </Viewbox>
                 </Border>
                 <Border Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
@@ -74,77 +74,135 @@
                               helpers:GridLatchSplitter.ThresholdSizeToClose="40"
                               helpers:GridLatchSplitter.ThresholdSizeToOpen="80"/>
             </Grid>
-            <Grid Grid.Row="1" UseLayoutRounding="True" SnapsToDevicePixels="True" Grid.RowSpan="2" 
-                  Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}"
-                  DataContext="{Binding SceneDeck, Mode=OneTime}">
+            <Grid Grid.Row="1" UseLayoutRounding="True" SnapsToDevicePixels="True" Grid.RowSpan="2" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}">
                 <Grid.Resources>
                     <converters:NullToBoolConverter x:Key="NullToDisabledConverter"/>
                 </Grid.Resources>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="16*"/>
+                    <ColumnDefinition Width="10*"/>
                     <ColumnDefinition Width="3"/>
-                    <ColumnDefinition Width="16*"/>
-                    <ColumnDefinition Width="3"/>
-                    <ColumnDefinition Width="25*"/>
-                    <ColumnDefinition Width="3"/>
-                    <ColumnDefinition Width="20*"/>
+                    <ColumnDefinition Width="5*"/>
                 </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0" Style="{DynamicResource NoBorderGroupBox}" Header="Scenes" BorderThickness="0" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True" Focusable="True">
+                <GroupBox DataContext="{Binding SceneDeck, Mode=OneTime}" Grid.Column="0" Style="{DynamicResource NoBorderGroupBox}" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True" Focusable="True" ToolTip="Scenes are used to group together multiple input sources. They do not group output sources">
+                    <GroupBox.Header>
+                        <TextBlock Text="Scenes"/>
+                    </GroupBox.Header>
                     <UIElement.InputBindings>
                         <KeyBinding Modifiers="Control" Key="OemPlus" Command="{Binding AddCommand, Mode=OneTime}"/>
                         <KeyBinding Key="Delete" Command="{Binding RemoveSelectedCommand, Mode=OneTime}"/>
                         <KeyBinding Modifiers="Shift" Key="Left" Command="{Binding MoveSelectedUpCommand, Mode=OneTime}"/>
                         <KeyBinding Modifiers="Shift" Key="Right" Command="{Binding MoveSelectedDownCommand, Mode=OneTime}"/>
                     </UIElement.InputBindings>
+                    <Grid Background="Transparent">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="5*"/>
+                            <ColumnDefinition Width="3"/>
+                            <ColumnDefinition Width="8*"/>
+                            <ColumnDefinition Width="3"/>
+                            <ColumnDefinition Width="5*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
+                            <ListBox ItemsSource="{Binding Items, Mode=OneTime}"
+                                     SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                     Margin="0,0,0,26" Background="Transparent" BorderThickness="0"
+                                     acs:AdvancedContextMenu.ContextGenerator="{x:Static scene:SceneViewModelContextMenuGenerator.Instance}"
+                                     SelectionChanged="OnSceneSourceOrOutputSelectionChanged"
+                                     GotFocus="ListBox_GotFocus">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <Border VerticalAlignment="Bottom" Height="26" Background="{DynamicResource AREghZyBrush.Tone3.Background.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Background.Static}" BorderThickness="0,1,0,1">
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Command="{Binding AddCommand, Mode=OneTime}" Background="Transparent" BorderBrush="Transparent" Width="24">
+                                        <TextBlock Text="+" FontSize="20" Margin="0,-5,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
+                                    </Button>
+                                    <Button Command="{Binding RemoveSelectedCommand, Mode=OneTime}" Background="Transparent" BorderBrush="Transparent" Width="24">
+                                        <TextBlock Text="-" FontSize="20" Margin="0,-5,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
+                                    </Button>
+                                    <Button Command="{Binding MoveSelectedUpCommand, Mode=OneTime}" Background="Transparent" BorderBrush="Transparent" Width="24">
+                                        <TextBlock Text="↑" FontSize="18" Margin="0,-3,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
+                                    </Button>
+                                    <Button Command="{Binding MoveSelectedDownCommand, Mode=OneTime}" Background="Transparent" BorderBrush="Transparent" Width="24">
+                                        <TextBlock Text="↓" FontSize="18" Margin="0,-3,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
+                                    </Button>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        <Border DataContext="{Binding SelectedItem}" IsEnabled="{Binding Converter={StaticResource NullToDisabledConverter}}" Grid.Column="2" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True" ToolTip="Inputs (aka sources) are the 'sources' of video and audio data (e.g. desktop capture, network video, etc)">
+                            <Grid>
+                                <Label Content="Inputs (aka sources)" VerticalAlignment="Top" Padding="5,0" VerticalContentAlignment="Center" Height="20"/>
+                                <Grid DataContext="{Binding SourceDeck}" Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}" x:Name="ThingGrid" Margin="0,20,0,0">
+                                    <ListBox ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
+                                             SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                             Margin="0,0,0,26" Background="Transparent" BorderThickness="0"
+                                             x:Name="SourcesListBox"
+                                             ItemTemplateSelector="{StaticResource IoItemTemplateSelector}"
+                                             acs:AdvancedContextMenu.ContextGenerator="{x:Static scene:SourceContextGenerator.Instance}"
+                                             SelectionChanged="OnSceneSourceOrOutputSelectionChanged"
+                                             GotFocus="ListBox_GotFocus">
+                                    </ListBox>
+                                    <Border VerticalAlignment="Bottom" Height="26" Background="{DynamicResource AREghZyBrush.Tone3.Background.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Background.Static}" BorderThickness="0,1,0,1">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Menu Background="Transparent" BorderBrush="Transparent" Width="24" Panel.ZIndex="2">
+                                                <MenuItem Height="24" Width="24">
+                                                    <MenuItem.Header>
+                                                        <TextBlock Text="+" FontSize="20" Margin="-2,-5,0,0"/>
+                                                    </MenuItem.Header>
+                                                    <MenuItem Header="Add Image" Command="{Binding AddImageCommand, Mode=OneTime}"/>
+                                                    <Separator/>
+                                                    <MenuItem Header="Add Output Loopback" InputGestureText="Debug Feature" Command="{Binding AddLoopbackInput, Mode=OneTime}"/>
+                                                </MenuItem>
+                                            </Menu>
+                                            <Button Command="{Binding RemoveSelectedCommand}" Background="Transparent" BorderBrush="Transparent" Width="24">
+                                                <TextBlock Text="-" FontSize="20" Margin="0,-5,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
+                                            </Button>
+                                            <Button Command="{Binding MoveSelectedUpCommand}" Background="Transparent" BorderBrush="Transparent" Width="24">
+                                                <TextBlock Text="↑" FontSize="18" Margin="0,-3,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
+                                            </Button>
+                                            <Button Command="{Binding MoveSelectedDownCommand}" Background="Transparent" BorderBrush="Transparent" Width="24">
+                                                <TextBlock Text="↓" FontSize="18" Margin="0,-3,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
+                                            </Button>
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                        <Border DataContext="{Binding SelectedItem}" IsEnabled="{Binding Converter={StaticResource NullToDisabledConverter}}" Grid.Column="4" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True">
+                            <Grid>
+                                <Label Content="Audio Mixer (Coming Soon)" VerticalAlignment="Top" Padding="5,0" VerticalContentAlignment="Center" Height="20"/>
+                                <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}" Margin="0,20,0,0" IsEnabled="False">
+                                    <TextBlock Text="Audio is not implemented yet" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="-3,0"/>
+                        <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="-3,0"/>
+                        <Border Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Background.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True" Margin="0,20,0,0"/>
+                    </Grid>
+                </GroupBox>
+                <GroupBox DataContext="{Binding OutputDeck}" Grid.Column="2" Style="{DynamicResource NoBorderGroupBox}" Header="Outputs" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True">
                     <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
-                        <ListBox ItemsSource="{Binding Items, Mode=OneTime}"
+                        <ListBox ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                  SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                  Margin="0,0,0,26" Background="Transparent" BorderThickness="0"
-                                 acs:AdvancedContextMenu.ContextGenerator="{x:Static scene:SceneViewModelContextMenuGenerator.Instance}"
+                                 ItemTemplateSelector="{StaticResource IoItemTemplateSelector}"
+                                 acs:AdvancedContextMenu.ContextGenerator="{x:Static scene:OutputContextGenerator.Instance}"
                                  SelectionChanged="OnSceneSourceOrOutputSelectionChanged"
                                  GotFocus="ListBox_GotFocus">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
                         </ListBox>
                         <Border VerticalAlignment="Bottom" Height="26" Background="{DynamicResource AREghZyBrush.Tone3.Background.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Background.Static}" BorderThickness="0,1,0,1">
                             <StackPanel Orientation="Horizontal">
-                                <Button Command="{Binding AddCommand, Mode=OneTime}" Background="Transparent" BorderBrush="Transparent" Width="24">
-                                    <TextBlock Text="+" FontSize="20" Margin="0,-5,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
-                                </Button>
-                                <Button Command="{Binding RemoveSelectedCommand, Mode=OneTime}" Background="Transparent" BorderBrush="Transparent" Width="24">
-                                    <TextBlock Text="-" FontSize="20" Margin="0,-5,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
-                                </Button>
-                                <Button Command="{Binding MoveSelectedUpCommand, Mode=OneTime}" Background="Transparent" BorderBrush="Transparent" Width="24">
-                                    <TextBlock Text="↑" FontSize="18" Margin="0,-3,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
-                                </Button>
-                                <Button Command="{Binding MoveSelectedDownCommand, Mode=OneTime}" Background="Transparent" BorderBrush="Transparent" Width="24">
-                                    <TextBlock Text="↓" FontSize="18" Margin="0,-3,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
-                                </Button>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </GroupBox>
-                <GroupBox DataContext="{Binding SelectedItem}" IsEnabled="{Binding Converter={StaticResource NullToDisabledConverter}}" Grid.Column="2" Style="{DynamicResource NoBorderGroupBox}" Header="Inputs (aka sources)" BorderThickness="0" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True">
-                    <Grid DataContext="{Binding SourceDeck}" Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}" x:Name="ThingGrid">
-                        <ListBox ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                 SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                 Margin="0,0,0,26" Background="Transparent" BorderThickness="0"
-                                 SelectionChanged="OnSceneSourceOrOutputSelectionChanged"
-                                 GotFocus="ListBox_GotFocus"
-                                 x:Name="SourcesListBox"
-                                 ItemTemplateSelector="{StaticResource IoItemTemplateSelector}">
-                            <FrameworkElement.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Add Image" Command="{Binding AddImageCommand, Mode=OneWay}"/>
-                                    <MenuItem Header="Add Same-Instance Input" Command="{Binding AddSameInstanceInputCommand, Mode=OneWay}"/>
-                                </ContextMenu>
-                            </FrameworkElement.ContextMenu>
-                        </ListBox>
-                        <Border VerticalAlignment="Bottom" Height="26" Background="{DynamicResource AREghZyBrush.Tone3.Background.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Background.Static}" BorderThickness="0,1,0,1">
-                            <StackPanel Orientation="Horizontal">
+                                <Menu Background="Transparent" BorderBrush="Transparent" Width="24" Panel.ZIndex="2">
+                                    <MenuItem Height="24" Width="24">
+                                        <MenuItem.Header>
+                                            <TextBlock Text="+" FontSize="20" Margin="-2,-5,0,0"/>
+                                        </MenuItem.Header>
+                                        <MenuItem Header="Add Buffered Output" InputGestureText="Debug Feature" Command="{Binding AddBufferedOutputCommand, Mode=OneTime}"/>
+                                    </MenuItem>
+                                </Menu>
                                 <Button Command="{Binding RemoveSelectedCommand}" Background="Transparent" BorderBrush="Transparent" Width="24">
                                     <TextBlock Text="-" FontSize="20" Margin="0,-5,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
                                 </Button>
@@ -158,49 +216,10 @@
                         </Border>
                     </Grid>
                 </GroupBox>
-                <GroupBox DataContext="{Binding SelectedItem}" IsEnabled="{Binding Converter={StaticResource NullToDisabledConverter}}" Grid.Column="4" Style="{DynamicResource NoBorderGroupBox}" Header="Audio Mixer (coming soon)" BorderThickness="0" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True">
-                    <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
-                        
-                    </Grid>
-                </GroupBox>
-                <GroupBox DataContext="{Binding SelectedItem}" IsEnabled="{Binding Converter={StaticResource NullToDisabledConverter}}" Grid.Column="6" Style="{DynamicResource NoBorderGroupBox}" Header="Outputs" BorderThickness="0" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True">
-                    <Grid DataContext="{Binding OutputDeck}" Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
-                        <ListBox ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                 SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                 Margin="0,0,0,26" Background="Transparent" BorderThickness="0"
-                                 SelectionChanged="OnSceneSourceOrOutputSelectionChanged"
-                                 GotFocus="ListBox_GotFocus"
-                                 ItemTemplateSelector="{StaticResource IoItemTemplateSelector}">
-                            <FrameworkElement.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Add Same-Instance Output" Command="{Binding AddSameInstanceOutputCommand, Mode=OneWay}"/>
-                                </ContextMenu>
-                            </FrameworkElement.ContextMenu>
-                        </ListBox>
-                        <Border VerticalAlignment="Bottom" Height="26" Background="{DynamicResource AREghZyBrush.Tone3.Background.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Background.Static}" BorderThickness="0,1,0,1">
-                            <StackPanel Orientation="Horizontal">
-                                <Button Command="{Binding AddCommand}" Background="Transparent" BorderBrush="Transparent" Width="24">
-                                    <TextBlock Text="+" FontSize="20" Margin="0,-5,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
-                                </Button>
-                                <Button Command="{Binding RemoveSelectedCommand}" Background="Transparent" BorderBrush="Transparent" Width="24">
-                                    <TextBlock Text="-" FontSize="20" Margin="0,-5,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
-                                </Button>
-                                <Button Command="{Binding MoveSelectedUpCommand}" Background="Transparent" BorderBrush="Transparent" Width="24">
-                                    <TextBlock Text="↑" FontSize="18" Margin="0,-3,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
-                                </Button>
-                                <Button Command="{Binding MoveSelectedDownCommand}" Background="Transparent" BorderBrush="Transparent" Width="24">
-                                    <TextBlock Text="↓" FontSize="18" Margin="0,-3,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
-                                </Button>
-                            </StackPanel>
-                        </Border>
-                    </Grid>
-                </GroupBox>
-                <Border Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Background.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True" Margin="0,32,0,0"/>
-                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="-2,0"/>
-                <Border Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Background.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True" Margin="0,32,0,0"/>
-                <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="-2,0"/>
-                <Border Grid.Column="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Background.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True" Margin="0,32,0,0"/>
-                <GridSplitter Grid.Column="5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="-2,0"/>
+                <!--
+                <Border Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Background.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True" Margin="0,52,0,0"/>
+                -->
+                <GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Grid.Column="1" Margin="-3,0"/>
             </Grid>
             <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="0,-5,0,0"
                           helpers:GridLatchSplitter.IsEnabled="True"

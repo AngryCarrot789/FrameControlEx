@@ -1,4 +1,3 @@
-using System.Dynamic;
 using System.Threading.Tasks;
 
 namespace FrameControlEx.Core.Imaging {
@@ -9,9 +8,5 @@ namespace FrameControlEx.Core.Imaging {
         public static ImageFactory Factory { get; set; }
 
         public abstract Task<IImage> CreateImageAsync(string path);
-
-        public void DrawImage() {
-
-        }
     }
 }

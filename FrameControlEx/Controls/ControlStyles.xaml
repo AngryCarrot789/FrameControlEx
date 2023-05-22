@@ -28,4 +28,21 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="{x:Type controls:NumberDragger}">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Focusable" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:NumberDragger}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid>
+                            <TextBlock x:Name="PART_TextBlock" Padding="2,1" Background="Transparent"/>
+                            <TextBox x:Name="PART_TextBox" VerticalContentAlignment="Center" BorderThickness="0" Background="Transparent"/>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

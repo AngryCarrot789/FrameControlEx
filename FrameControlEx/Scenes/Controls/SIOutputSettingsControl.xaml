@@ -13,10 +13,20 @@
                 <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding RenameCommand, Mode=OneTime}"/>
             </TextBlock.InputBindings>
         </TextBlock>
-        <Grid Margin="0,26,0,0">
-            <TextBlock Text="The Output's ID" Padding="5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-            <TextBox Text="{Binding ID, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsReadOnly="True" Padding="4,2" VerticalAlignment="Top" Margin="0,26,24,0" VerticalContentAlignment="Center" Height="24"/>
-            <Button Command="{Binding ChangeTargetCommand, Mode=OneTime}" Content="..." Height="24" VerticalAlignment="Top" HorizontalAlignment="Right" Width="24" Margin="0,26,0,0" BorderThickness="0,1,1,1" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}"/>
+        <Grid Margin="5,26,5,5">
+            <TextBlock Margin="10,10,10,26" TextAlignment="Center" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="The buffered output is mainly a debug"/><Run Text=" feature to validate the output"/><LineBreak/><Run/><LineBreak/><Run Text="It stores a snapshot of the output image"/><Run Text=", which "/><Run Text="the "/><Run Text="loopback input "/><Run Text="can access and draw on-screen again"/><Run Text=" "/><LineBreak/><Run Text="(creating that classic "/><Run Text="infinitely deep"/><Run Text=" effect)"/></TextBlock>
+            <Grid VerticalAlignment="Bottom" Height="24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Command="{Binding EnableCommand, Mode=OneTime}" Content="Enabled" VerticalAlignment="Top" Height="24"/>
+                <Button Command="{Binding DisableCommand, Mode=OneTime}" Content="Disable" VerticalAlignment="Top" Height="24" Grid.Column="2"/>
+                <Button Command="{Binding ToggleEnabledCommand, Mode=OneTime}" Content="Toggle" VerticalAlignment="Top" Height="24" Grid.Column="4"/>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>

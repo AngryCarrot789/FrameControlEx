@@ -47,7 +47,7 @@ namespace FrameControlEx.Views.Main {
 
         public MainWindow() {
             this.InitializeComponent();
-            this.DataContext = new FrameControlViewModel(new WPFSkiaRenderSurface(this));
+            this.DataContext = new FrameControlViewModel();
             this.ViewModel.SceneDeck.AddNewScene("Scene 1");
             this.buffer_time = new double[20];
 
@@ -66,69 +66,6 @@ namespace FrameControlEx.Views.Main {
             };
 
             timer.Start();
-        }
-
-        private static readonly FieldInfo BitmapField;
-
-        static MainWindow() {
-            BitmapField = typeof(SKElement).GetField("bitmap", BindingFlags.GetField | BindingFlags.Instance | BindingFlags.NonPublic);
-        }
-
-        public WriteableBitmap GetViewPortBitmap() {
-            return (WriteableBitmap) BitmapField.GetValue(this.ViewPortElement);
-        }
-
-        private void ViewPortElement_OnPaintSurface(object sender, SKPaintSurfaceEventArgs e) {
-            FrameControlViewModel view = this.ViewModel ?? throw new Exception($"No {nameof(FrameControlViewModel)} available");
-            SKCanvas canvas = e.Surface.Canvas;
-            canvas.Clear(SKColors.Black);
-
-            SceneViewModel active = view.SceneDeck.SelectedItem;
-            if (active == null || active.SourceDeck.Items.Count < 1) {
-                return;
-            }
-
-            e.Surface.Flush();
-
-            foreach (SourceViewModel source in active.SourceDeck.Items) {
-                if (!source.IsEnabled) {
-                    continue;
-                }
-
-                // TODO: Maybe create separate rendering classes for each type of source
-                if (source is VisualSourceViewModel visual) {
-                    visual.OnTickVisual();
-                    Vector2 scale = visual.Scale, pos = visual.Pos;
-                    if (source is ImageSourceViewModel imgSrc) {
-                        if (imgSrc.Image is SkiaImageFactory.SkiaImage img) {
-                            SKMatrix matrix = canvas.TotalMatrix;
-                            canvas.Scale(new SKPoint(scale.X, scale.Y));
-                            canvas.DrawImage(img.image, pos.X, pos.Y);
-                            canvas.SetMatrix(matrix);
-                        }
-                    }
-                    else if (source is SameInstanceInputViewModel input) {
-                        if (input.TargetOutput != null && input.TargetOutput.IsEnabled & input.TargetOutput.lastFrame != null) {
-                            SKMatrix matrix = canvas.TotalMatrix;
-                            canvas.Scale(new SKPoint(scale.X, scale.Y));
-                            canvas.DrawImage(input.TargetOutput.lastFrame, pos.X, pos.Y);
-                            canvas.SetMatrix(matrix);
-                        }
-                    }
-                }
-            }
-
-            e.Surface.Flush();
-
-            foreach (OutputViewModel output in active.OutputDeck.Items) {
-                if (!output.IsEnabled) {
-                    continue;
-                }
-
-                if (output is VisualOutputViewModel visual) {
-                    visual.OnAcceptFrame(e.Surface);
-                }
-            }
         }
 
         private void OnSceneSourceOrOutputSelectionChanged(object sender, SelectionChangedEventArgs e) {
@@ -156,15 +93,62 @@ namespace FrameControlEx.Views.Main {
             }
         }
 
-        private class WPFSkiaRenderSurface : IRenderSurface {
-            private readonly MainWindow window;
+        private void ViewPortElement_OnPaintSurface(object sender, SKPaintSurfaceEventArgs e) {
+            FrameControlViewModel frameControl = this.ViewModel ?? throw new Exception($"No {nameof(FrameControlViewModel)} available");
+            SKCanvas canvas = e.Surface.Canvas;
 
-            public WPFSkiaRenderSurface(MainWindow window) {
-                this.window = window;
+            SceneViewModel active = frameControl.SceneDeck.SelectedItem;
+            if (active == null || active.SourceDeck.Items.Count < 1) {
+                canvas.Clear(SKColors.Black);
+                return;
             }
 
-            public void Render() {
-                this.window.ViewPortElement.InvalidateVisual();
+            if (active.ClearScreenOnRender) {
+                canvas.Clear(active.BackgroundColour);
+            }
+
+            foreach (SourceViewModel source in active.SourceDeck.Items) {
+                if (!source.IsEnabled) {
+                    continue;
+                }
+
+                // TODO: Maybe create separate rendering classes for each type of source
+                if (source is VisualSourceViewModel visual) {
+                    visual.OnTickVisual();
+                    Vector2 scale = visual.Scale, pos = visual.Pos, origin = visual.ScaleOrigin;
+                    if (source is ImageSourceViewModel imgSrc) {
+                        if (imgSrc.Image is SkiaImageFactory.SkiaImage img) {
+                            SKMatrix matrix = canvas.TotalMatrix;
+                            canvas.Translate(pos.X, pos.Y);
+                            canvas.Scale(scale.X, scale.Y, (float) img.image.Width * origin.X, (float) img.image.Height * origin.Y);
+                            canvas.DrawImage(img.image, 0, 0);
+                            canvas.SetMatrix(matrix);
+                        }
+                    }
+                    else if (source is LoopbackSourceViewModel input) {
+                        if (input.TargetOutput != null && input.TargetOutput.IsEnabled & input.TargetOutput.lastFrame != null) {
+                            SKMatrix matrix = canvas.TotalMatrix;
+                            canvas.Translate(pos.X, pos.Y);
+                            SKImage frame = input.TargetOutput.lastFrame;
+                            canvas.Scale(scale.X, scale.Y, (float) frame.Width * origin.X, (float) frame.Height * origin.Y);
+                            canvas.DrawImage(frame, 0, 0);
+                            canvas.SetMatrix(matrix);
+                        }
+                    }
+                }
+            }
+
+            // TODO: Maybe move this code somewhere else... maybe? dunno
+
+            e.Surface.Flush();
+            foreach (OutputViewModel output in frameControl.OutputDeck.Items) {
+                if (!output.IsEnabled) {
+                    continue;
+                }
+
+                if (output is VisualOutputViewModel visual) {
+                    visual.OnAcceptFrame(e.Surface);
+                }
             }
         }
     }

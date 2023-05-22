@@ -18,11 +18,11 @@ namespace FrameControlEx.Core.MainView.Scene {
         }
 
         public void AddNewScene(string name) {
-            this.items.Add(new SceneViewModel(this) {
+            this.Add(new SceneViewModel(this) {
                 ReadableName = name
             });
 
-            this.SelectedItem = this.items[this.items.Count - 1];
+            this.SelectedItem = this.Items[this.Items.Count - 1];
         }
 
         public override async Task AddActionAsync() {
@@ -33,7 +33,7 @@ namespace FrameControlEx.Core.MainView.Scene {
         }
 
         public override async Task RemoveItemAction(SceneViewModel item) {
-            if (!this.items.Contains(item)) {
+            if (!this.Contains(item)) {
                 return;
             }
 

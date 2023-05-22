@@ -17,10 +17,17 @@ namespace FrameControlEx.Core.MainView.Scene {
         private bool isEnabled = true;
         public bool IsEnabled {
             get => this.isEnabled;
-            set => this.RaisePropertyChanged(ref this.isEnabled, value);
+            set {
+                if (this.isEnabled == value)
+                    return;
+
+                this.RaisePropertyChanged(ref this.isEnabled, value);
+                this.OnIsEnabledChanged();
+            }
         }
 
         public AsyncRelayCommand RenameCommand { get; }
+
         public RelayCommand EnableCommand { get; }
         public RelayCommand DisableCommand { get; }
         public RelayCommand ToggleEnabledCommand { get; }
@@ -28,8 +35,14 @@ namespace FrameControlEx.Core.MainView.Scene {
         protected BaseIOViewModel() {
             this.RenameCommand = new AsyncRelayCommand(this.RenameAction);
             this.EnableCommand = new RelayCommand(() => this.IsEnabled = true, () => !this.IsEnabled);
-            this.DisableCommand = new RelayCommand(() => this.IsEnabled = true, () => !this.IsEnabled);
+            this.DisableCommand = new RelayCommand(() => this.IsEnabled = false, () => this.IsEnabled);
             this.ToggleEnabledCommand = new RelayCommand(() => this.IsEnabled = !this.IsEnabled);
+        }
+
+        protected virtual void OnIsEnabledChanged() {
+            this.EnableCommand.RaiseCanExecuteChanged();
+            this.DisableCommand.RaiseCanExecuteChanged();
+            this.ToggleEnabledCommand.RaiseCanExecuteChanged();
         }
 
         public virtual async Task RenameAction() {
@@ -60,6 +73,27 @@ namespace FrameControlEx.Core.MainView.Scene {
         /// <param name="isDisposing"></param>
         protected virtual void DisposeCore(ExceptionStack e) {
 
+        }
+
+        /// <summary>
+        /// The main method for creating a complete clone of this <see cref="BaseIOViewModel"/>
+        /// </summary>
+        /// <returns></returns>
+        public virtual BaseIOViewModel CloneCore() {
+            BaseIOViewModel clone = this.CreateInstanceCore();
+            this.LoadThisIntoCopy(clone);
+            return clone;
+        }
+
+        protected abstract BaseIOViewModel CreateInstanceCore();
+
+        /// <summary>
+        /// The data set into the given clone should only really be data that the user could have manually entered; cached data can be ignored
+        /// </summary>
+        /// <param name="vm">The cloned view model</param>
+        protected virtual void LoadThisIntoCopy(BaseIOViewModel vm) {
+            vm.readableName = this.readableName;
+            vm.IsEnabled = this.isEnabled;
         }
     }
 }

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FrameControlEx.Scenes.Controls"
              xmlns:scene="clr-namespace:FrameControlEx.Core.MainView.Scene;assembly=FrameControlEx.Core"
+             xmlns:converters="clr-namespace:FrameControlEx.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="250"
              d:DataContext="{d:DesignInstance scene:SceneViewModel}">
@@ -14,8 +15,40 @@
                 <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding RenameCommand, Mode=OneTime}"/>
             </TextBlock.InputBindings>
         </TextBlock>
-        <Grid Margin="0,26,0,0">
+        <Grid Margin="5,26,5,5">
+            <Grid.Resources>
+                <converters:SKColorConverter x:Key="ColourConverter"/>
+            </Grid.Resources>
+            <CheckBox IsChecked="{Binding ClearScreenOnRender}" Content="Clear Background On Render" VerticalAlignment="Top" Height="20" ToolTip="Whether or not to actually clear the output frame during each render. True is the default value. Disable for freaky results!"/>
+            <Label Content="Background Colour: (picker coming soon)" VerticalAlignment="Top" Margin="0,21,0,0"/>
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="10,153,10,10"><Run Text="If it "/><Run Text="wasn't obvious enough, scenes are a way of grouping "/><Run Text="input"/><Run Text="s (aka sources)"/><LineBreak/><Run/><LineBreak/><Run Text="Only 1 scene "/><Run Text="can be"/><Run Text=" active at a time"/></TextBlock>
+            <Grid Margin="0,74,0,0" Height="79" VerticalAlignment="Top">
+                <Label Content="Apply for all inputs/sources:" VerticalAlignment="Top"/>
+                <Grid Margin="0,26,0,29">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Command="{Binding SourceDeck.EnableAllCommand, Mode=OneTime}" Content="Enabled"/>
+                    <Button Command="{Binding SourceDeck.DisableAllCommand, Mode=OneTime}" Content="Disable" Grid.Column="2"/>
+                    <Button Command="{Binding SourceDeck.ToggleEnabledAllCommand, Mode=OneTime}" Content="Toggle" Grid.Column="4"/>
+                </Grid>
 
+                <Grid VerticalAlignment="Bottom" Height="24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="5"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{Binding SourceDeck.CountEnabled, Mode=OneWay, StringFormat={}{0} Enabled}" VerticalAlignment="Center" Padding="2,0"/>
+                    <TextBlock Text="{Binding SourceDeck.CountDisabled, Mode=OneWay, StringFormat={}{0} Disabled}" VerticalAlignment="Center" Grid.Column="2" Padding="2,0"/>
+                </Grid>
+            </Grid>
+            <!-- OneWayToSource sort of makes this work, but it breaks when the data context changes -->
+            <TextBox Text="{Binding BackgroundColour, Converter={StaticResource ColourConverter}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, FallbackValue=Black}" IsEnabled="{Binding ClearScreenOnRender}" Height="22" Margin="0,47,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Padding="3,0"/>
         </Grid>
     </Grid>
 </UserControl>

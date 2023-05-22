@@ -19,7 +19,7 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
             if (!await this.CheckHasDeck())
                 return;
 
-            BasicBufferOutputViewModel result = (BasicBufferOutputViewModel) await IoC.BufferSelector.SelectOutput(this.Deck.Scene.OutputDeck, (x) => x is BasicBufferOutputViewModel);
+            BasicBufferOutputViewModel result = (BasicBufferOutputViewModel) await IoC.BufferSelector.SelectOutput(this.FrameControl.OutputDeck, (x) => x is BasicBufferOutputViewModel);
             if (result != null) {
                 this.TargetOutput = result;
                 this.InvalidateVisual();
@@ -32,8 +32,8 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
 
         protected override void LoadThisIntoCopy(BaseIOViewModel vm) {
             base.LoadThisIntoCopy(vm);
-            if (vm is LoopbackSourceViewModel si) {
-                si.targetOutput = this.targetOutput;
+            if (vm is LoopbackSourceViewModel l) {
+                l.targetOutput = this.targetOutput;
             }
         }
     }

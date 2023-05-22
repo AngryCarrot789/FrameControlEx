@@ -10,14 +10,15 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace FrameControlEx.MainView.Editors {
+namespace FrameControlEx.Scenes.Controls {
     /// <summary>
-    /// Interaction logic for ImageSourceEditorWindow.xaml
+    /// Interaction logic for VisualMovementController.xaml
     /// </summary>
-    public partial class ImageSourceEditorWindow : Window {
-        public ImageSourceEditorWindow() {
+    public partial class VisualMovementController : UserControl {
+        public VisualMovementController() {
             InitializeComponent();
         }
     }

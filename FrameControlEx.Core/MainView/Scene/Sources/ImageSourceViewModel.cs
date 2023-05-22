@@ -6,7 +6,7 @@ using FrameControlEx.Core.Views.Dialogs;
 
 namespace FrameControlEx.Core.MainView.Scene.Sources {
     public class ImageSourceViewModel : VisualSourceViewModel {
-        private bool requireImageReload;
+        private bool requireImageReload = true;
         public bool RequireImageReload {
             get => this.requireImageReload;
             set => this.RaisePropertyChanged(ref this.requireImageReload, value);
@@ -21,30 +21,21 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
             }
         }
 
-        public IImage Image { get; private set; }
+        /// <summary>
+        /// The image loaded from a file, stored in memory. May be null (duh)
+        /// </summary>
+        public IImage Image { get; set; }
 
         public AsyncRelayCommand SelectFileCommand { get; }
 
         public AsyncRelayCommand RefreshCommand { get; }
 
-        public ImageSourceViewModel(SourceDeckViewModel deck, string filePath = null) : base(deck) {
-            this.filePath = filePath;
+        public ImageSourceViewModel() {
             this.SelectFileCommand = new AsyncRelayCommand(this.SelectFileActionAsync);
             this.RefreshCommand = new AsyncRelayCommand(this.RefreshActionAsync);
         }
 
         public async Task RefreshActionAsync() {
-            if (this.Image != null) {
-                #if DEBUG
-                this.Image.Dispose();
-                #else // lazy
-                try {
-                    this.Image.Dispose();
-                }
-                catch { /* ignored */ }
-                #endif
-            }
-
             try {
                 await this.OpenImage(this.FilePath);
                 this.RequireImageReload = false;
@@ -53,7 +44,7 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
                 await IoC.MessageDialogs.ShowMessageExAsync("Error opening image", $"Error opening '{this.filePath}'", e.ToString());
             }
 
-            this.OnVisualInvalidated();
+            this.InvalidateVisual();
         }
 
         public async Task SelectFileActionAsync() {
@@ -74,6 +65,8 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
                 catch (Exception e) {
                     await IoC.MessageDialogs.ShowMessageExAsync("Error opening image", $"Exception occurred while opening {path}", e.ToString());
                 }
+
+                this.InvalidateVisual();
             }
         }
 
@@ -83,8 +76,19 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
                 throw new Exception("Image factory unavailable");
             }
 
-            this.Image?.Dispose();
-            this.Image = await factory.CreateImageAsync(file);
+            IImage image = await factory.CreateImageAsync(file);
+            if (this.Image != null) {
+                #if DEBUG
+                this.Image.Dispose();
+                #else // lazy
+                try {
+                    this.Image.Dispose();
+                }
+                catch { /* ignored */ }
+                #endif
+            }
+
+            this.Image = image;
         }
 
         protected override void DisposeCore(ExceptionStack e) {
@@ -96,6 +100,17 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
                 catch (Exception ex) {
                     e.Push(ex);
                 }
+            }
+        }
+
+        protected override BaseIOViewModel CreateInstanceCore() {
+            return new ImageSourceViewModel();
+        }
+
+        protected override void LoadThisIntoCopy(BaseIOViewModel vm) {
+            base.LoadThisIntoCopy(vm);
+            if (vm is ImageSourceViewModel src) {
+                src.filePath = this.filePath;
             }
         }
     }

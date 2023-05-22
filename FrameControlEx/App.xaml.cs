@@ -16,6 +16,7 @@ using FrameControlEx.Core.Shortcuts.Managing;
 using FrameControlEx.Core.Shortcuts.ViewModels;
 using FrameControlEx.Imaging;
 using FrameControlEx.MainView;
+using FrameControlEx.Scenes;
 using FrameControlEx.Services;
 using FrameControlEx.Shortcuts;
 using FrameControlEx.Shortcuts.Converters;

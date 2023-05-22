@@ -99,6 +99,8 @@
     <Compile Include="AdvancedContextService\Static\StaticMenuItemCollection.cs" />
     <Compile Include="AdvancedContextService\Static\StaticMenuSeparator.cs" />
     <Compile Include="AdvancedContextService\Static\StaticShortcutMenuItem.cs" />
+    <Compile Include="Controls\NumberDragger.cs" />
+    <Compile Include="Converters\SKColorConverter.cs" />
     <Compile Include="Imaging\SkiaImageFactory.cs" />
     <Compile Include="MainView\IOItemTemplateSelector.cs" />
     <Compile Include="MainView\OutputSelector.cs" />
@@ -119,6 +121,9 @@
     </Compile>
     <Compile Include="Scenes\Controls\SIOutputSettingsControl.xaml.cs">
       <DependentUpon>SIOutputSettingsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Scenes\Controls\VisualMovementController.xaml.cs">
+      <DependentUpon>VisualMovementController.xaml</DependentUpon>
     </Compile>
     <Compile Include="Services\ClipboardService.cs" />
     <Compile Include="Services\WinExplorerService.cs" />
@@ -218,6 +223,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Scenes\Controls\SIOutputSettingsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Scenes\Controls\VisualMovementController.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -377,7 +386,6 @@
     <Resource Include="Resources\Icons\UIGeneral\icons8-sync-48.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="MainView\" />
     <Folder Include="Settings\Pages\" />
   </ItemGroup>
   <ItemGroup>

@@ -9,11 +9,10 @@
                   xmlns:attached="clr-namespace:FrameControlEx.Themes.Attached"
                   mc:Ignorable="d"
                   d:DataContext="{d:DesignInstance userInputs1:DoubleInputViewModel}"
-                  Title="{Binding Title}" Height="234.304" Width="320"
+                  Title="{Binding Title}" Height="200" Width="320"
                   WindowStartupLocation="CenterOwner"
                   WindowStyle="ToolWindow" ResizeMode="NoResize"
-                  Style="{DynamicResource CustomWindowStyleEx}"
-                  SizeToContent="Height">
+                  Style="{DynamicResource CustomWindowStyleEx}">
     <Window.Resources>
         <userInputs:SimpleInputValidationRule x:Key="ValidatorInputA"/>
         <userInputs:SimpleInputValidationRule x:Key="ValidatorInputB"/>

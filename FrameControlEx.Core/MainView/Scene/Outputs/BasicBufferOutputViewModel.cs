@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using FrameControlEx.Core.Views.Dialogs.Message;
-using FrameControlEx.Core.Views.Dialogs.UserInputs;
 using SkiaSharp;
 
 namespace FrameControlEx.Core.MainView.Scene.Outputs {
@@ -11,13 +7,17 @@ namespace FrameControlEx.Core.MainView.Scene.Outputs {
     public class BasicBufferOutputViewModel : VisualOutputViewModel {
         public SKImage lastFrame;
 
-        public BasicBufferOutputViewModel(OutputDeckViewModel deck) : base(deck) {
+        public BasicBufferOutputViewModel() {
 
         }
 
         public override void OnAcceptFrame(SKSurface surface) {
             base.OnAcceptFrame(surface);
             this.lastFrame = surface.Snapshot();
+        }
+
+        protected override BaseIOViewModel CreateInstanceCore() {
+            return new BasicBufferOutputViewModel();
         }
     }
 }
