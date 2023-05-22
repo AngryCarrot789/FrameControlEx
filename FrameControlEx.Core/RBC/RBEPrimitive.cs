@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace FramePFX.Core.RBC {
+namespace FrameControlEx.Core.RBC {
     public class RBEByte : RBEBase {
         public override RBEType Type => RBEType.Byte;
 

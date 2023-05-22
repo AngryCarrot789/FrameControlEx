@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -13,6 +14,7 @@ using FrameControlEx.Core.MainView.Scene.Outputs;
 using FrameControlEx.Core.MainView.Scene.Sources;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Imaging;
+using FrameControlEx.Utils;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 using SkiaSharp.Views.WPF;
@@ -26,6 +28,40 @@ namespace FrameControlEx.Views.Main {
 
         private int buffer_index;
         private readonly double[] buffer_time;
+        private DateTime lastRenderTime = DateTime.Now;
+
+        public MainWindow() {
+            this.InitializeComponent();
+            FrameControlViewModel frameControl = new FrameControlViewModel();
+            frameControl.SceneDeck.AddNewScene("Scene 1");
+            frameControl.RenderCallback = () => {
+                this.Dispatcher.Invoke(this.ViewPortElement.InvalidateVisual, DispatcherPriority.Render);
+            };
+
+            this.DataContext = frameControl;
+            this.buffer_time = new double[20];
+
+            // DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
+            // timer.Interval = TimeSpan.FromMilliseconds(1);
+            // timer.Tick += (sender, args) => {
+            //     this.ViewPortElement.InvalidateVisual();
+            //     // this.ViewPortElement.UpdateLayout();
+            //     DateTime now = DateTime.Now;
+            //     TimeSpan diff = now - this.lastRenderTime;
+            //     this.lastRenderTime = now;
+            //     this.AddDateTime(diff.TotalMilliseconds);
+            //     double interval = this.GetAverageTime();
+            //     this.AverageTime.Text = $"{Math.Round(interval, 2).ToString().FitLength(8)}\t ({Math.Round(1000d / interval, 2).ToString().FitLength(6)} FPS)";
+            // };
+            // timer.Start();
+        }
+
+        protected override void OnClosed(EventArgs e) {
+            base.OnClosed(e);
+            if (this.DataContext is FrameControlViewModel vm) {
+                vm.OnDispose();
+            }
+        }
 
         public void AddDateTime(double time) {
             int index = this.buffer_index;
@@ -41,31 +77,6 @@ namespace FrameControlEx.Views.Main {
 
         public double GetAverageTime() {
             return this.buffer_time.Sum() / this.buffer_time.Length;
-        }
-
-        private DateTime lastRenderTime = DateTime.Now;
-
-        public MainWindow() {
-            this.InitializeComponent();
-            this.DataContext = new FrameControlViewModel();
-            this.ViewModel.SceneDeck.AddNewScene("Scene 1");
-            this.buffer_time = new double[20];
-
-            DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
-            timer.Interval = TimeSpan.FromMilliseconds(1);
-            timer.Tick += (sender, args) => {
-                this.ViewPortElement.InvalidateVisual();
-                // this.ViewPortElement.UpdateLayout();
-                DateTime now = DateTime.Now;
-                TimeSpan diff = now - this.lastRenderTime;
-                this.lastRenderTime = now;
-                this.AddDateTime(diff.TotalMilliseconds);
-                double interval = this.GetAverageTime();
-
-                this.AverageTime.Text = $"{Math.Round(interval, 2).ToString().FitLength(8)}\t ({Math.Round(1000d / interval, 2).ToString().FitLength(6)} FPS)";
-            };
-
-            timer.Start();
         }
 
         private void OnSceneSourceOrOutputSelectionChanged(object sender, SelectionChangedEventArgs e) {
@@ -94,11 +105,18 @@ namespace FrameControlEx.Views.Main {
         }
 
         private void ViewPortElement_OnPaintSurface(object sender, SKPaintSurfaceEventArgs e) {
+            DateTime now = DateTime.Now;
+            TimeSpan diff = now - this.lastRenderTime;
+            this.lastRenderTime = now;
+            this.AddDateTime(diff.TotalMilliseconds);
+            double interval = this.GetAverageTime();
+            this.AverageTime.Text = $"{Math.Round(interval, 2).ToString().FitLength(8)}\t ({Math.Round(1000d / interval, 2).ToString().FitLength(6)} FPS)";
+
             FrameControlViewModel frameControl = this.ViewModel ?? throw new Exception($"No {nameof(FrameControlViewModel)} available");
             SKCanvas canvas = e.Surface.Canvas;
 
             SceneViewModel active = frameControl.SceneDeck.SelectedItem;
-            if (active == null || active.SourceDeck.Items.Count < 1) {
+            if (active == null) {
                 canvas.Clear(SKColors.Black);
                 return;
             }

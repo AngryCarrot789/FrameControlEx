@@ -84,6 +84,7 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
         public AsyncRelayCommand EditPosCommand { get; }
         public AsyncRelayCommand EditScaleCommand { get; }
         public AsyncRelayCommand EditScaleOriginCommand { get; }
+        public RelayCommand ResetCommand { get; }
 
         public event VisualInvalidatedEventHandler OnVisualInvalidated;
 
@@ -94,6 +95,11 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
             this.EditPosCommand = new AsyncRelayCommand(this.EditPosAction);
             this.EditScaleCommand = new AsyncRelayCommand(this.EditScaleAction);
             this.EditScaleOriginCommand = new AsyncRelayCommand(this.EditScaleOriginAction);
+            this.ResetCommand = new RelayCommand(() => {
+                this.Pos = new Vector2(0, 0);
+                this.Scale = new Vector2(1, 1);
+                this.ScaleOrigin = new Vector2(0.5f, 0.5f);
+            });
         }
 
         protected DoubleInputViewModel CreateVec2Input(string msgA, string msgB, string title, float inputA, float inputB) {

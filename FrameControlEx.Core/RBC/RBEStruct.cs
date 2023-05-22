@@ -1,11 +1,8 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using FramePFX.Core.Utils;
-using OpenTK.Graphics.ES30;
-using Buffer = System.Buffer;
 
-namespace FramePFX.Core.RBC {
+namespace FrameControlEx.Core.RBC {
     /// <summary>
     /// Used to store unmanaged structs in the little-endian format. Struct can have a max size of 65535 (<see cref="ushort.MaxValue"/>) bytes
     /// <para>

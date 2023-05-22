@@ -8,33 +8,36 @@
              xmlns:sources="clr-namespace:FrameControlEx.Core.MainView.Scene.Sources;assembly=FrameControlEx.Core"
              xmlns:helpers="clr-namespace:FrameControlEx.Controls.Helpers"
              mc:Ignorable="d" 
-             Height="144" d:DesignWidth="400"
+             Height="168" d:DesignWidth="400"
              d:DataContext="{d:DesignInstance sources:VisualSourceViewModel}">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="55"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <TextBlock Text="Pos X" VerticalAlignment="Center" Padding="3,1" Grid.Row="0" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditPosCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
-        <TextBlock Text="Pos Y" VerticalAlignment="Center" Padding="3,1" Grid.Row="1" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditPosCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
-        <TextBlock Text="Scale X" VerticalAlignment="Center" Padding="3,1" Grid.Row="2" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
-        <TextBlock Text="Scale Y" VerticalAlignment="Center" Padding="3,1" Grid.Row="3" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
-        <TextBlock Text="Origin X" VerticalAlignment="Center" Padding="3,1" Grid.Row="4" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleOriginCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
-        <TextBlock Text="Origin Y" VerticalAlignment="Center" Padding="3,1" Grid.Row="5" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleOriginCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
+        <Grid Margin="0,0,0,24">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="55"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Pos X" VerticalAlignment="Center" Padding="3,1" Grid.Row="0" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditPosCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
+            <TextBlock Text="Pos Y" VerticalAlignment="Center" Padding="3,1" Grid.Row="1" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditPosCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
+            <TextBlock Text="Scale X" VerticalAlignment="Center" Padding="3,1" Grid.Row="2" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
+            <TextBlock Text="Scale Y" VerticalAlignment="Center" Padding="3,1" Grid.Row="3" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
+            <TextBlock Text="Origin X" VerticalAlignment="Center" Padding="3,1" Grid.Row="4" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleOriginCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
+            <TextBlock Text="Origin Y" VerticalAlignment="Center" Padding="3,1" Grid.Row="5" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleOriginCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
 
-        <Slider Grid.Column="1" Grid.Row="0" Value="{Binding PosX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-4000" Maximum="4000" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft"/>
-        <Slider Grid.Column="1" Grid.Row="1" Value="{Binding PosY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-4000" Maximum="4000" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft"/>
-        <Slider Grid.Column="1" Grid.Row="2" Value="{Binding ScaleX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-15" Maximum="15" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.02" SmallChange="0.001"/>
-        <Slider Grid.Column="1" Grid.Row="3" Value="{Binding ScaleY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-15" Maximum="15" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.02" SmallChange="0.001"/>
-        <Slider Grid.Column="1" Grid.Row="4" Value="{Binding ScaleOriginX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-5" Maximum="5" TickFrequency="1" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.01" SmallChange="0.001"/>
-        <Slider Grid.Column="1" Grid.Row="5" Value="{Binding ScaleOriginY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-5" Maximum="5" TickFrequency="1" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.01" SmallChange="0.001"/>
+            <Slider Grid.Column="1" Grid.Row="0" Value="{Binding PosX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-4000" Maximum="4000" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft"/>
+            <Slider Grid.Column="1" Grid.Row="1" Value="{Binding PosY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-4000" Maximum="4000" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft"/>
+            <Slider Grid.Column="1" Grid.Row="2" Value="{Binding ScaleX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-15" Maximum="15" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.02" SmallChange="0.001"/>
+            <Slider Grid.Column="1" Grid.Row="3" Value="{Binding ScaleY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-15" Maximum="15" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.02" SmallChange="0.001"/>
+            <Slider Grid.Column="1" Grid.Row="4" Value="{Binding ScaleOriginX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-5" Maximum="5" TickFrequency="1" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.01" SmallChange="0.001"/>
+            <Slider Grid.Column="1" Grid.Row="5" Value="{Binding ScaleOriginY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-5" Maximum="5" TickFrequency="1" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.01" SmallChange="0.001"/>
+        </Grid>
+        <Button Content="Reset All" VerticalAlignment="Bottom" Height="24" Command="{Binding ResetCommand, Mode=OneTime}"/>
     </Grid>
 </UserControl>

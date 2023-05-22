@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace FramePFX.Utils {
+namespace FrameControlEx.Core.Utils {
     public class UsageCounter {
         private volatile int count;
 

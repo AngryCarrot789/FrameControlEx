@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace FramePFX.Core.RBC {
+namespace FrameControlEx.Core.RBC {
     /// <summary>
     /// The base class for the RBE (REghZy Binary Element... i know right what a sexy acronym)
     /// <para>

@@ -1,4 +1,4 @@
-namespace FramePFX.Utils {
+namespace FrameControlEx.Core.Utils {
     // https://www.youtube.com/watch?v=gsOtwF2sOLc :D
     public static class Periodic {
         public static long Add(long lhs, long rhs, long min, long max) {

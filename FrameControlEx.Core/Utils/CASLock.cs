@@ -1,6 +1,6 @@
 using System.Threading;
 
-namespace FramePFX.Utils {
+namespace FrameControlEx.Core.Utils {
     public sealed class CASLock {
         private readonly object locker;
         private volatile int counter;

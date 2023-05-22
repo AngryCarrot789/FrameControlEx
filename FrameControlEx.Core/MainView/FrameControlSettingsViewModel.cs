@@ -5,6 +5,7 @@ namespace FrameControlEx.Core.MainView {
     public class FrameControlSettingsViewModel : BaseViewModel {
         private int width;
         private int height;
+        private int frameRate;
 
         /// <summary>
         /// The width of the output
@@ -20,6 +21,14 @@ namespace FrameControlEx.Core.MainView {
         public int Height {
             get => this.height;
             set => this.RaisePropertyChanged(ref this.height, value);
+        }
+
+        /// <summary>
+        /// The rendering frame rate
+        /// </summary>
+        public int FrameRate {
+            get => this.frameRate;
+            set => this.RaisePropertyChanged(ref this.frameRate, value);
         }
     }
 }

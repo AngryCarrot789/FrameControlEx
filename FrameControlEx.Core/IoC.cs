@@ -9,6 +9,8 @@ using FrameControlEx.Core.Views.Dialogs.UserInputs;
 
 namespace FrameControlEx.Core {
     public static class IoC {
+        private static volatile bool isAppRunning = true;
+
         public static SimpleIoC Instance { get; } = new SimpleIoC();
 
         public static ActionManager ActionManager { get; } = new ActionManager();
@@ -26,5 +28,10 @@ namespace FrameControlEx.Core {
         public static IKeyboardDialogService KeyboardDialogs { get; set; }
         public static IMouseDialogService MouseDialogs { get; set; }
         public static IOutputSelector BufferSelector { get; set; }
+
+        public static bool IsAppRunning {
+            get => isAppRunning;
+            set => isAppRunning = value;
+        }
     }
 }

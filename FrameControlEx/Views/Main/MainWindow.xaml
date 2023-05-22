@@ -15,7 +15,7 @@
                 xmlns:sources="clr-namespace:FrameControlEx.Core.MainView.Scene.Sources;assembly=FrameControlEx.Core"
                 xmlns:outputs="clr-namespace:FrameControlEx.Core.MainView.Scene.Outputs;assembly=FrameControlEx.Core" xmlns:controls1="clr-namespace:FrameControlEx.Controls"
                 mc:Ignorable="d"
-                Title="MainWindow" Height="650" Width="1024"
+                Title="MainWindow" Height="624" Width="1024"
                 TitlebarBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}"
                 Style="{DynamicResource CustomWindowStyleEx}"
                 d:DataContext="{d:DesignInstance mainView:FrameControlViewModel}">
@@ -60,7 +60,7 @@
                 </Grid>
                 <Border Background="{DynamicResource AREghZyBrush.Tone1.Background.Static}" Grid.Column="2">
                     <Viewbox>
-                        <wpf:SKElement Width="{Binding Width, FallbackValue=500}" Height="{Binding Height, FallbackValue=500}" x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
+                        <wpf:SKElement Width="{Binding Settings.Width, FallbackValue=500}" Height="{Binding Settings.Height, FallbackValue=500}" x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
                     </Viewbox>
                 </Border>
                 <Border Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
@@ -70,7 +70,7 @@
                               helpers:GridLatchSplitter.ClosedSize="0" 
                               helpers:GridLatchSplitter.TargetColumn="{Binding ElementName=Col0}"
                               helpers:GridLatchSplitter.MinimumSize="150"
-                              helpers:GridLatchSplitter.MaximumSize="400"
+                              helpers:GridLatchSplitter.MaximumSize="500"
                               helpers:GridLatchSplitter.ThresholdSizeToClose="40"
                               helpers:GridLatchSplitter.ThresholdSizeToOpen="80"/>
             </Grid>

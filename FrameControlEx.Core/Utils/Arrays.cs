@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace FrameControlEx.Core.Utils {
     /// <summary>
@@ -55,14 +56,31 @@ namespace FrameControlEx.Core.Utils {
             return true;
         }
 
-        public static T[] Clone<T>(T[] data) {
-            if (data == null) {
+        public static unsafe T[] CloneArrayUnsafe<T>(T[] array) where T : unmanaged {
+            if (array == null)
                 return null;
+            int length = array.Length;
+            T[] values = new T[length];
+            int bytes = sizeof(T) * length;
+            if (bytes > 100 || length > 50) { // BlockCopy will most likely help out
+                Buffer.BlockCopy(array, 0, values, 0, bytes);
+            }
+            else if (length > 0) {
+                for (int i = 0; i < length; i++)
+                    values[i] = array[i];
             }
 
-            T[] array = new T[data.Length];
-            Array.Copy(data, array, array.Length);
-            return array;
+            return values;
+        }
+
+        public static T[] CloneArray<T>(T[] array) {
+            if (array == null)
+                return null;
+            int length = array.Length;
+            T[] values = new T[length];
+            for (int i = 0; i < length; i++)
+                values[i] = array[i];
+            return values;
         }
     }
 }

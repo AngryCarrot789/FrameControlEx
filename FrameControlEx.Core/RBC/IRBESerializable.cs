@@ -1,4 +1,4 @@
-namespace FramePFX.Core.RBC {
+namespace FrameControlEx.Core.RBC {
     public interface IRBESerializable {
         /// <summary>
         /// Serialises this object's data into the given map

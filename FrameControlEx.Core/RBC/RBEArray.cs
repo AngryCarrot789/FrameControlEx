@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using FramePFX.Core.Utils;
+using FrameControlEx.Core.Utils;
 
-namespace FramePFX.Core.RBC {
+namespace FrameControlEx.Core.RBC {
     public enum LengthReadStrategy {
         /// <summary>
         /// Appends a byte, short, int or long before the data to indicate the length.
@@ -345,8 +345,9 @@ namespace FramePFX.Core.RBC {
         }
 
         public override RBEBase CloneCore() => this.Clone();
+
         public RBEStructArray Clone() {
-            return new RBEStructArray { data = Arrays.CloneArrayUnsafe(this.data) };
+            return new RBEStructArray {data = Arrays.CloneArrayUnsafe(this.data)};
         }
     }
 }

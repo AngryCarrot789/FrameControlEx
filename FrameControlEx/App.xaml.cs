@@ -83,6 +83,11 @@ namespace FrameControlEx {
             }
         }
 
+        protected override void OnExit(ExitEventArgs e) {
+            IoC.IsAppRunning = false;
+            base.OnExit(e);
+        }
+
         private async void Application_Startup(object sender, StartupEventArgs e) {
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             try {
