@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="FrameControlEx.Scenes.Controls.MMFSourceSettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FrameControlEx.Scenes.Controls"
+             xmlns:outputs="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Outputs;assembly=FrameControlEx.Core" xmlns:controls="clr-namespace:FrameControlEx.Scenes.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="250"
+             d:DataContext="{d:DesignInstance outputs:MMFrameOutputViewModel}">
+    <Grid>
+        <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged}" Padding="5" VerticalAlignment="Top" HorizontalAlignment="Center" TextDecorations="Underline" FontWeight="Bold">
+            <TextBlock.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding RenameCommand, Mode=OneTime}"/>
+            </TextBlock.InputBindings>
+        </TextBlock>
+        <DockPanel Margin="5,26,5,5">
+            <Grid DockPanel.Dock="Top" Height="97">
+                <CheckBox IsChecked="{Binding IsAutoGenerationHalted}" IsEnabled="{Binding IsAutoGenerationHalted}" Content="If checked, uncheck to restore" Height="20" VerticalAlignment="Top"/>
+                <CheckBox IsChecked="{Binding GenerateMapName}" Content="Auto-generate MemMap file name" Height="20" VerticalAlignment="Top" Margin="0,20,0,0"/>
+                <Grid Margin="0,45,0,0" Height="50" VerticalAlignment="Top">
+                    <TextBox Text="{Binding MapName, Mode=OneWay}" IsReadOnly="True" AcceptsReturn="False" Padding="4,2" Margin="0,26,24,0" VerticalContentAlignment="Center"/>
+                    <TextBlock Text="Memory-Map Name" Padding="5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                    <Button Command="{Binding EditMappedFileNameCommand, Mode=OneTime}" Content="..." HorizontalAlignment="Right" Width="24" Margin="0,26,0,0" BorderThickness="0,1,1,1" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}"/>
+                </Grid>
+
+            </Grid>
+            <controls:BaseIOStateController VerticalAlignment="Bottom" DockPanel.Dock="Bottom"/>
+            <TextBlock Margin="10,10,10,26" TextAlignment="Center" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="The MMFOutput is a &quot;Memory Mapped Frame Output&quot;, which uses a memory mapped file"/><LineBreak/><Run/><LineBreak/><Run Text="It "/><Run Text="takes the pixels of the output frame and writes it into that file (along with a 64-byte header) for another process to read"/></TextBlock>
+        </DockPanel>
+    </Grid>
+</UserControl>
+

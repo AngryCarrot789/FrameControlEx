@@ -21,9 +21,7 @@ namespace FrameControlEx.Core.MainView {
         public Action RenderCallback { get; set; }
 
         private volatile bool isThreadRunning;
-        private volatile bool isRenderQueued;
         private readonly Task renderTask;
-        private long lastRender;
         private long targetIntervalTicks;
 
         public FrameControlViewModel() {
@@ -54,16 +52,27 @@ namespace FrameControlEx.Core.MainView {
 
         private const long MILLIS_PER_THREAD_SPLICE = 16;
         private static readonly long THREAD_SPLICE_IN_TICKS = 16L * Time.TICK_PER_MILLIS;
-        private static readonly long YIELD_MILLIS_IN_TICKS = 3L * Time.TICK_PER_MILLIS;
+        // 1.71 is the average yield interval
+        // private static readonly long YIELD_MILLIS_IN_TICKS = (long) (1.71d * Time.TICK_PER_MILLIS);
+        private static readonly long YIELD_MILLIS_IN_TICKS = Time.TICK_PER_MILLIS / 20;
 
         private long nextTickTime;
+
+        #if DEBUG
+        private static long MIN_YIELD_TIME;
+        private static long MAX_YIELD_TIME;
+        #endif
 
         private void RenderMain() {
             while (this.isThreadRunning) {
                 // Get the target time that the action should be executed
                 // While the waiting time is larger than the thread splice time
                 // (target - time) == duration to wait
+
+                #if DEBUG // helpful for debugging the timing
                 long tickTime = Time.GetSystemTicks();
+                #endif
+
                 long target = this.nextTickTime;
                 while ((target - Time.GetSystemTicks()) > THREAD_SPLICE_IN_TICKS) {
                     Thread.Sleep(1); // sleep for roughly 15-16ms, on windows at least
@@ -74,19 +83,36 @@ namespace FrameControlEx.Core.MainView {
                 while ((target - Time.GetSystemTicks()) > YIELD_MILLIS_IN_TICKS) {
                     // Thread.Sleep(1);
                     // Yield may result in more precise timing
+
+                    #if DEBUG
+                    long a = Time.GetSystemTicks();
+                    // Thread.Yield();
+                    Thread.Sleep(0);
+                    long b = Time.GetSystemTicks() - a;
+                    if (b > MAX_YIELD_TIME)
+                        MAX_YIELD_TIME = b;
+                    if (b < MIN_YIELD_TIME)
+                        MIN_YIELD_TIME = b;
+                    #else
                     Thread.Yield();
+                    #endif
                 }
 
                 // CPU intensive wait
-                while (Time.GetSystemTicks() < target) {
-                    Thread.SpinWait(16);
-                    // SpinWait may result in more precise timing
-                    // Thread.Yield();
+                #if DEBUG
+                long time = Time.GetSystemTicks();
+                while (time < target) {
+                    Thread.SpinWait(16); // SpinWait may result in more precise timing
+                    time = Time.GetSystemTicks();
                 }
+                #else
+                while (Time.GetSystemTicks() < target) {
+                    Thread.SpinWait(16); // SpinWait may result in more precise timing
+                }
+                #endif
 
                 this.nextTickTime = Time.GetSystemTicks() + this.targetIntervalTicks;
-                Action callback = this.RenderCallback;
-                callback?.Invoke();
+                this.RenderCallback?.Invoke();
 
                 // long time = Time.GetSystemMillis();
                 // long difference = time - this.lastRender;

@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using FrameControlEx.Core.MainView.Scene;
-using FrameControlEx.Core.MainView.Scene.Outputs;
+using FrameControlEx.Core.FrameControl.Scene;
 using FrameControlEx.Core.Services;
 using FrameControlEx.MainView.Views;
 

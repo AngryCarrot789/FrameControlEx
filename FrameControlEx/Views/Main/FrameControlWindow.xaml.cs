@@ -2,22 +2,18 @@
 using System.Collections;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using FrameControlEx.Core.MainView;
-using FrameControlEx.Core.MainView.Scene;
-using FrameControlEx.Core.MainView.Scene.Outputs;
-using FrameControlEx.Core.MainView.Scene.Sources;
+using FrameControlEx.Core.FrameControl;
+using FrameControlEx.Core.FrameControl.Scene;
+using FrameControlEx.Core.FrameControl.Scene.Outputs;
+using FrameControlEx.Core.FrameControl.Scene.Sources;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Imaging;
-using FrameControlEx.Utils;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
-using SkiaSharp.Views.WPF;
 
 namespace FrameControlEx.Views.Main {
     /// <summary>
@@ -35,7 +31,12 @@ namespace FrameControlEx.Views.Main {
             FrameControlViewModel frameControl = new FrameControlViewModel();
             frameControl.SceneDeck.AddNewScene("Scene 1");
             frameControl.RenderCallback = () => {
-                this.Dispatcher.Invoke(this.ViewPortElement.InvalidateVisual, DispatcherPriority.Render);
+                try {
+                    this.Dispatcher.Invoke(this.ViewPortElement.InvalidateVisual, DispatcherPriority.Render);
+                }
+                catch (TaskCanceledException) {
+                    // prevents visual studios catching/breakpointing when the main window closes
+                }
             };
 
             this.DataContext = frameControl;
@@ -115,7 +116,7 @@ namespace FrameControlEx.Views.Main {
             FrameControlViewModel frameControl = this.ViewModel ?? throw new Exception($"No {nameof(FrameControlViewModel)} available");
             SKCanvas canvas = e.Surface.Canvas;
 
-            SceneViewModel active = frameControl.SceneDeck.SelectedItem;
+            SceneViewModel active = frameControl.SceneDeck.PrimarySelectedItem;
             if (active == null) {
                 canvas.Clear(SKColors.Black);
                 return;

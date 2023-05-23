@@ -6,19 +6,23 @@
                 xmlns:local="clr-namespace:FrameControlEx"
                 xmlns:views="clr-namespace:FrameControlEx.Views"
                 xmlns:helpers="clr-namespace:FrameControlEx.Controls.Helpers"
-                xmlns:mainView="clr-namespace:FrameControlEx.Core.MainView;assembly=FrameControlEx.Core"
-                xmlns:scene="clr-namespace:FrameControlEx.Core.MainView.Scene;assembly=FrameControlEx.Core"
                 xmlns:converters="clr-namespace:FrameControlEx.Converters"
                 xmlns:acs="clr-namespace:FrameControlEx.AdvancedContextService"
                 xmlns:wpf="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
                 xmlns:controls="clr-namespace:FrameControlEx.Scenes.Controls"
-                xmlns:sources="clr-namespace:FrameControlEx.Core.MainView.Scene.Sources;assembly=FrameControlEx.Core"
-                xmlns:outputs="clr-namespace:FrameControlEx.Core.MainView.Scene.Outputs;assembly=FrameControlEx.Core" xmlns:controls1="clr-namespace:FrameControlEx.Controls"
+                xmlns:controls1="clr-namespace:FrameControlEx.Controls"
+                xmlns:frameControl="clr-namespace:FrameControlEx.Core.FrameControl;assembly=FrameControlEx.Core"
+                xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Sources;assembly=FrameControlEx.Core"
+                xmlns:scene="clr-namespace:FrameControlEx.Core.FrameControl.Scene;assembly=FrameControlEx.Core"
+                xmlns:outputs="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Outputs;assembly=FrameControlEx.Core"
                 mc:Ignorable="d"
                 Title="MainWindow" Height="624" Width="1024"
                 TitlebarBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}"
                 Style="{DynamicResource CustomWindowStyleEx}"
-                d:DataContext="{d:DesignInstance mainView:FrameControlViewModel}">
+                d:DataContext="{d:DesignInstance frameControl:FrameControlViewModel}">
+    <Window.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibleConverter"/>
+    </Window.Resources>
     <Grid>
         <Border IsHitTestVisible="True" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" VerticalAlignment="Top">
             <Menu HorizontalAlignment="Left" IsHitTestVisible="True">
@@ -41,8 +45,9 @@
                 <Grid x:Name="SettingsPanel" d:DataContext="{d:DesignInstance sources:LoopbackSourceViewModel}" Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
                     <ContentPresenter Content="{Binding}">
                         <ContentPresenter.Resources>
-                            <DataTemplate DataType="{x:Type mainView:FrameControlViewModel}">
+                            <DataTemplate DataType="{x:Type frameControl:FrameControlViewModel}">
                             </DataTemplate>
+                            <!-- INPUTS -->
                             <DataTemplate DataType="{x:Type scene:SceneViewModel}">
                                 <controls:SceneSettingsControl DataContext="{Binding}"/>
                             </DataTemplate>
@@ -52,8 +57,12 @@
                             <DataTemplate DataType="{x:Type sources:LoopbackSourceViewModel}">
                                 <controls:SIInputSettingsControl DataContext="{Binding}"/>
                             </DataTemplate>
+                            <!-- OUTPUTS -->
                             <DataTemplate DataType="{x:Type outputs:BasicBufferOutputViewModel}">
                                 <controls:SIOutputSettingsControl DataContext="{Binding}"/>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type outputs:FFmpegOutputViewModel}">
+                                <controls:FFmpegOutputSettingsControl DataContext="{Binding}"/>
                             </DataTemplate>
                         </ContentPresenter.Resources>
                     </ContentPresenter>
@@ -103,14 +112,36 @@
                         </Grid.ColumnDefinitions>
                         <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
                             <ListBox ItemsSource="{Binding Items, Mode=OneTime}"
-                                     SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                     SelectedItem="{Binding PrimarySelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                      Margin="0,0,0,26" Background="Transparent" BorderThickness="0"
-                                     acs:AdvancedContextMenu.ContextGenerator="{x:Static scene:SceneViewModelContextMenuGenerator.Instance}"
+                                     acs:AdvancedContextMenu.ContextGenerator="{x:Static scene:SceneContextMenuGenerator.Instance}"
                                      SelectionChanged="OnSceneSourceOrOutputSelectionChanged"
-                                     GotFocus="ListBox_GotFocus">
+                                     GotFocus="ListBox_GotFocus"
+                                     helpers:ListBoxHelper.SelectedItems="{Binding SelectedItems}"
+                                     helpers:ListBoxHelper.UpdateSelectedItemsOnChange="True"
+                                     SelectionMode="Extended"
+                                     HorizontalContentAlignment="Stretch">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                                        <Setter Property="Padding" Value="1"/>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                        <Border x:Name="PART_Border">
+                                            <DockPanel HorizontalAlignment="Stretch">
+                                                <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" VerticalAlignment="Center"
+                                                           Margin="4,1"/>
+                                                <Path x:Name="optionMark"
+                                                      Data="F1 M 9.97498,1.22334L 4.6983,9.09834L 4.52164,9.09834L 0,5.19331L 1.27664,3.52165L 4.255,6.08833L 8.33331,1.52588e-005L 9.97498,1.22334 Z "
+                                                      Fill="{DynamicResource OptionMark.Static.Glyph}"
+                                                      Stretch="None"
+                                                      Margin="4,1,3,1"
+                                                      VerticalAlignment="Center" HorizontalAlignment="Right" DockPanel.Dock="Right"
+                                                      Width="11" Height="10"
+                                                      Visibility="{Binding IsActive, Converter={StaticResource BoolToVisibleConverter}}"/>
+                                            </DockPanel>
+                                        </Border>
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
@@ -131,18 +162,21 @@
                                 </StackPanel>
                             </Border>
                         </Grid>
-                        <Border DataContext="{Binding SelectedItem}" IsEnabled="{Binding Converter={StaticResource NullToDisabledConverter}}" Grid.Column="2" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True" ToolTip="Inputs (aka sources) are the 'sources' of video and audio data (e.g. desktop capture, network video, etc)">
+                        <Border DataContext="{Binding PrimarySelectedItem}" IsEnabled="{Binding Converter={StaticResource NullToDisabledConverter}}" Grid.Column="2" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True" ToolTip="Inputs (aka sources) are the 'sources' of video and audio data (e.g. desktop capture, network video, etc)">
                             <Grid>
                                 <Label Content="Inputs (aka sources)" VerticalAlignment="Top" Padding="5,0" VerticalContentAlignment="Center" Height="20"/>
                                 <Grid DataContext="{Binding SourceDeck}" Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}" x:Name="ThingGrid" Margin="0,20,0,0">
                                     <ListBox ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                             SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                             SelectedItem="{Binding PrimarySelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                              Margin="0,0,0,26" Background="Transparent" BorderThickness="0"
                                              x:Name="SourcesListBox"
                                              ItemTemplateSelector="{StaticResource IoItemTemplateSelector}"
                                              acs:AdvancedContextMenu.ContextGenerator="{x:Static scene:SourceContextGenerator.Instance}"
                                              SelectionChanged="OnSceneSourceOrOutputSelectionChanged"
-                                             GotFocus="ListBox_GotFocus">
+                                             GotFocus="ListBox_GotFocus"
+                                             helpers:ListBoxHelper.SelectedItems="{Binding SelectedItems}"
+                                             helpers:ListBoxHelper.UpdateSelectedItemsOnChange="True"
+                                             SelectionMode="Extended">
                                     </ListBox>
                                     <Border VerticalAlignment="Bottom" Height="26" Background="{DynamicResource AREghZyBrush.Tone3.Background.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Background.Static}" BorderThickness="0,1,0,1">
                                         <StackPanel Orientation="Horizontal">
@@ -170,7 +204,7 @@
                                 </Grid>
                             </Grid>
                         </Border>
-                        <Border DataContext="{Binding SelectedItem}" IsEnabled="{Binding Converter={StaticResource NullToDisabledConverter}}" Grid.Column="4" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True">
+                        <Border DataContext="{Binding PrimarySelectedItem}" IsEnabled="{Binding Converter={StaticResource NullToDisabledConverter}}" Grid.Column="4" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True">
                             <Grid>
                                 <Label Content="Audio Mixer (Coming Soon)" VerticalAlignment="Top" Padding="5,0" VerticalContentAlignment="Center" Height="20"/>
                                 <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}" Margin="0,20,0,0" IsEnabled="False">
@@ -186,12 +220,15 @@
                 <GroupBox DataContext="{Binding OutputDeck}" Grid.Column="2" Style="{DynamicResource NoBorderGroupBox}" Header="Outputs" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True">
                     <Grid Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
                         <ListBox ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
-                                 SelectedItem="{Binding SelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                 SelectedItem="{Binding PrimarySelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                  Margin="0,0,0,26" Background="Transparent" BorderThickness="0"
                                  ItemTemplateSelector="{StaticResource IoItemTemplateSelector}"
                                  acs:AdvancedContextMenu.ContextGenerator="{x:Static scene:OutputContextGenerator.Instance}"
                                  SelectionChanged="OnSceneSourceOrOutputSelectionChanged"
-                                 GotFocus="ListBox_GotFocus">
+                                 GotFocus="ListBox_GotFocus"
+                                 helpers:ListBoxHelper.SelectedItems="{Binding SelectedItems}"
+                                 helpers:ListBoxHelper.UpdateSelectedItemsOnChange="True"
+                                 SelectionMode="Extended">
                         </ListBox>
                         <Border VerticalAlignment="Bottom" Height="26" Background="{DynamicResource AREghZyBrush.Tone3.Background.Static}" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Background.Static}" BorderThickness="0,1,0,1">
                             <StackPanel Orientation="Horizontal">
@@ -200,6 +237,8 @@
                                         <MenuItem.Header>
                                             <TextBlock Text="+" FontSize="20" Margin="-2,-5,0,0"/>
                                         </MenuItem.Header>
+                                        <MenuItem Header="Add FFmpeg Output" Command="{Binding AddFFmpegOutputCommand, Mode=OneTime}"/>
+                                        <Separator/>
                                         <MenuItem Header="Add Buffered Output" InputGestureText="Debug Feature" Command="{Binding AddBufferedOutputCommand, Mode=OneTime}"/>
                                     </MenuItem>
                                 </Menu>

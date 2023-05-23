@@ -1,8 +1,8 @@
-namespace FrameControlEx.Core.MainView {
+namespace FrameControlEx.Core.FrameControl {
     /// <summary>
     /// Contains settings for the frame control app. These settings can be templated so that users can easily switch between templates (e.g. different resolutions, fps, etc)
     /// </summary>
-    public class FrameControlSettingsViewModel : BaseViewModel {
+    public class SettingsViewModel : BaseViewModel {
         private int width;
         private int height;
         private int frameRate;
@@ -29,6 +29,14 @@ namespace FrameControlEx.Core.MainView {
         public int FrameRate {
             get => this.frameRate;
             set => this.RaisePropertyChanged(ref this.frameRate, value);
+        }
+
+        public SettingsViewModel Clone() {
+            return new SettingsViewModel() {
+                width = this.width,
+                height = this.height,
+                frameRate = this.frameRate
+            };
         }
     }
 }

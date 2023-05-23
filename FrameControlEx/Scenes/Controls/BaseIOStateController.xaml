@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="FrameControlEx.Scenes.Controls.BaseIOStateController"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:FrameControlEx.Scenes.Controls"
+             xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.Scene;assembly=FrameControlEx.Core"
+             mc:Ignorable="d" 
+             Height="24" d:DesignWidth="250"
+             d:DataContext="{d:DesignInstance sources:SceneContextMenuGenerator}">
+    <Grid VerticalAlignment="Bottom">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Button Command="{Binding EnableCommand, Mode=OneTime}" Content="Enabled" VerticalAlignment="Top" Height="24"/>
+        <Button Command="{Binding DisableCommand, Mode=OneTime}" Content="Disable" VerticalAlignment="Top" Height="24" Grid.Column="2"/>
+        <Button Command="{Binding ToggleEnabledCommand, Mode=OneTime}" Content="Toggle" VerticalAlignment="Top" Height="24" Grid.Column="4"/>
+    </Grid>
+</UserControl>

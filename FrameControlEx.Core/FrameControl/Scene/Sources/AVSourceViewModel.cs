@@ -3,11 +3,11 @@ using System.Numerics;
 using System.Threading.Tasks;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;
 
-namespace FrameControlEx.Core.MainView.Scene.Sources {
+namespace FrameControlEx.Core.FrameControl.Scene.Sources {
     /// <summary>
     /// Base class for visual sources (videos, images, but not audio)
     /// </summary>
-    public abstract class VisualSourceViewModel : SourceViewModel {
+    public abstract class VisualSourceViewModel : SourceViewModel, IVisualSource {
         private Vector2 pos;
         private Vector2 scale;
         private Vector2 scaleOrigin;
