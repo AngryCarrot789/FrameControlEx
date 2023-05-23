@@ -9,14 +9,14 @@ namespace FFmpeg.AutoGen
     {
         public static Dictionary<string, int> LibraryVersionMap =  new Dictionary<string, int>
         {
-            {"avcodec", 58},
-            {"avdevice", 58},
-            {"avfilter", 7},
-            {"avformat", 58},
-            {"avutil", 56},
-            {"postproc", 55},
-            {"swresample", 3},
-            {"swscale", 5},
+            {"avcodec", 60},
+            {"avdevice", 60},
+            {"avfilter", 9},
+            {"avformat", 60},
+            {"avutil", 58},
+            {"postproc", 57},
+            {"swresample", 4},
+            {"swscale", 7},
         };
     }
 }

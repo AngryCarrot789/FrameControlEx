@@ -1,68 +1,52 @@
 ﻿<KeyMap>
     <Group Name="Application">
-        <Group Name="Views">
-            <Shortcut Name="CloseWindowShortcut" ActionId="actions.views.windows.CloseViewAction" Global="true">
-                <KeyStroke Key="Escape"/>
-            </Shortcut>
-        </Group>
-        <Group Name="TabbedControl">
-            <Shortcut Name="CloseTabShortcut" ActionId="actions.tabs.CloseTabAction">
-                <MouseStroke Button="Middle"/>
-            </Shortcut>
-        </Group>
-        <Group Name="EditorView">
-            <Group Name="NBTTag">
-                <Shortcut Name="CopyNameShortcut" ActionId="actions.nbt.copy.name">
-                    <KeyStroke Mods="CTRL+ALT" Key="C"/>
-                </Shortcut>
-                <Shortcut Name="CopyValueShortcut" ActionId="actions.nbt.copy.primitive_value">
-                    <KeyStroke Mods="CTRL+SHIFT" Key="C"/>
-                </Shortcut>
-                <Shortcut Name="CopyBinaryShortcut" ActionId="actions.nbt.copy.binary">
+        <Group Name="FrameControl">
+            <Group Name="Deck">
+                <Shortcut Name="Copy" ActionId="actions.deck.copy">
                     <KeyStroke Mods="CTRL" Key="C"/>
                 </Shortcut>
-                <Shortcut Name="CutBinaryShortcut" ActionId="actions.nbt.cut.binary">
+                <Shortcut Name="Cut" ActionId="actions.deck.cut">
                     <KeyStroke Mods="CTRL" Key="X"/>
                 </Shortcut>
-                <Shortcut Name="PasteBinaryShortcut" ActionId="actions.nbt.paste.binary">
+                <Shortcut Name="Paste" ActionId="actions.deck.paste">
                     <KeyStroke Mods="CTRL" Key="V"/>
                 </Shortcut>
-                <Shortcut Name="RenameShortcut1" ActionId="actions.nbt.rename">
-                    <KeyStroke Mods="CTRL" Key="R"/>
-                </Shortcut>
-                <Shortcut Name="RenameShortcut2" ActionId="actions.nbt.rename">
-                    <KeyStroke Key="F2"/>
-                </Shortcut>
-                <Shortcut Name="RemoveFromParent" ActionId="actions.nbt.remove_from_parent">
-                    <KeyStroke Key="Delete"/>
-                </Shortcut>
-                <Shortcut Name="Save" ActionId="actions.item.SaveFile">
-                    <KeyStroke Mods="CTRL" Key="S"/>
-                </Shortcut>
-                <Shortcut Name="SaveAs" ActionId="actions.item.SaveFileAs">
-                    <KeyStroke Mods="CTRL+SHIFT" Key="S"/>
-                </Shortcut>
-                <Shortcut Name="CopyFilePath" ActionId="actions.item.CopyFilePath">
-                    <KeyStroke Mods="CTRL+ALT+SHIFT" Key="C"/>
-                </Shortcut>
-                <Shortcut Name="OpenInExplorer" ActionId="actions.item.OpenInExplorer">
-                    <KeyStroke Mods="CTRL+SHIFT" Key="O"/>
-                </Shortcut>
-                <Shortcut Name="RefreshItem" ActionId="actions.item.Refresh">
-                    <KeyStroke Mods="CTRL+SHIFT" Key="O"/>
-                </Shortcut>
             </Group>
-            <Shortcut Name="FindShortcut" ActionId="actions.nbt.find" Inherit="true">
-                <KeyStroke Mods="CTRL" Key="F"/>
+            <Shortcut Name="CopyValueShortcut" ActionId="actions.nbt.copy.primitive_value">
+                <KeyStroke Mods="CTRL+SHIFT" Key="C"/>
             </Shortcut>
-            <Shortcut Name="OpenFile" Inherit="true" ActionId="actions.main-window.OpenFile">
-                <KeyStroke Mods="CTRL" Key="O"/>
+            <Shortcut Name="CopyBinaryShortcut" ActionId="actions.nbt.copy.binary">
+                <KeyStroke Mods="CTRL" Key="C"/>
             </Shortcut>
-            <Shortcut Name="FindShortcutGlobal" ActionId="actions.nbt.find" Inherit="true">
-                <Shortcut.Context>
-                    <Flag Key="IsGlobalFind" Value="True"/>
-                </Shortcut.Context>
-                <KeyStroke Mods="CTRL+SHIFT" Key="F"/>
+            <Shortcut Name="CutBinaryShortcut" ActionId="actions.nbt.cut.binary">
+                <KeyStroke Mods="CTRL" Key="X"/>
+            </Shortcut>
+            <Shortcut Name="PasteBinaryShortcut" ActionId="actions.nbt.paste.binary">
+                <KeyStroke Mods="CTRL" Key="V"/>
+            </Shortcut>
+            <Shortcut Name="RenameShortcut1" ActionId="actions.nbt.rename">
+                <KeyStroke Mods="CTRL" Key="R"/>
+            </Shortcut>
+            <Shortcut Name="RenameShortcut2" ActionId="actions.nbt.rename">
+                <KeyStroke Key="F2"/>
+            </Shortcut>
+            <Shortcut Name="RemoveFromParent" ActionId="actions.nbt.remove_from_parent">
+                <KeyStroke Key="Delete"/>
+            </Shortcut>
+            <Shortcut Name="Save" ActionId="actions.item.SaveFile">
+                <KeyStroke Mods="CTRL" Key="S"/>
+            </Shortcut>
+            <Shortcut Name="SaveAs" ActionId="actions.item.SaveFileAs">
+                <KeyStroke Mods="CTRL+SHIFT" Key="S"/>
+            </Shortcut>
+            <Shortcut Name="CopyFilePath" ActionId="actions.item.CopyFilePath">
+                <KeyStroke Mods="CTRL+ALT+SHIFT" Key="C"/>
+            </Shortcut>
+            <Shortcut Name="OpenInExplorer" ActionId="actions.item.OpenInExplorer">
+                <KeyStroke Mods="CTRL+SHIFT" Key="O"/>
+            </Shortcut>
+            <Shortcut Name="RefreshItem" ActionId="actions.item.Refresh">
+                <KeyStroke Mods="CTRL+SHIFT" Key="O"/>
             </Shortcut>
         </Group>
     </Group>

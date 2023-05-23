@@ -27,8 +27,9 @@ namespace FrameControlEx.Views {
             set => this.SetValue(CanCloseWithEscapeKeyProperty, value);
         }
 
-        private bool isInRegularClosingHandler;
+        private bool isHandlingSyncClosing;
         private bool isHandlingAsyncClose;
+        private bool? closeEventResult;
 
         private readonly Action showAction;
         private readonly Func<bool?> showDialogAction;
@@ -71,20 +72,52 @@ namespace FrameControlEx.Views {
             // </Setter>
         }
 
-        protected sealed override async void OnClosing(CancelEventArgs e) {
-            if (this.isInRegularClosingHandler || this.isHandlingAsyncClose) {
+        protected sealed override void OnClosing(CancelEventArgs e) {
+            if (this.isHandlingSyncClosing || this.isHandlingAsyncClose) {
                 return;
             }
 
             try {
-                this.isInRegularClosingHandler = true;
-                e.Cancel = true;
-                if (await this.CloseAsync()) {
-                    e.Cancel = false;
+                this.isHandlingSyncClosing = true;
+                this.OnClosingInternal(e);
+                if (this.closeEventResult.HasValue) {
+                    try { // try finally juuust in case...
+                        e.Cancel = !this.closeEventResult.Value; // true = close, false = do not close
+                    }
+                    finally {
+                        this.closeEventResult = null;
+                    }
+                }
+                else {
+                    e.Cancel = true;
                 }
             }
             finally {
-                this.isInRegularClosingHandler = false;
+                this.isHandlingSyncClosing = false;
+            }
+        }
+
+        /*
+            async void is required here
+            OnClosing is fired, that sets isHandlingSyncClosing to true and invokes this method which awaits CloseAsync()
+
+            During the invocation of CloseAsync, If the call does not require
+            real async (e.g. does not use Task.Delay() or whatever):
+                CloseAsync will return in the same execution context as OnClosing, meaning isHandlingSyncClosing
+                stays true, and OnClosing can access closeEventResult and set the e.Cancel accordingly
+
+            However, if the call chain in CloseAsync uses Task.Delay() or something which returns
+            a task that is incomplete by the time the async state machine comes to actually "awaiting" it,
+            then the behaviour changes:
+                OnClosing returns before CloseAsync is completed, setting isHandlingSyncClosing to false, meaning that
+                CloseAsyncInternal will manually close the window itself because the original OnClosing was cancelled
+
+
+         */
+        private async void OnClosingInternal(CancelEventArgs e) {
+            bool result = await this.CloseAsync();
+            if (this.isHandlingSyncClosing) {
+                this.closeEventResult = result;
             }
         }
 
@@ -99,18 +132,18 @@ namespace FrameControlEx.Views {
 
         private async Task<bool> CloseAsyncInternal() {
             if (await this.OnClosingAsync()) {
-                if (this.isInRegularClosingHandler) {
-                    return true;
+                if (!this.isHandlingSyncClosing) {
+                    try {
+                        this.isHandlingAsyncClose = true;
+                        await DispatcherUtils.InvokeAsync(this.Dispatcher, this.Close);
+                        return true;
+                    }
+                    finally {
+                        this.isHandlingAsyncClose = false;
+                    }
                 }
 
-                try {
-                    this.isHandlingAsyncClose = true;
-                    await DispatcherUtils.InvokeAsync(this.Dispatcher, this.Close);
-                    return true;
-                }
-                finally {
-                    this.isHandlingAsyncClose = false;
-                }
+                return true;
             }
             else {
                 return false;

@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using FrameControlEx.Core.FrameControl.Scene;
 using FrameControlEx.Core.Services;
-using FrameControlEx.MainView.Views;
+using FrameControlEx.FrameControl.Views;
 
-namespace FrameControlEx.MainView {
+namespace FrameControlEx.FrameControl {
     public class OutputSelector : IOutputSelector {
         public async Task<OutputViewModel> SelectOutput(OutputDeckViewModel deck, Predicate<OutputViewModel> filter) {
             OutputSelectorWindow selectorWindow = new OutputSelectorWindow();

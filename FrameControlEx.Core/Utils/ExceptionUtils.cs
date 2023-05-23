@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 
 namespace FrameControlEx.Core.Utils {
     public static class ExceptionUtils {
@@ -25,7 +26,7 @@ namespace FrameControlEx.Core.Utils {
             GetSuppressed(@this, true).Add(suppressed);
         }
 
-        public static string ToString(Exception e, bool message = true, bool fileInfo = true) {
+        public static string GetToString(this Exception e, bool message = true, bool fileInfo = true) {
             List<string> list = new List<string>();
             HashSet<Exception> dejaVu = new HashSet<Exception>();
             dejaVu.Add(e);
@@ -51,7 +52,19 @@ namespace FrameControlEx.Core.Utils {
                 GetEnclosedStackTrace(cause, list, message, trace, CAUSE_CAPTION, "", dejaVu);
             }
 
-            return string.Join("\n", list);
+            StringBuilder sb = new StringBuilder(2048);
+            foreach (string line in list) {
+                if (!string.IsNullOrEmpty(line)) {
+                    if (line.EndsWith(Environment.NewLine) || line[line.Length - 1] == '\n') {
+                        sb.Append(line);
+                    }
+                    else {
+                        sb.Append(line).Append(Environment.NewLine);
+                    }
+                }
+            }
+
+            return sb.ToString().Trim();
         }
 
         public static string GetExceptionHeader(Exception e, bool message) {

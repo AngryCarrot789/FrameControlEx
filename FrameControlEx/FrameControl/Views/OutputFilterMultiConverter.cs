@@ -4,7 +4,7 @@ using System.Windows.Data;
 using FrameControlEx.Core.FrameControl.Scene;
 using FrameControlEx.Core.Utils;
 
-namespace FrameControlEx.MainView.Views {
+namespace FrameControlEx.FrameControl.Views {
     public class OutputFilterMultiConverter : IMultiValueConverter {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
             if (values.Length != 2) {

@@ -36,6 +36,10 @@ namespace FrameControlEx.Core.Actions.Contexts {
             return false;
         }
 
+        public bool TryGetContext(Type type, out object value) {
+            return (value = this.InternalContext.First(type.IsInstanceOfType)) != null;
+        }
+
         public bool HasContext<T>() {
             return this.InternalContext.Any(x => x is T);
         }

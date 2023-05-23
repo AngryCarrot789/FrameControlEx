@@ -1,11 +1,13 @@
 using System;
+using System.Numerics;
 using System.Threading.Tasks;
 using FrameControlEx.Core.Imaging;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs;
+using SkiaSharp;
 
-namespace FrameControlEx.Core.MainView.Scene.Sources {
-    public class ImageSourceViewModel : VisualSourceViewModel {
+namespace FrameControlEx.Core.FrameControl.Scene.Sources {
+    public class ImageSourceViewModel : AVSourceViewModel {
         private bool requireImageReload = true;
         public bool RequireImageReload {
             get => this.requireImageReload;
@@ -41,7 +43,7 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
                 this.RequireImageReload = false;
             }
             catch (Exception e) {
-                await IoC.MessageDialogs.ShowMessageExAsync("Error opening image", $"Error opening '{this.filePath}'", e.ToString());
+                await IoC.MessageDialogs.ShowMessageExAsync("Error opening image", $"Error opening '{this.filePath}'", e.GetToString());
             }
 
             this.InvalidateVisual();
@@ -63,20 +65,27 @@ namespace FrameControlEx.Core.MainView.Scene.Sources {
                     await this.OpenImage(path);
                 }
                 catch (Exception e) {
-                    await IoC.MessageDialogs.ShowMessageExAsync("Error opening image", $"Exception occurred while opening {path}", e.ToString());
+                    await IoC.MessageDialogs.ShowMessageExAsync("Error opening image", $"Exception occurred while opening {path}", e.GetToString());
                 }
 
                 this.InvalidateVisual();
             }
         }
 
-        private async Task OpenImage(string file) {
-            ImageFactory factory = ImageFactory.Factory;
-            if (factory == null) {
-                throw new Exception("Image factory unavailable");
+        public override void OnRender(SKSurface surface, SKCanvas canvas, SKImageInfo frameInfo) {
+            base.OnRender(surface, canvas, frameInfo);
+            if (this.Image is ImageFactory.SkiaImage img) {
+                Vector2 scale = this.Scale, pos = this.Pos, origin = this.ScaleOrigin;
+                SKMatrix matrix = canvas.TotalMatrix;
+                canvas.Translate(pos.X, pos.Y);
+                canvas.Scale(scale.X, scale.Y, img.image.Width * origin.X, img.image.Height * origin.Y);
+                canvas.DrawImage(img.image, 0, 0);
+                canvas.SetMatrix(matrix);
             }
+        }
 
-            IImage image = await factory.CreateImageAsync(file);
+        private async Task OpenImage(string file) {
+            IImage image = await ImageFactory.CreateImageAsync(file);
             if (this.Image != null) {
                 #if DEBUG
                 this.Image.Dispose();

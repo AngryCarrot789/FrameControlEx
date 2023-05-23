@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FrameControlEx.Core.Actions.Contexts;
 using FrameControlEx.Core.AdvancedContextService;
+using FrameControlEx.Core.FrameControl.Scene.Sources;
 
-namespace FrameControlEx.Core.MainView.Scene {
+namespace FrameControlEx.Core.FrameControl.Scene {
     /// <summary>
     /// A view model that stores information about a video or audio source/input
     /// </summary>
@@ -29,7 +30,7 @@ namespace FrameControlEx.Core.MainView.Scene {
 
         public async Task RemoveAction() {
             if (await this.CheckHasDeck()) {
-                await this.Deck.RemoveItemAction(this);
+                await this.Deck.RemoveItemsAction(this);
             }
         }
 
@@ -49,6 +50,10 @@ namespace FrameControlEx.Core.MainView.Scene {
         public void Generate(List<IContextEntry> list, IDataContext context) {
             if (context.TryGetContext(out SourceViewModel source)) {
                 list.Add(new CommandContextEntry("Rename", source.RenameCommand));
+                if (source is ImageSourceViewModel img) {
+                    list.Add(new CommandContextEntry("Open Image...", img.SelectFileCommand));
+                }
+
                 list.Add(SeparatorEntry.Instance);
                 if (source.IsEnabled) {
                     list.Add(new CommandContextEntry("Disable", source.DisableCommand));
@@ -58,7 +63,6 @@ namespace FrameControlEx.Core.MainView.Scene {
                 }
 
                 if (source.Deck != null) {
-                    list.Add(SeparatorEntry.Instance);
                     list.Add(new CommandContextEntry("Remove", source.RemoveCommand));
                 }
 
@@ -78,6 +82,8 @@ namespace FrameControlEx.Core.MainView.Scene {
 
         public void AddNewItemsContext(List<IContextEntry> list, SourceDeckViewModel deck) {
             list.Add(new CommandContextEntry("Add Image", deck.AddImageCommand));
+            list.Add(new CommandContextEntry("Add MMF Source", deck.AddMMFCommand));
+            list.Add(SeparatorEntry.Instance);
             list.Add(new CommandContextEntry("Add output-loopback", deck.AddLoopbackInput));
         }
     }

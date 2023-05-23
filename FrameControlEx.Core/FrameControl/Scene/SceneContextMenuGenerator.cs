@@ -3,8 +3,8 @@ using FrameControlEx.Core.Actions.Contexts;
 using FrameControlEx.Core.AdvancedContextService;
 
 namespace FrameControlEx.Core.FrameControl.Scene {
-    public class SceneViewModelContextMenuGenerator : IContextGenerator {
-        public static SceneViewModelContextMenuGenerator Instance { get; } = new SceneViewModelContextMenuGenerator();
+    public class SceneContextMenuGenerator : IContextGenerator {
+        public static SceneContextMenuGenerator Instance { get; } = new SceneContextMenuGenerator();
 
         public void Generate(List<IContextEntry> list, IDataContext context) {
             if (context.TryGetContext(out SceneViewModel scene)) {

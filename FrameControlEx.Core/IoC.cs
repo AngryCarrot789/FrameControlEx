@@ -1,6 +1,8 @@
 using System;
 using FrameControlEx.Core.Actions;
+using FrameControlEx.Core.FrameControl;
 using FrameControlEx.Core.Services;
+using FrameControlEx.Core.Settings;
 using FrameControlEx.Core.Shortcuts.Dialogs;
 using FrameControlEx.Core.Shortcuts.Managing;
 using FrameControlEx.Core.Views.Dialogs.FilePicking;
@@ -28,6 +30,11 @@ namespace FrameControlEx.Core {
         public static IKeyboardDialogService KeyboardDialogs { get; set; }
         public static IMouseDialogService MouseDialogs { get; set; }
         public static IOutputSelector BufferSelector { get; set; }
+
+        public static SettingsManagerViewModel Settings { get; } = new SettingsManagerViewModel();
+
+        static IoC() {
+        }
 
         public static bool IsAppRunning {
             get => isAppRunning;

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;
 
-namespace FrameControlEx.Core.MainView.Scene {
+namespace FrameControlEx.Core.FrameControl.Scene {
     /// <summary>
     /// Base class for sources and outputs
     /// </summary>

@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace FrameControlEx.Core.MainView.Scene.Templates {
+namespace FrameControlEx.Core.FrameControl.Scene.Templates {
     public class SourceTemplateViewModel : BaseViewModel {
         private Vector2 pos;
         public Vector2 Pos {

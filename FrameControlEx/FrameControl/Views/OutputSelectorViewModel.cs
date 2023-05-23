@@ -2,7 +2,7 @@ using System;
 using FrameControlEx.Core.FrameControl.Scene;
 using FrameControlEx.Core.Views.Dialogs;
 
-namespace FrameControlEx.MainView.Views {
+namespace FrameControlEx.FrameControl.Views {
     public class OutputSelectorViewModel : BaseConfirmableDialogViewModel {
         public OutputDeckViewModel TargetDeck { get; }
 

@@ -9,5 +9,11 @@ namespace FrameControlEx.Core.Utils {
                    Add("Bitmap", "bmp").
                    AddAllFiles().
                    ToString();
+
+        public static readonly string VideoFormatsAndAll =
+            Filter.Of().
+                   Add("MP4 Container", "mp4").
+                   AddAllFiles().
+                   ToString();
     }
 }

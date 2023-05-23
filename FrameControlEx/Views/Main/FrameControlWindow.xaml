@@ -1,4 +1,4 @@
-﻿<views:WindowEx x:Class="FrameControlEx.Views.Main.MainWindow"
+﻿<views:WindowEx x:Class="FrameControlEx.Views.Main.FrameControlWindow"
                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -15,6 +15,7 @@
                 xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Sources;assembly=FrameControlEx.Core"
                 xmlns:scene="clr-namespace:FrameControlEx.Core.FrameControl.Scene;assembly=FrameControlEx.Core"
                 xmlns:outputs="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Outputs;assembly=FrameControlEx.Core"
+                xmlns:core="clr-namespace:FrameControlEx.Core;assembly=FrameControlEx.Core"
                 mc:Ignorable="d"
                 Title="MainWindow" Height="624" Width="1024"
                 TitlebarBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}"
@@ -57,6 +58,9 @@
                             <DataTemplate DataType="{x:Type sources:LoopbackSourceViewModel}">
                                 <controls:SIInputSettingsControl DataContext="{Binding}"/>
                             </DataTemplate>
+                            <DataTemplate DataType="{x:Type sources:MMFAVSourceViewModel}">
+                                <controls:MMFSourceSettingsControl DataContext="{Binding}"/>
+                            </DataTemplate>
                             <!-- OUTPUTS -->
                             <DataTemplate DataType="{x:Type outputs:BasicBufferOutputViewModel}">
                                 <controls:SIOutputSettingsControl DataContext="{Binding}"/>
@@ -64,12 +68,17 @@
                             <DataTemplate DataType="{x:Type outputs:FFmpegOutputViewModel}">
                                 <controls:FFmpegOutputSettingsControl DataContext="{Binding}"/>
                             </DataTemplate>
+                            <DataTemplate DataType="{x:Type outputs:MMFAVOutputViewModel}">
+                                <controls:MMFOutputSettingsControl DataContext="{Binding}"/>
+                            </DataTemplate>
                         </ContentPresenter.Resources>
                     </ContentPresenter>
                 </Grid>
                 <Border Background="{DynamicResource AREghZyBrush.Tone1.Background.Static}" Grid.Column="2">
                     <Viewbox>
-                        <wpf:SKElement Width="{Binding Settings.Width, FallbackValue=500}" Height="{Binding Settings.Height, FallbackValue=500}" x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
+                        <wpf:SKElement Width="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Width, FallbackValue=500}"
+                                       Height="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Height, FallbackValue=500}"
+                                       x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
                     </Viewbox>
                 </Border>
                 <Border Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
@@ -79,7 +88,7 @@
                               helpers:GridLatchSplitter.ClosedSize="0" 
                               helpers:GridLatchSplitter.TargetColumn="{Binding ElementName=Col0}"
                               helpers:GridLatchSplitter.MinimumSize="150"
-                              helpers:GridLatchSplitter.MaximumSize="500"
+                              helpers:GridLatchSplitter.MaximumSize="600"
                               helpers:GridLatchSplitter.ThresholdSizeToClose="40"
                               helpers:GridLatchSplitter.ThresholdSizeToOpen="80"/>
             </Grid>
@@ -164,7 +173,14 @@
                         </Grid>
                         <Border DataContext="{Binding PrimarySelectedItem}" IsEnabled="{Binding Converter={StaticResource NullToDisabledConverter}}" Grid.Column="2" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"  Focusable="True" ToolTip="Inputs (aka sources) are the 'sources' of video and audio data (e.g. desktop capture, network video, etc)">
                             <Grid>
-                                <Label Content="Inputs (aka sources)" VerticalAlignment="Top" Padding="5,0" VerticalContentAlignment="Center" Height="20"/>
+                                <Grid.Resources>
+                                    <converters:BoolConverter x:Key="RenderOrderToTextConverter" TrueValue="↑" FalseValue="↓"/>
+                                </Grid.Resources>
+                                <Label Content="Inputs (aka sources)" VerticalAlignment="Top" Padding="5,0" VerticalContentAlignment="Center" Height="20" Margin="0,0,20,0"/>
+                                <ToggleButton IsChecked="{Binding IsRenderOrderReversed, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Right" VerticalAlignment="Top" Width="20" Height="20" Background="{DynamicResource AREghZyBrush.Tone6.Background.Static}"
+                                              ToolTip="Flips the order in which the sources are rendered. By default, they are rendered top to bottom, meaning the last item is rendered last and the top item is rendered first. Flipping the direction will render bottom to top" ToolTipService.ShowDuration="40000" BorderBrush="{DynamicResource AREghZyBrush.Tone6.Border.Static}">
+                                    <TextBlock Text="{Binding IsRenderOrderReversed, Converter={StaticResource RenderOrderToTextConverter}}" FontSize="18" Margin="0,-5,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
+                                </ToggleButton>
                                 <Grid DataContext="{Binding SourceDeck}" Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}" x:Name="ThingGrid" Margin="0,20,0,0">
                                     <ListBox ItemsSource="{Binding Items, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}"
                                              SelectedItem="{Binding PrimarySelectedItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -186,6 +202,7 @@
                                                         <TextBlock Text="+" FontSize="20" Margin="-2,-5,0,0"/>
                                                     </MenuItem.Header>
                                                     <MenuItem Header="Add Image" Command="{Binding AddImageCommand, Mode=OneTime}"/>
+                                                    <MenuItem Header="Add Image" Command="{Binding AddMMFCommand, Mode=OneTime}"/>
                                                     <Separator/>
                                                     <MenuItem Header="Add Output Loopback" InputGestureText="Debug Feature" Command="{Binding AddLoopbackInput, Mode=OneTime}"/>
                                                 </MenuItem>
@@ -238,6 +255,7 @@
                                             <TextBlock Text="+" FontSize="20" Margin="-2,-5,0,0"/>
                                         </MenuItem.Header>
                                         <MenuItem Header="Add FFmpeg Output" Command="{Binding AddFFmpegOutputCommand, Mode=OneTime}"/>
+                                        <MenuItem Header="Add Memory-Mapped File Output" Command="{Binding AddMMFCommand, Mode=OneTime}"/>
                                         <Separator/>
                                         <MenuItem Header="Add Buffered Output" InputGestureText="Debug Feature" Command="{Binding AddBufferedOutputCommand, Mode=OneTime}"/>
                                     </MenuItem>
@@ -269,9 +287,10 @@
                           helpers:GridLatchSplitter.ThresholdSizeToClose="80"
                           helpers:GridLatchSplitter.ThresholdSizeToOpen="120"/>
             <Border Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" Grid.Row="3">
-                <Grid>
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Left" x:Name="AverageTime"/>
-                </Grid>
+                <DockPanel>
+                    <TextBlock x:Name="ActivityBarTextBlock" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" x:Name="AverageTime" DockPanel.Dock="Right"/>
+                </DockPanel>
             </Border>
         </Grid>
     </Grid>

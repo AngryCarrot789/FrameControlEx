@@ -1,11 +1,13 @@
+using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using FrameControlEx.Core.MainView.Scene.Sources;
+using FrameControlEx.Core.FrameControl.Scene.Sources;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs.Message;
 
-namespace FrameControlEx.Core.MainView.Scene {
+namespace FrameControlEx.Core.FrameControl.Scene {
     /// <summary>
     /// A view model for storing all sources for a specific scene
     /// </summary>
@@ -18,8 +20,9 @@ namespace FrameControlEx.Core.MainView.Scene {
 
         public int CountDisabled => this.Items.Count(x => !x.IsEnabled);
 
-        public AsyncRelayCommand AddImageCommand { get; }
-        public AsyncRelayCommand AddLoopbackInput { get; }
+        public RelayCommand AddImageCommand { get; }
+        public RelayCommand AddMMFCommand { get; }
+        public RelayCommand AddLoopbackInput { get; }
 
         public RelayCommand EnableAllCommand { get; }
         public RelayCommand DisableAllCommand { get; }
@@ -29,8 +32,30 @@ namespace FrameControlEx.Core.MainView.Scene {
 
         public SourceDeckViewModel(SceneViewModel scene) {
             this.Scene = scene;
-            this.AddImageCommand = new AsyncRelayCommand(this.AddImageAction);
-            this.AddLoopbackInput = new AsyncRelayCommand(this.AddLoopbackInputAction);
+            this.AddImageCommand = new RelayCommand(() => {
+                ImageSourceViewModel source = new ImageSourceViewModel {
+                    ReadableName = $"Image {this.Items.Count(x => x is ImageSourceViewModel) + 1}"
+                };
+
+                this.Add(source);
+                this.InvalidateVisual();
+            });
+            this.AddMMFCommand = new RelayCommand(() => {
+                MMFAVSourceViewModel source = new MMFAVSourceViewModel {
+                    ReadableName = $"MMF Source {this.Items.Count(x => x is MMFAVSourceViewModel) + 1}"
+                };
+
+                this.Add(source);
+                this.InvalidateVisual();
+            });
+            this.AddLoopbackInput = new RelayCommand(() => {
+                LoopbackSourceViewModel source = new LoopbackSourceViewModel {
+                    ReadableName = $"SIInput {this.Items.Count(x => x is LoopbackSourceViewModel) + 1}"
+                };
+
+                this.Add(source);
+                this.InvalidateVisual();
+            });
             this.EnableAllCommand = new RelayCommand(() => this.Items.ForEach(x => x.IsEnabled = true), () => this.Items.Any(x => !x.IsEnabled));
             this.DisableAllCommand = new RelayCommand(() => this.Items.ForEach(x => x.IsEnabled = false), () => this.Items.Any(x => x.IsEnabled));
             this.ToggleEnabledAllCommand = new RelayCommand(() => this.Items.ForEach(x => x.IsEnabled = !x.IsEnabled));
@@ -48,36 +73,14 @@ namespace FrameControlEx.Core.MainView.Scene {
             this.DisableAllCommand.RaiseCanExecuteChanged();
         }
 
-        private async Task AddImageAction() {
-            ImageSourceViewModel source = new ImageSourceViewModel {
-                ReadableName = $"Image {this.Items.Count + 1}"
-            };
-
-            this.Add(source);
-            this.InvalidateVisual();
-        }
-
-        private async Task AddLoopbackInputAction() {
-            LoopbackSourceViewModel source = new LoopbackSourceViewModel {
-                ReadableName = $"SIInput {this.Items.Count + 1}"
-            };
-
-            this.Add(source);
-            this.InvalidateVisual();
-        }
-
         public override async Task AddActionAsync() {
             await IoC.MessageDialogs.ShowMessageAsync("Wot", "Right click the '+' button and select an item to add");
         }
 
-        public override async Task RemoveItemAction(SourceViewModel item) {
-            if (!this.Contains(item)) {
-                return;
-            }
-
-            string result = await ConfirmRemoveDialog.ShowAsync("Remove input/source?", $"Are you sure you want to remove {(string.IsNullOrEmpty(item.ReadableName) ? "this source" : item.ReadableName)}?");
+        public override async Task RemoveItemsAction(IList<SourceViewModel> list) {
+            string result = await ConfirmRemoveDialog.ShowAsync("Remove inputs/sources?", $"Are you sure you want to remove {(list.Count == 1 && !string.IsNullOrEmpty(list[0].ReadableName) ? list[0].ReadableName : list.Count.ToString())}?");
             if (result == "yes") {
-                await base.RemoveItemAction(item);
+                await base.RemoveItemsAction(list);
                 this.InvalidateVisual();
             }
         }

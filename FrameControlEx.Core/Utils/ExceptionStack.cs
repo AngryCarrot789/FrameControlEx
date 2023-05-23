@@ -33,13 +33,14 @@ namespace FrameControlEx.Core.Utils {
 
         public bool IsGlobalStack { get; }
 
-        private ExceptionStack(string message, bool isGlobalStack) {
+        private ExceptionStack(string message, bool isGlobalStack, bool throwOnDispose = true) {
             this.Message = message;
             this.Exceptions = new List<Exception>();
             this.IsGlobalStack = isGlobalStack;
+            this.ThrowOnDispose = throwOnDispose;
         }
 
-        public ExceptionStack(string message) : this(message, false) {
+        public ExceptionStack(string message, bool throwOnDispose = true) : this(message, false, throwOnDispose) {
 
         }
 
@@ -123,16 +124,25 @@ namespace FrameControlEx.Core.Utils {
                 Pop(this);
             }
 
+            if (this.ThrowOnDispose && this.TryGetException(out Exception exception)) {
+                throw exception;
+            }
+        }
+
+        public bool TryGetException(out Exception exception) {
             if (this.Exceptions.Count > 0) {
-                Exception ex = new Exception(this.Message ?? "Exceptions occurred during operation");
+                exception = new Exception(this.Message ?? "Exceptions occurred during operation");
                 foreach (Exception item in this.Exceptions) {
                     if (item != null) { // just in case
-                        ex.AddSuppressed(item);
+                        exception.AddSuppressed(item);
                     }
                 }
 
-                throw ex;
+                return true;
             }
+
+            exception = null;
+            return false;
         }
     }
 }

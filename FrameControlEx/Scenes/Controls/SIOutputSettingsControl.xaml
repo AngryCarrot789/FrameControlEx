@@ -2,8 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:outputs="clr-namespace:FrameControlEx.Core.MainView.Scene.Outputs;assembly=FrameControlEx.Core"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:outputs="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Outputs;assembly=FrameControlEx.Core" xmlns:controls="clr-namespace:FrameControlEx.Scenes.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="250"
              d:DataContext="{d:DesignInstance outputs:BasicBufferOutputViewModel}">
@@ -15,18 +15,7 @@
         </TextBlock>
         <Grid Margin="5,26,5,5">
             <TextBlock Margin="10,10,10,26" TextAlignment="Center" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"><Run Text="The buffered output is mainly a debug"/><Run Text=" feature to validate the output"/><LineBreak/><Run/><LineBreak/><Run Text="It stores a snapshot of the output image"/><Run Text=", which "/><Run Text="the "/><Run Text="loopback input "/><Run Text="can access and draw on-screen again"/><Run Text=" "/><LineBreak/><Run Text="(creating that classic "/><Run Text="infinitely deep"/><Run Text=" effect)"/></TextBlock>
-            <Grid VerticalAlignment="Bottom" Height="24">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="5"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="5"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button Command="{Binding EnableCommand, Mode=OneTime}" Content="Enabled" VerticalAlignment="Top" Height="24"/>
-                <Button Command="{Binding DisableCommand, Mode=OneTime}" Content="Disable" VerticalAlignment="Top" Height="24" Grid.Column="2"/>
-                <Button Command="{Binding ToggleEnabledCommand, Mode=OneTime}" Content="Toggle" VerticalAlignment="Top" Height="24" Grid.Column="4"/>
-            </Grid>
+            <controls:BaseIOStateController VerticalAlignment="Bottom"/>
         </Grid>
     </Grid>
 </UserControl>

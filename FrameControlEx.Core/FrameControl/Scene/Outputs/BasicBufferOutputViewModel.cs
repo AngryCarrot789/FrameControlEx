@@ -1,18 +1,20 @@
 using SkiaSharp;
 
-namespace FrameControlEx.Core.MainView.Scene.Outputs {
+namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
     /// <summary>
     /// A visual output that just takes a snapshot of the fully rendered output
     /// </summary>
-    public class BasicBufferOutputViewModel : VisualOutputViewModel {
+    public class BasicBufferOutputViewModel : AVOutputViewModel {
         public SKImage lastFrame;
 
         public BasicBufferOutputViewModel() {
 
         }
 
-        public override void OnAcceptFrame(SKSurface surface) {
-            base.OnAcceptFrame(surface);
+        public override void OnAcceptFrame(SKSurface surface, in SKImageInfo frameInfo) {
+            base.OnAcceptFrame(surface, frameInfo);
+
+            // the GC goes nuts because of this; like 1 gig of memory used every second
             this.lastFrame = surface.Snapshot();
         }
 

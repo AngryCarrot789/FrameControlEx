@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using FrameControlEx.Core.Utils;
 
 namespace FrameControlEx.Core.Timing {
     /// <summary>
@@ -43,7 +44,7 @@ namespace FrameControlEx.Core.Timing {
                             return;
                         }
                         catch (Exception e) {
-                            Debug.WriteLine(e.ToString());
+                            Debug.WriteLine(e.GetToString());
                             #if DEBUG
                             throw;
                             #else

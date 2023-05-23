@@ -1,17 +1,17 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:mainView="clr-namespace:FrameControlEx.MainView"
-                    xmlns:scene="clr-namespace:FrameControlEx.Core.FrameControl.Scene;assembly=FrameControlEx.Core">
-    <mainView:IOItemTemplateSelector x:Key="IoItemTemplateSelector">
-        <mainView:IOItemTemplateSelector.SourceTemplate>
+                    xmlns:scene="clr-namespace:FrameControlEx.Core.FrameControl.Scene;assembly=FrameControlEx.Core"
+                    xmlns:frameControl="clr-namespace:FrameControlEx.FrameControl">
+    <frameControl:IOItemTemplateSelector x:Key="IoItemTemplateSelector">
+        <frameControl:IOItemTemplateSelector.SourceTemplate>
             <DataTemplate DataType="{x:Type scene:SourceViewModel}">
                 <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </DataTemplate>
-        </mainView:IOItemTemplateSelector.SourceTemplate>
-        <mainView:IOItemTemplateSelector.OutputTemplate>
+        </frameControl:IOItemTemplateSelector.SourceTemplate>
+        <frameControl:IOItemTemplateSelector.OutputTemplate>
             <DataTemplate DataType="{x:Type scene:OutputViewModel}">
                 <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
             </DataTemplate>
-        </mainView:IOItemTemplateSelector.OutputTemplate>
-    </mainView:IOItemTemplateSelector>
+        </frameControl:IOItemTemplateSelector.OutputTemplate>
+    </frameControl:IOItemTemplateSelector>
 </ResourceDictionary>

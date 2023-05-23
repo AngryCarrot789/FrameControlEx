@@ -1,18 +1,12 @@
 using System.Runtime.InteropServices;
 
-namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
-    [StructLayout(LayoutKind.Sequential)]
+namespace FrameControlEx.Core.FrameControl.Scene {
+    [StructLayout(LayoutKind.Sequential, Size = 128, Pack = 0)]
     public struct MEMMAPFILE_HEADER {
+        public bool isValid;
         public int width;
         public int height;
         public short bpp;
-        private short unused0;
-        private int unused1;
-        private long unused2;
-        private long unused3;
-        private long unused4;
-        private long unused5;
-        private long unused6;
-        private long unused7;
+        public long time_writter;
     }
 }

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,8 +13,9 @@ using FrameControlEx.Core.FrameControl;
 using FrameControlEx.Core.FrameControl.Scene;
 using FrameControlEx.Core.FrameControl.Scene.Outputs;
 using FrameControlEx.Core.FrameControl.Scene.Sources;
+using FrameControlEx.Core.Imaging;
+using FrameControlEx.Core.Notifications;
 using FrameControlEx.Core.Utils;
-using FrameControlEx.Imaging;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 
@@ -19,18 +23,19 @@ namespace FrameControlEx.Views.Main {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : WindowEx {
-        public FrameControlViewModel ViewModel { get => (FrameControlViewModel) this.DataContext; }
+    public partial class FrameControlWindow : WindowEx, IFrameControlView {
+        public FrameControlViewModel FrameControl { get; }
 
         private int buffer_index;
         private readonly double[] buffer_time;
         private DateTime lastRenderTime = DateTime.Now;
 
-        public MainWindow() {
+        public FrameControlWindow() {
             this.InitializeComponent();
-            FrameControlViewModel frameControl = new FrameControlViewModel();
-            frameControl.SceneDeck.AddNewScene("Scene 1");
-            frameControl.RenderCallback = () => {
+            this.DataContext = this.FrameControl = new FrameControlViewModel(this);
+
+            this.FrameControl.SceneDeck.AddNewScene("Scene 1");
+            this.FrameControl.RenderCallback = () => {
                 try {
                     this.Dispatcher.Invoke(this.ViewPortElement.InvalidateVisual, DispatcherPriority.Render);
                 }
@@ -39,7 +44,6 @@ namespace FrameControlEx.Views.Main {
                 }
             };
 
-            this.DataContext = frameControl;
             this.buffer_time = new double[20];
 
             // DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
@@ -57,11 +61,17 @@ namespace FrameControlEx.Views.Main {
             // timer.Start();
         }
 
-        protected override void OnClosed(EventArgs e) {
-            base.OnClosed(e);
-            if (this.DataContext is FrameControlViewModel vm) {
-                vm.OnDispose();
-            }
+        protected override async Task<bool> OnClosingAsync() {
+            this.PushNotification(new NotificationViewModel() {
+                Message = "Stopping render thread and cleaning up resources..."
+            });
+
+            // so that the message shows in the window
+            await Task.Run(async () => {
+                await this.Dispatcher.Invoke(this.FrameControl.OnDisposeAsync, DispatcherPriority.Background);
+            });
+
+            return true;
         }
 
         public void AddDateTime(double time) {
@@ -111,10 +121,12 @@ namespace FrameControlEx.Views.Main {
             this.lastRenderTime = now;
             this.AddDateTime(diff.TotalMilliseconds);
             double interval = this.GetAverageTime();
-            this.AverageTime.Text = $"{Math.Round(interval, 2).ToString().FitLength(8)}\t ({Math.Round(1000d / interval, 2).ToString().FitLength(6)} FPS)";
+            this.AverageTime.Text = $"INTERVAL: {Math.Round(interval, 2).ToString().FitLength(6)}\t ({Math.Round(1000d / interval, 2).ToString().FitLength(8)} FPS)";
 
-            FrameControlViewModel frameControl = this.ViewModel ?? throw new Exception($"No {nameof(FrameControlViewModel)} available");
-            SKCanvas canvas = e.Surface.Canvas;
+            FrameControlViewModel frameControl = this.FrameControl ?? throw new Exception($"No {nameof(FrameControlViewModel)} available");
+            SKSurface surface = e.Surface;
+            SKCanvas canvas = surface.Canvas;
+            SKImageInfo rawImageInfo = e.RawInfo;
 
             SceneViewModel active = frameControl.SceneDeck.PrimarySelectedItem;
             if (active == null) {
@@ -126,48 +138,52 @@ namespace FrameControlEx.Views.Main {
                 canvas.Clear(active.BackgroundColour);
             }
 
-            foreach (SourceViewModel source in active.SourceDeck.Items) {
+            IEnumerable<SourceViewModel> items = active.IsRenderOrderReversed ? active.SourceDeck.ReverseEnumerable() : active.SourceDeck.Items;
+            foreach (SourceViewModel source in items) {
                 if (!source.IsEnabled) {
                     continue;
                 }
 
                 // TODO: Maybe create separate rendering classes for each type of source
-                if (source is VisualSourceViewModel visual) {
-                    visual.OnTickVisual();
-                    Vector2 scale = visual.Scale, pos = visual.Pos, origin = visual.ScaleOrigin;
-                    if (source is ImageSourceViewModel imgSrc) {
-                        if (imgSrc.Image is SkiaImageFactory.SkiaImage img) {
-                            SKMatrix matrix = canvas.TotalMatrix;
-                            canvas.Translate(pos.X, pos.Y);
-                            canvas.Scale(scale.X, scale.Y, (float) img.image.Width * origin.X, (float) img.image.Height * origin.Y);
-                            canvas.DrawImage(img.image, 0, 0);
-                            canvas.SetMatrix(matrix);
-                        }
-                    }
-                    else if (source is LoopbackSourceViewModel input) {
-                        if (input.TargetOutput != null && input.TargetOutput.IsEnabled & input.TargetOutput.lastFrame != null) {
-                            SKMatrix matrix = canvas.TotalMatrix;
-                            canvas.Translate(pos.X, pos.Y);
-                            SKImage frame = input.TargetOutput.lastFrame;
-                            canvas.Scale(scale.X, scale.Y, (float) frame.Width * origin.X, (float) frame.Height * origin.Y);
-                            canvas.DrawImage(frame, 0, 0);
-                            canvas.SetMatrix(matrix);
-                        }
-                    }
+                if (source is AVSourceViewModel av) {
+                    av.OnTickVisual();
+                    av.OnRender(surface, canvas, rawImageInfo);
                 }
+
             }
 
             // TODO: Maybe move this code somewhere else... maybe? dunno
 
             e.Surface.Flush();
             foreach (OutputViewModel output in frameControl.OutputDeck.Items) {
-                if (!output.IsEnabled) {
-                    continue;
+                if (output.IsEnabled && output is IVisualOutput visual) {
+                    visual.OnAcceptFrame(surface, in rawImageInfo);
                 }
+            }
+        }
 
-                if (output is VisualOutputViewModel visual) {
-                    visual.OnAcceptFrame(e.Surface);
+        public void CloseWindow() {
+            this.Close();
+        }
+
+        public Task CloseWindowAsync() {
+            return this.CloseAsync();
+        }
+
+        public void PushNotification(NotificationViewModel notification) {
+            if (string.IsNullOrWhiteSpace(notification.Header)) {
+                if (string.IsNullOrWhiteSpace(notification.Message)) {
+                    return;
                 }
+                else {
+                    this.ActivityBarTextBlock.Text = notification.Message;
+                }
+            }
+            else if (string.IsNullOrWhiteSpace(notification.Message)) {
+                this.ActivityBarTextBlock.Text = notification.Header;
+            }
+            else {
+                this.ActivityBarTextBlock.Text = notification.Header + ": " + notification.Message;
             }
         }
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using FrameControlEx.Core.Actions.Contexts;
+using FrameControlEx.Core.Utils;
 
 namespace FrameControlEx.Core.Actions {
     public class ActionManager {
@@ -139,7 +140,7 @@ namespace FrameControlEx.Core.Actions {
                         return await action.ExecuteAsync(e);
                     }
                     catch (Exception ex) {
-                        await IoC.MessageDialogs.ShowMessageExAsync("Action execution exception", $"An exception occurred while executing '{e.ActionId ?? action.GetType().ToString()}'", ex.ToString());
+                        await IoC.MessageDialogs.ShowMessageExAsync("Action execution exception", $"An exception occurred while executing '{e.ActionId ?? action.GetType().ToString()}'", ex.GetToString());
                         return true;
                     }
                 }

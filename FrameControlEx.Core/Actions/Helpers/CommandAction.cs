@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using FrameControlEx.Core.Actions.Contexts;
 
 namespace FrameControlEx.Core.Actions.Helpers {
     /// <summary>
@@ -49,6 +51,10 @@ namespace FrameControlEx.Core.Actions.Helpers {
             this.CommandAccessor = accessor ?? throw new ArgumentNullException(nameof(accessor));
         }
 
+        public static CommandActionBuilder Builder() {
+            return new CommandActionBuilder();
+        }
+
         public override async Task<bool> ExecuteAsync(AnActionEventArgs e) {
             if (!e.DataContext.TryGetContext(out T instance)) {
                 return false;
@@ -88,6 +94,97 @@ namespace FrameControlEx.Core.Actions.Helpers {
             }
 
             return this.PresentationWhenCannotExecute;
+        }
+    }
+
+    public class CommandActionBuilder {
+        private readonly Dictionary<Type, Func<object, ICommand>> accessors;
+
+        public CommandActionBuilder() {
+            this.accessors = new Dictionary<Type, Func<object, ICommand>>();
+        }
+
+        public static CommandActionBuilder Of() {
+            return new CommandActionBuilder();
+        }
+
+        public CommandActionBuilder ForType<T>(Func<T, ICommand> function) {
+            this.accessors[typeof(T)] = x => function((T) x);
+            return this;
+        }
+
+        public AnAction ToAction() {
+            return new CommandActionExImpl(this.accessors);
+        }
+
+        private class CommandActionExImpl : AnAction {
+            private readonly Dictionary<Type, Func<object, ICommand>> accessors;
+
+            public CommandActionExImpl(Dictionary<Type, Func<object, ICommand>> accessors) {
+                this.accessors = accessors;
+            }
+
+            public override Presentation GetPresentation(AnActionEventArgs e) {
+                ICommand cmd = this.GetCommand(e.DataContext);
+                return cmd == null ? Presentation.VisibleAndDisabled : Presentation.VisibleAndEnabled;
+            }
+
+            public override async Task<bool> ExecuteAsync(AnActionEventArgs e) {
+                foreach (object obj in e.DataContext.Context) {
+                    if (obj == null) {
+                        continue;
+                    }
+
+                    ICommand command;
+                    Type type = obj.GetType();
+                    Func<object, ICommand> func = null;
+                    while (type != null && !this.accessors.TryGetValue(type, out func)) {
+                        type = type.BaseType;
+                    }
+
+                    if (func == null || (command = func(obj)) == null) {
+                        continue;
+                    }
+
+                    if (command.CanExecute(null)) {
+                        if (command is BaseAsyncRelayCommand asyncCmd) {
+                            await asyncCmd.ExecuteAsync(null);
+                        }
+                        else {
+                            command.Execute(null);
+                        }
+
+                        return true;
+                    }
+
+                    return false;
+                }
+
+                return false;
+            }
+
+            public ICommand GetCommand(IDataContext context) {
+                foreach (object obj in context.Context) {
+                    if (obj == null) {
+                        continue;
+                    }
+
+                    ICommand command;
+                    Type type = obj.GetType();
+                    Func<object, ICommand> func = null;
+                    while (type != null && !this.accessors.TryGetValue(type, out func)) {
+                        type = type.BaseType;
+                    }
+
+                    if (func == null || (command = func(obj)) == null) {
+                        continue;
+                    }
+
+                    return command;
+                }
+
+                return null;
+            }
         }
     }
 }

@@ -2,7 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using FrameControlEx.Core.FrameControl.Scene;
 
-namespace FrameControlEx.MainView {
+namespace FrameControlEx.FrameControl {
     public class IOItemTemplateSelector : DataTemplateSelector {
         public DataTemplate SourceTemplate { get; set; }
         public DataTemplate OutputTemplate { get; set; }

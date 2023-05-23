@@ -118,4 +118,31 @@ namespace FrameControlEx.Converters {
             this.FalseValue = null;
         }
     }
+
+    public class BoolToColourConverter : BoolConverter {
+        public new Color TrueValue {
+            get => (Color) base.TrueValue;
+            set => base.TrueValue = value;
+        }
+
+        public new Color FalseValue {
+            get => (Color) base.FalseValue;
+            set => base.FalseValue = value;
+        }
+
+        public new Color UnsetValue {
+            get => (Color) base.UnsetValue;
+            set => base.UnsetValue = value;
+        }
+
+        public new Color NonBoolValue {
+            get => (Color) base.NonBoolValue;
+            set => base.NonBoolValue = value;
+        }
+
+        public BoolToColourConverter() {
+            this.TrueValue = Colors.Black;
+            this.FalseValue = Colors.Black;
+        }
+    }
 }

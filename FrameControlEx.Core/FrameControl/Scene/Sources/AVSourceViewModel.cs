@@ -2,12 +2,14 @@ using System;
 using System.Numerics;
 using System.Threading.Tasks;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;
+using SkiaSharp;
 
 namespace FrameControlEx.Core.FrameControl.Scene.Sources {
     /// <summary>
-    /// Base class for visual sources (videos, images, but not audio)
+    /// Base class for audio visual sources. These contain a position, scale,
+    /// scale origin, etc, that represent the standard controls for an input/source
     /// </summary>
-    public abstract class VisualSourceViewModel : SourceViewModel, IVisualSource {
+    public abstract class AVSourceViewModel : SourceViewModel, IAudioSource, IVisualSource {
         private Vector2 pos;
         private Vector2 scale;
         private Vector2 scaleOrigin;
@@ -88,7 +90,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
 
         public event VisualInvalidatedEventHandler OnVisualInvalidated;
 
-        protected VisualSourceViewModel() {
+        protected AVSourceViewModel() {
             this.pos = new Vector2(0, 0);
             this.scale = new Vector2(1, 1);
             this.scaleOrigin = new Vector2(0.5f, 0.5f);
@@ -102,7 +104,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             });
         }
 
-        protected DoubleInputViewModel CreateVec2Input(string msgA, string msgB, string title, float inputA, float inputB) {
+        protected DoubleInputViewModel CreateVec2Editor(string msgA, string msgB, string title, float inputA, float inputB) {
             DoubleInputViewModel input = new DoubleInputViewModel() {
                 MessageA = msgA, MessageB = msgB, Title = title,
                 InputA = Math.Round(inputA, 4).ToString(),
@@ -114,7 +116,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
         }
 
         public virtual async Task EditPosAction() {
-            DoubleInputViewModel input = this.CreateVec2Input("Pos X:", "Pos Y:", "Input a new position", this.PosX, this.PosY);
+            DoubleInputViewModel input = this.CreateVec2Editor("Pos X:", "Pos Y:", "Input a new position", this.PosX, this.PosY);
             if (await IoC.UserInput.ShowDoubleInputDialogAsync(input)) {
                 if (float.TryParse(input.InputA, out float x) && float.TryParse(input.InputB, out float y)) {
                     this.Pos = new Vector2(x, y);
@@ -123,7 +125,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
         }
 
         public virtual async Task EditScaleAction() {
-            DoubleInputViewModel input = this.CreateVec2Input("Scale X:", "Scale Y:", "Input a new scale", this.ScaleX, this.ScaleY);
+            DoubleInputViewModel input = this.CreateVec2Editor("Scale X:", "Scale Y:", "Input a new scale", this.ScaleX, this.ScaleY);
             if (await IoC.UserInput.ShowDoubleInputDialogAsync(input)) {
                 if (float.TryParse(input.InputA, out float x) && float.TryParse(input.InputB, out float y)) {
                     this.Scale = new Vector2(x, y);
@@ -132,7 +134,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
         }
 
         public virtual async Task EditScaleOriginAction() {
-            DoubleInputViewModel input = this.CreateVec2Input("Origin X:", "Origin Y:", "Input a new scale origin", this.ScaleOriginX, this.ScaleOriginY);
+            DoubleInputViewModel input = this.CreateVec2Editor("Origin X:", "Origin Y:", "Input a new scale origin", this.ScaleOriginX, this.ScaleOriginY);
             if (await IoC.UserInput.ShowDoubleInputDialogAsync(input)) {
                 if (float.TryParse(input.InputA, out float x) && float.TryParse(input.InputB, out float y)) {
                     this.ScaleOrigin = new Vector2(x, y);
@@ -156,9 +158,13 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
 
         }
 
+        public virtual void OnRender(SKSurface surface, SKCanvas canvas, SKImageInfo frameInfo) {
+
+        }
+
         protected override void LoadThisIntoCopy(BaseIOViewModel vm) {
             base.LoadThisIntoCopy(vm);
-            if (vm is VisualSourceViewModel vs) { // syntax looks nicer than force cast
+            if (vm is AVSourceViewModel vs) { // syntax looks nicer than force cast
                 vs.pos = this.pos;
                 vs.scale = this.scale;
                 vs.scaleOrigin = this.scaleOrigin;

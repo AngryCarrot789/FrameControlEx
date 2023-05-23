@@ -191,6 +191,29 @@ namespace FrameControlEx.Core.Utils {
             }
         }
 
+        public void RemoveRange(IEnumerable<T> items) {
+            if (items == null)
+                throw new ArgumentNullException(nameof(items), "Items cannot be null");
+
+            IList<T> list = this.Items;
+            this.CheckReentrancy();
+            if (ReferenceEquals(items, this) || ReferenceEquals(items, this.Items)) {
+                items = items.ToList();
+            }
+
+            foreach (T item in items) {
+                int index = this.Items.IndexOf(item);
+                if (index == -1) {
+                    continue;
+                }
+
+                list.RemoveAt(index);
+                this.OnCountPropertyChanged();
+                this.OnIndexerPropertyChanged();
+                this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
+            }
+        }
+
         public bool RemoveFirst(Predicate<T> canRemove) {
             this.CheckReentrancy();
             int index = this.FindIndexOf(canRemove);
@@ -222,6 +245,10 @@ namespace FrameControlEx.Core.Utils {
             this.OnCountPropertyChanged();
             this.OnIndexerPropertyChanged();
             this.OnCollectionChanged(EventArgsCache.ResetCollectionChanged);
+        }
+
+        public IEnumerable<T> ReverseEnumerable() {
+            return this.Items.Reverse();
         }
     }
 }

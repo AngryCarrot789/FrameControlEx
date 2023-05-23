@@ -1,58 +1,65 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using FrameControlEx.Core.MainView.Scene;
+using FrameControlEx.Core.FrameControl.Scene;
+using FrameControlEx.Core.Settings;
 using FrameControlEx.Core.Utils;
 
-namespace FrameControlEx.Core.MainView {
+namespace FrameControlEx.Core.FrameControl {
     public class FrameControlViewModel : BaseViewModel {
-        private FrameControlSettingsViewModel settings;
-
-        public FrameControlSettingsViewModel Settings {
-            get => this.settings;
-            set => this.RaisePropertyChanged(ref this.settings, value);
-        }
-
         public SceneDeckViewModel SceneDeck { get; }
 
         public OutputDeckViewModel OutputDeck { get; }
 
         public Action RenderCallback { get; set; }
 
-        private volatile bool isThreadRunning;
+        private volatile bool isRenderLoopRunning;
         private readonly Task renderTask;
         private long targetIntervalTicks;
 
-        public FrameControlViewModel() {
+        public IFrameControlView View { get; }
+
+        public FrameControlViewModel(IFrameControlView view) {
+            this.View = view ?? throw new ArgumentNullException(nameof(view));
             this.SceneDeck = new SceneDeckViewModel(this);
             this.OutputDeck = new OutputDeckViewModel(this);
-            this.settings = new FrameControlSettingsViewModel();
-            this.settings.PropertyChanged += this.SettingsOnPropertyChanged;
-            this.settings.Width = 1920;
-            this.settings.Height = 1080;
-            this.settings.FrameRate = 60;
+            IoC.Settings.OnSettingsModified += this.OnSettingsModified;
+            this.OnSettingsModified(IoC.Settings.ActiveSettings);
 
-            this.isThreadRunning = true;
+            this.isRenderLoopRunning = true;
             this.renderTask = Task.Factory.StartNew(this.RenderMain, TaskCreationOptions.LongRunning);
         }
 
-        private void SettingsOnPropertyChanged(object sender, PropertyChangedEventArgs e) {
-            switch (e.PropertyName) {
-                case nameof(FrameControlSettingsViewModel.FrameRate): {
-                    this.targetIntervalTicks = (long) Math.Floor((1000d / this.settings.FrameRate) * Time.TICK_PER_MILLIS);
-                    break;
-                }
-            }
+        private void OnSettingsModified(SettingsViewModel settings) {
+            this.targetIntervalTicks = (long) Math.Floor((1000d / settings.FrameRate) * Time.TICK_PER_MILLIS);
         }
 
-        public void OnDispose() {
-            this.isThreadRunning = false;
+        public async Task OnDisposeAsync() {
+            this.isRenderLoopRunning = false;
+            if (this.renderTask != null && !this.renderTask.IsCanceled && !this.renderTask.IsCompleted) {
+                await this.renderTask;
+            }
+
+            using (ExceptionStack stack = new ExceptionStack("Exception disposing scenes", false)) {
+                this.SceneDeck.DisposeItemsAndClear(stack);
+                #if DEBUG
+                if (stack.TryGetException(out Exception exception)) {
+                    Debug.WriteLine($"Failed to dispose scenes: " + exception.GetToString());
+                }
+                #endif
+            }
+            // clear all scenes
+            this.SceneDeck.DisposeAllAndClear(new List<(SceneViewModel, Exception)>());
         }
 
         private const long MILLIS_PER_THREAD_SPLICE = 16;
         private static readonly long THREAD_SPLICE_IN_TICKS = 16L * Time.TICK_PER_MILLIS;
-        // 1.71 is the average yield interval
+        // 1.71ms to 2.3ms is the max yield interval i found
         // private static readonly long YIELD_MILLIS_IN_TICKS = (long) (1.71d * Time.TICK_PER_MILLIS);
         private static readonly long YIELD_MILLIS_IN_TICKS = Time.TICK_PER_MILLIS / 20;
 
@@ -64,7 +71,7 @@ namespace FrameControlEx.Core.MainView {
         #endif
 
         private void RenderMain() {
-            while (this.isThreadRunning) {
+            while (this.isRenderLoopRunning) {
                 // Get the target time that the action should be executed
                 // While the waiting time is larger than the thread splice time
                 // (target - time) == duration to wait
@@ -94,7 +101,7 @@ namespace FrameControlEx.Core.MainView {
                     if (b < MIN_YIELD_TIME)
                         MIN_YIELD_TIME = b;
                     #else
-                    Thread.Yield();
+                    Thread.Sleep(0);
                     #endif
                 }
 

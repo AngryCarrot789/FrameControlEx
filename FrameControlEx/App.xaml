@@ -13,7 +13,7 @@
                 <!--
                 -->
 
-                <ResourceDictionary Source="MainView/IOTemplateStyles.xaml"/>
+                <ResourceDictionary Source="FrameControl/IOTemplateStyles.xaml"/>
                 <ResourceDictionary Source="AdvancedContextService/ContextStyles.xaml"/>
                 <ResourceDictionary Source="Controls/ControlStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>

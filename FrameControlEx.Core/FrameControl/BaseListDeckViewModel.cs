@@ -4,21 +4,37 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+using FrameControlEx.Core.FrameControl.Scene;
 using FrameControlEx.Core.Utils;
 
-namespace FrameControlEx.Core.MainView {
+namespace FrameControlEx.Core.FrameControl {
     /// <summary>
     /// A base view model for a list in which items can be added, removed, moved up/down, etc
     /// </summary>
     /// <typeparam name="T">The type of item to store</typeparam>
     public abstract class BaseListDeckViewModel<T> : BaseViewModel {
+        private static List<object> DeckClipboard;
+
         private readonly ObservableCollectionEx<T> items;
         public ReadOnlyObservableCollection<T> Items { get; }
 
-        private T selectedItem;
-        public T SelectedItem {
-            get => this.selectedItem;
-            set => this.RaisePropertyChanged(ref this.selectedItem, value);
+        // cannot be non-null due to how the ListBoxHelper deals with selected items
+        // TODO: move to observable collection for selected items
+
+        private IList<T> selectedItems = new List<T>();
+        public IList<T> SelectedItems {
+            get => this.selectedItems;
+            set => this.RaisePropertyChanged(ref this.selectedItems, value ?? new List<T>());
+        }
+
+        private T primarySelectedItem;
+        public T PrimarySelectedItem {
+            get => this.primarySelectedItem;
+            set {
+                T oldItem = this.primarySelectedItem;
+                this.RaisePropertyChanged(ref this.primarySelectedItem, value);
+                this.OnPrimarySelectionChanged(oldItem, value);
+            }
         }
 
         public AsyncRelayCommand AddCommand { get; }
@@ -27,7 +43,7 @@ namespace FrameControlEx.Core.MainView {
         public RelayCommand MoveSelectedDownCommand { get; }
         public AsyncRelayCommand ClearCommand { get; }
 
-        public BaseListDeckViewModel() {
+        protected BaseListDeckViewModel() {
             this.items = new ObservableCollectionEx<T>();
             // add before creating Items so that we get called first before UI stuff; probably better?
             this.items.CollectionChanged += this.OnItemCollectionChanged;
@@ -39,6 +55,22 @@ namespace FrameControlEx.Core.MainView {
             this.ClearCommand = new AsyncRelayCommand(this.ClearActionAsync);
         }
 
+        protected virtual void OnPrimarySelectionChanged(T oldValue, T newValue) {
+
+        }
+
+        // static BaseListDeckViewModel() {
+        //     ActionManager.Instance.Register("actions.deck.copy", CommandActionBuilder.Of().ForType().ToAction());
+        // }
+//
+        // private class CopyAction : AnAction {
+        //     public override Task<bool> ExecuteAsync(AnActionEventArgs e) {
+        //         if (e.DataContext.TryGetContext(out SceneDeckViewModel deck)) {
+//
+        //         }
+        //     }
+        // }
+
         protected virtual void OnItemCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
 
         }
@@ -48,36 +80,38 @@ namespace FrameControlEx.Core.MainView {
         }
 
         public virtual Task RemoveSelectedActionAsync() {
-            if (this.selectedItem != null) {
-                return this.RemoveItemAction(this.selectedItem);
+            if (this.SelectedItems.Count > 0) {
+                return this.RemoveItemsAction(this.SelectedItems);
             }
 
             return Task.CompletedTask;
         }
 
-        public virtual async Task RemoveItemAction(T item) {
-            int index = this.items.IndexOf(item);
-            if (index >= 0) {
+        public virtual async Task RemoveItemsAction(T item) {
+            await this.RemoveItemsAction(new List<T> {item});
+        }
+
+        public virtual async Task RemoveItemsAction(IList<T> list) {
+            if (list.Count < 1) {
+                return;
+            }
+
+            foreach (T item in list.ToList()) {
                 if (item is IDisposable) {
                     try {
                         ((IDisposable) item).Dispose();
                     }
                     catch (Exception e) {
-                        await IoC.MessageDialogs.ShowMessageExAsync("Exception disposing image", $"Failed to dispose {item.GetType()} properly. This error can be ignored", e.ToString());
+                        await IoC.MessageDialogs.ShowMessageExAsync("Exception disposing item", $"Failed to dispose {item.GetType()} properly", e.GetToString());
                     }
-                    finally {
-                        this.items.Remove(item);
-                    }
-                }
-                else {
-                    this.items.Remove(item);
                 }
 
-                int count = this.items.Count;
-                if (count > 0) {
-                    this.SelectedItem = this.items[Math.Min(index, count - 1)];
-                }
+                this.items.Remove(item);
             }
+        }
+
+        protected virtual void RemoveItems(IEnumerable<T> enumerable) {
+            this.items.RemoveRange(enumerable);
         }
 
         public virtual async Task ClearActionAsync() {
@@ -92,43 +126,74 @@ namespace FrameControlEx.Core.MainView {
         }
 
         public void DisposeAllAndClear(List<(T, Exception)> exceptions) {
-            try {
-                foreach (T item in this.items) {
-                    if (item is IDisposable disposable) {
-                        try {
-                            disposable.Dispose();
-                        }
-                        catch (Exception e) {
-                            exceptions.Add((item, e));
-                        }
+            foreach (T item in this.items) {
+                if (item is IDisposable disposable) {
+                    try {
+                        disposable.Dispose();
+                    }
+                    catch (Exception e) {
+                        exceptions.Add((item, e));
                     }
                 }
             }
-            finally {
-                this.items.Clear();
+
+            this.items.Clear();
+        }
+
+        public void DisposeItemsAndClear(ExceptionStack stack) {
+            foreach (T source in this.Items) {
+                if (source is IDisposable) {
+                    try {
+                        ((IDisposable) source).Dispose();
+                    }
+                    catch (Exception e) {
+                        stack.Push(new Exception($"Failed to dispose {source}", e));
+                    }
+                }
+            }
+
+            this.Clear();
+        }
+
+        public virtual void MoveSelectedItems(int offset) {
+            if (offset == 0 || this.SelectedItems.Count < 1) {
+                return;
+            }
+
+            List<int> selection = new List<int>();
+            foreach (T item in this.SelectedItems) {
+                int index = this.items.IndexOf(item);
+                if (index < 0) {
+                    continue;
+                }
+
+                selection.Add(index);
+            }
+
+            if (offset > 0) {
+                selection.Sort((a, b) => b.CompareTo(a));
+            }
+            else {
+                selection.Sort((a, b) => a.CompareTo(b));
+            }
+
+            for (int i = 0; i < selection.Count; i++) {
+                int target = selection[i] + offset;
+                if (target < 0 || target >= this.items.Count || selection.Contains(target)) {
+                    continue;
+                }
+
+                this.items.Move(selection[i], target);
+                selection[i] = target;
             }
         }
 
         public virtual void MoveSelectedItemUpAction() {
-            int index;
-            if (this.selectedItem == null || (index = this.items.IndexOf(this.selectedItem)) < 0) {
-                return;
-            }
-
-            if (index > 0) {
-                this.items.Move(index, index - 1);
-            }
+            this.MoveSelectedItems(-1);
         }
 
         public virtual void MoveSelectedItemDownAction() {
-            int index;
-            if (this.selectedItem == null || (index = this.items.IndexOf(this.selectedItem)) < 0) {
-                return;
-            }
-
-            if ((index + 1) < this.items.Count) {
-                this.items.Move(index, index + 1);
-            }
+            this.MoveSelectedItems(1);
         }
 
         protected virtual void EnsureItem(T item, bool valid) {
@@ -216,6 +281,10 @@ namespace FrameControlEx.Core.MainView {
         protected virtual void ClearAndAddRange(IEnumerable<T> enumerable) {
             this.EnsureItems(this.items, false);
             this.items.ClearAndAddRange(enumerable);
+        }
+
+        public IEnumerable<T> ReverseEnumerable() {
+            return this.items.ReverseEnumerable();
         }
     }
 }

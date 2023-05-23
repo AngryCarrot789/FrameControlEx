@@ -14,9 +14,9 @@ using SkiaSharp;
 
 namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
     /// <summary>
-    /// A memory-mapped frame output view model. This writes the current frame to a memory-mapped file for other processes to read from
+    /// A memory-mapped file based output. This writes the current frame to a memory-mapped file for other processes to read from
     /// </summary>
-    public class MMFrameOutputViewModel : VisualOutputViewModel {
+    public class MMFAVOutputViewModel : AVOutputViewModel {
         private MemoryMappedFile file;
         private SKImageInfo lastInfo;
         private long currentLength;
@@ -47,7 +47,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
 
         public AsyncRelayCommand EditMappedFileNameCommand { get; }
 
-        public MMFrameOutputViewModel() {
+        public MMFAVOutputViewModel() {
             this.EditMappedFileNameCommand = new AsyncRelayCommand(this.EditMappedFileNameAction);
         }
 
@@ -63,7 +63,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
             using (MemoryMappedViewAccessor view = mappedFile.CreateViewAccessor(0, this.currentLength)) {
                 unsafe {
                     MEMMAPFILE_HEADER header = new MEMMAPFILE_HEADER() {
-                        width = frameInfo.Width, height = frameInfo.Height, bpp = (byte) frameInfo.BytesPerPixel
+                        isValid = true, width = frameInfo.Width, height = frameInfo.Height, bpp = (byte) frameInfo.BytesPerPixel
                     };
 
                     view.Write(0, ref header);
@@ -203,12 +203,12 @@ namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
         }
 
         protected override BaseIOViewModel CreateInstanceCore() {
-            return new MMFrameOutputViewModel();
+            return new MMFAVOutputViewModel();
         }
 
         protected override void LoadThisIntoCopy(BaseIOViewModel vm) {
             base.LoadThisIntoCopy(vm);
-            if (vm is MMFrameOutputViewModel output) {
+            if (vm is MMFAVOutputViewModel output) {
                 output.generateMapName = this.generateMapName;
                 output.mapName = this.mapName;
             }

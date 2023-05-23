@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FrameControlEx.Scenes.Controls"
-             xmlns:sources="clr-namespace:FrameControlEx.Core.MainView.Scene.Sources;assembly=FrameControlEx.Core"
+             xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Sources;assembly=FrameControlEx.Core"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="250"
              d:DataContext="{d:DesignInstance sources:LoopbackSourceViewModel}">
@@ -18,19 +18,8 @@
             <TextBlock Text="The target output to pull video from" Padding="5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
             <TextBox DataContext="{Binding TargetOutput}" Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsReadOnly="True" Padding="4,2" VerticalAlignment="Top" Margin="0,26,0,0" VerticalContentAlignment="Center" Height="24" Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}"/>
             <Button Command="{Binding ChangeTargetCommand, Mode=OneTime}" Content="Select Target" Height="24" VerticalAlignment="Top" Margin="0,55,0,0"/>
-            <local:VisualMovementController VerticalAlignment="Bottom" Margin="0,0,0,29"/>
-            <Grid VerticalAlignment="Bottom" Height="24">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="5"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="5"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button Command="{Binding EnableCommand, Mode=OneTime}" Content="Enabled" VerticalAlignment="Top" Height="24"/>
-                <Button Command="{Binding DisableCommand, Mode=OneTime}" Content="Disable" VerticalAlignment="Top" Height="24" Grid.Column="2"/>
-                <Button Command="{Binding ToggleEnabledCommand, Mode=OneTime}" Content="Toggle" VerticalAlignment="Top" Height="24" Grid.Column="4"/>
-            </Grid>
+            <local:VisualMovementController VerticalAlignment="Bottom" Margin="0,0,0,39"/>
+            <local:BaseIOStateController VerticalAlignment="Bottom"/>
         </Grid>
     </Grid>
 </UserControl>

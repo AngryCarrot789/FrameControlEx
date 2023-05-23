@@ -1,8 +1,9 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FrameControlEx.Core.Views.Dialogs.Message;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;
 
-namespace FrameControlEx.Core.MainView.Scene {
+namespace FrameControlEx.Core.FrameControl.Scene {
     public class SceneDeckViewModel : BaseListDeckViewModel<SceneViewModel> {
         public static readonly MessageDialog ConfirmRemoveDialog;
 
@@ -17,12 +18,22 @@ namespace FrameControlEx.Core.MainView.Scene {
             this.FrameControl = frameControl;
         }
 
+        protected override void OnPrimarySelectionChanged(SceneViewModel oldValue, SceneViewModel newValue) {
+            base.OnPrimarySelectionChanged(oldValue, newValue);
+            if (oldValue != null)
+                oldValue.IsActive = false;
+            if (newValue != null)
+                newValue.IsActive = true;
+        }
+
         public void AddNewScene(string name) {
             this.Add(new SceneViewModel(this) {
                 ReadableName = name
             });
 
-            this.SelectedItem = this.Items[this.Items.Count - 1];
+            this.SelectedItems = new List<SceneViewModel>() {
+                this.Items[this.Items.Count - 1]
+            };
         }
 
         public override async Task AddActionAsync() {
@@ -32,14 +43,14 @@ namespace FrameControlEx.Core.MainView.Scene {
             }
         }
 
-        public override async Task RemoveItemAction(SceneViewModel item) {
-            if (!this.Contains(item)) {
+        public override async Task RemoveItemsAction(IList<SceneViewModel> list) {
+            if (list.Count < 1) {
                 return;
             }
 
-            string result = await ConfirmRemoveDialog.ShowAsync("Remove scene?", $"Are you sure you want to remove {(string.IsNullOrEmpty(item.ReadableName) ? "this scene" : item.ReadableName)}?");
+            string result = await ConfirmRemoveDialog.ShowAsync($"Remove scene{(list.Count == 1 ? "" : "s")}?", $"Are you sure you want to remove {(list.Count == 1 && !string.IsNullOrEmpty(list[0].ReadableName) ? list[0].ReadableName : list.Count.ToString())}?");
             if (result == "yes") {
-                await base.RemoveItemAction(item);
+                await base.RemoveItemsAction(list);
             }
         }
     }

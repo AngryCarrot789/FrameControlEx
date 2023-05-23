@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using FFmpeg.AutoGen;
 using FrameControlEx.Core;
 using FrameControlEx.Core.Actions;
-using FrameControlEx.Core.Actions.Helpers;
 using FrameControlEx.Core.Imaging;
 using FrameControlEx.Core.Shortcuts.Managing;
 using FrameControlEx.Core.Shortcuts.ViewModels;
-using FrameControlEx.Imaging;
-using FrameControlEx.MainView;
-using FrameControlEx.Scenes;
+using FrameControlEx.Core.Utils;
+using FrameControlEx.FrameControl;
 using FrameControlEx.Services;
 using FrameControlEx.Shortcuts;
 using FrameControlEx.Shortcuts.Converters;
@@ -67,6 +64,11 @@ namespace FrameControlEx {
             };
 
             IoC.BroadcastShortcutActivity = (x) => {
+                foreach (object window in this.Windows) {
+                    if (window is FrameControlWindow fcWin) {
+                        fcWin.ActivityBarTextBlock.Text = x?.Trim() ?? "";
+                    }
+                }
             };
 
             IoC.BufferSelector = new OutputSelector();
@@ -79,8 +81,10 @@ namespace FrameControlEx {
                 }
             }
             else {
-                await IoC.MessageDialogs.ShowMessageAsync("No keymap available", "Keymap file does not exist: " + keymapFilePath + $".\n{Directory.GetCurrentDirectory()}\n{String.Join("\n", Environment.GetCommandLineArgs())}");
+                await IoC.MessageDialogs.ShowMessageAsync("No keymap available", "Keymap file does not exist: " + keymapFilePath + $".\nCurrent directory: {Directory.GetCurrentDirectory()}\nCommand line args:{string.Join("\n", Environment.GetCommandLineArgs())}");
             }
+
+            ffmpeg.avdevice_register_all();
         }
 
         protected override void OnExit(ExitEventArgs e) {
@@ -89,16 +93,18 @@ namespace FrameControlEx {
         }
 
         private async void Application_Startup(object sender, StartupEventArgs e) {
+            // Dialogs may be shown, becoming the main window, possibly causing the
+            // app to shutdown when the mode is OnMainWindowClose or OnLastWindowClose
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
             try {
                 await this.InitApp();
             }
             catch (Exception ex) {
                 if (IoC.MessageDialogs != null) {
-                    await IoC.MessageDialogs.ShowMessageExAsync("App initialisation failed", "Failed to start MCNBTEditor", ex.ToString());
+                    await IoC.MessageDialogs.ShowMessageExAsync("App initialisation failed", "Failed to start FrameControl", ex.GetToString());
                 }
                 else {
-                    MessageBox.Show("Failed to start MCNBTEditor:\n\n" + ex, "App initialisation failed");
+                    MessageBox.Show("Failed to start FrameControl:\n\n" + ex, "Fatal App initialisation failure");
                 }
 
                 this.Shutdown();
@@ -106,11 +112,9 @@ namespace FrameControlEx {
             }
 
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
-            MainWindow window = new MainWindow();
+
+            FrameControlWindow window = new FrameControlWindow();
             this.MainWindow = window;
-
-            ImageFactory.Factory = new SkiaImageFactory();
-
             window.Show();
 
             // string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "WPFStyles.xaml");

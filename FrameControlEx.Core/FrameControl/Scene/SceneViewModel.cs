@@ -1,12 +1,14 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
-using FrameControlEx.Core.Actions.Contexts;
-using FrameControlEx.Core.AdvancedContextService;
+using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;
 using SkiaSharp;
 
-namespace FrameControlEx.Core.MainView.Scene {
-    public class SceneViewModel : BaseViewModel {
+namespace FrameControlEx.Core.FrameControl.Scene {
+    public class SceneViewModel : BaseViewModel, IDisposable {
         private string readableName;
         public string ReadableName {
             get => this.readableName;
@@ -23,6 +25,18 @@ namespace FrameControlEx.Core.MainView.Scene {
         public SKColor BackgroundColour {
             get => this.backgroundColour;
             set => this.RaisePropertyChanged(ref this.backgroundColour, value);
+        }
+
+        private bool isActive;
+        public bool IsActive {
+            get => this.isActive;
+            set => this.RaisePropertyChanged(ref this.isActive, value);
+        }
+
+        private bool isRenderOrderReversed;
+        public bool IsRenderOrderReversed {
+            get => this.isRenderOrderReversed;
+            set => this.RaisePropertyChanged(ref this.isRenderOrderReversed, value);
         }
 
         public SourceDeckViewModel SourceDeck { get; }
@@ -47,24 +61,29 @@ namespace FrameControlEx.Core.MainView.Scene {
         }
 
         public async Task RemoveAction() {
-            await this.Deck.RemoveItemAction(this);
+            await this.Deck.RemoveItemsAction(this);
         }
-    }
 
-    public class SceneViewModelContextMenuGenerator : IContextGenerator {
-        public static SceneViewModelContextMenuGenerator Instance { get; } = new SceneViewModelContextMenuGenerator();
-
-        public void Generate(List<IContextEntry> list, IDataContext context) {
-            if (context.TryGetContext(out SceneViewModel scene)) {
-                list.Add(new CommandContextEntry("Rename Scene", scene.RenameCommand));
-                if (scene.Deck != null) {
-                    list.Add(SeparatorEntry.Instance);
-                    list.Add(new CommandContextEntry("Add New Scene", scene.Deck.AddCommand));
-                    list.Add(new CommandContextEntry("Remove Scene", scene.RemoveCommand));
+        /// <summary>
+        /// Disposes this scene and all sources that it defines
+        /// </summary>
+        public void Dispose() {
+            using (ExceptionStack stack = new ExceptionStack($"Exception while disposing {this.GetType()}")) {
+                try {
+                    this.DisposeCore(stack);
+                }
+                catch (Exception e) {
+                    stack.Push(new Exception($"Unexpected exception while invoking {nameof(this.DisposeCore)}", e));
                 }
             }
-            else if (context.TryGetContext(out SceneDeckViewModel deck)) {
-                list.Add(new CommandContextEntry("Add Scene", deck.AddCommand));
+        }
+
+        protected virtual void DisposeCore(ExceptionStack e) {
+            using (ExceptionStack stack = new ExceptionStack("Failed to dispose source deck items", false)) {
+                this.SourceDeck.DisposeItemsAndClear(stack);
+                if (stack.TryGetException(out var exception)) {
+                    e.Push(exception);
+                }
             }
         }
     }

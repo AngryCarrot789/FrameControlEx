@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace FrameControlEx.Core.Actions.Contexts {
@@ -24,6 +25,11 @@ namespace FrameControlEx.Core.Actions.Contexts {
         /// Tries to get a context object of the specific type
         /// </summary>
         bool TryGetContext<T>(out T value);
+
+        /// <summary>
+        /// Tries to get a context object of the specific type
+        /// </summary>
+        bool TryGetContext(Type type, out object value);
 
         /// <summary>
         /// Returns whether this data context contains an instance of the given type
