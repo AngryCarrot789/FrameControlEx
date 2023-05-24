@@ -11,11 +11,11 @@ namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
 
         }
 
-        public override void OnAcceptFrame(SKSurface surface, in SKImageInfo frameInfo) {
-            base.OnAcceptFrame(surface, frameInfo);
+        public override void OnAcceptFrame(RenderContext context) {
+            base.OnAcceptFrame(context);
 
             // the GC goes nuts because of this; like 1 gig of memory used every second
-            this.lastFrame = surface.Snapshot();
+            this.lastFrame = context.Surface.Snapshot();
         }
 
         protected override BaseIOViewModel CreateInstanceCore() {

@@ -24,18 +24,26 @@
     <Window.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibleConverter"/>
     </Window.Resources>
-    <Grid>
-        <Border IsHitTestVisible="True" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" VerticalAlignment="Top">
+    <DockPanel>
+        <Border DockPanel.Dock="Top" IsHitTestVisible="True" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" VerticalAlignment="Top">
             <Menu HorizontalAlignment="Left" IsHitTestVisible="True">
-                <MenuItem Header="File"/>
+                <MenuItem Header="View">
+                    <MenuItem x:Name="ShowActivityBarMenuItem" IsCheckable="True" Header="Show Activity Bar (on the bottom)"/>
+                </MenuItem>
             </Menu>
         </Border>
-        <Grid Margin="0,18,0,0">
+        <Border Visibility="{Binding ElementName=ShowActivityBarMenuItem, Path=IsChecked, Converter={StaticResource BoolToVisibleConverter}}" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" 
+                Height="20" VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
+            <DockPanel>
+                <TextBlock x:Name="ActivityBarTextBlock" TextTrimming="CharacterEllipsis"/>
+                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" x:Name="AverageTime" DockPanel.Dock="Right"/>
+            </DockPanel>
+        </Border>
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="30*"/>
                 <RowDefinition Height="5"/>
                 <RowDefinition Height="172" x:Name="Row0"/>
-                <RowDefinition Height="20"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
@@ -44,41 +52,48 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid x:Name="SettingsPanel" d:DataContext="{d:DesignInstance sources:LoopbackSourceViewModel}" Background="{DynamicResource AREghZyBrush.Tone2.Background.Static}">
-                    <ContentPresenter Content="{Binding}">
-                        <ContentPresenter.Resources>
-                            <DataTemplate DataType="{x:Type frameControl:FrameControlViewModel}">
-                            </DataTemplate>
-                            <!-- INPUTS -->
-                            <DataTemplate DataType="{x:Type scene:SceneViewModel}">
-                                <controls:SceneSettingsControl DataContext="{Binding}"/>
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type sources:ImageSourceViewModel}">
-                                <controls:ImageSourceSettingsControl DataContext="{Binding}"/>
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type sources:LoopbackSourceViewModel}">
-                                <controls:SIInputSettingsControl DataContext="{Binding}"/>
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type sources:MMFAVSourceViewModel}">
-                                <controls:MMFSourceSettingsControl DataContext="{Binding}"/>
-                            </DataTemplate>
-                            <!-- OUTPUTS -->
-                            <DataTemplate DataType="{x:Type outputs:BasicBufferOutputViewModel}">
-                                <controls:SIOutputSettingsControl DataContext="{Binding}"/>
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type outputs:FFmpegOutputViewModel}">
-                                <controls:FFmpegOutputSettingsControl DataContext="{Binding}"/>
-                            </DataTemplate>
-                            <DataTemplate DataType="{x:Type outputs:MMFAVOutputViewModel}">
-                                <controls:MMFOutputSettingsControl DataContext="{Binding}"/>
-                            </DataTemplate>
-                        </ContentPresenter.Resources>
-                    </ContentPresenter>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ContentPresenter Content="{Binding}">
+                            <ContentPresenter.Resources>
+                                <DataTemplate DataType="{x:Type frameControl:FrameControlViewModel}">
+                                </DataTemplate>
+                                <!-- INPUTS -->
+                                <DataTemplate DataType="{x:Type scene:SceneViewModel}">
+                                    <controls:SceneSettingsControl DataContext="{Binding}"/>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type sources:ImageSourceViewModel}">
+                                    <controls:ImageSourceSettingsControl DataContext="{Binding}"/>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type sources:LoopbackSourceViewModel}">
+                                    <controls:SIInputSettingsControl DataContext="{Binding}"/>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type sources:MMFAVSourceViewModel}">
+                                    <controls:MMFSourceSettingsControl DataContext="{Binding}"/>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type sources:SceneSourceViewModel}">
+                                    <controls:SceneSourceSettingsControl DataContext="{Binding}"/>
+                                </DataTemplate>
+                                <!-- OUTPUTS -->
+                                <DataTemplate DataType="{x:Type outputs:BasicBufferOutputViewModel}">
+                                    <controls:SIOutputSettingsControl DataContext="{Binding}"/>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type outputs:FFmpegOutputViewModel}">
+                                    <controls:FFmpegOutputSettingsControl DataContext="{Binding}"/>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type outputs:MMFAVOutputViewModel}">
+                                    <controls:MMFOutputSettingsControl DataContext="{Binding}"/>
+                                </DataTemplate>
+                            </ContentPresenter.Resources>
+                        </ContentPresenter>
+                    </ScrollViewer>
                 </Grid>
                 <Border Background="{DynamicResource AREghZyBrush.Tone1.Background.Static}" Grid.Column="2">
                     <Viewbox>
-                        <wpf:SKElement Width="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Width, FallbackValue=500}"
-                                       Height="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Height, FallbackValue=500}"
-                                       x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
+                        <AdornerDecorator x:Name="SelectionAdornerDecorator">
+                            <wpf:SKElement Width="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Width, FallbackValue=500}"
+                                           Height="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Height, FallbackValue=500}"
+                                           x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
+                        </AdornerDecorator>
                     </Viewbox>
                 </Border>
                 <Border Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
@@ -201,10 +216,11 @@
                                                     <MenuItem.Header>
                                                         <TextBlock Text="+" FontSize="20" Margin="-2,-5,0,0"/>
                                                     </MenuItem.Header>
-                                                    <MenuItem Header="Add Image" Command="{Binding AddImageCommand, Mode=OneTime}"/>
-                                                    <MenuItem Header="Add Image" Command="{Binding AddMMFCommand, Mode=OneTime}"/>
+                                                    <MenuItem Header="Image" Command="{Binding AddImageCommand, Mode=OneTime}"/>
+                                                    <MenuItem Header="MemMapFile" Command="{Binding AddMemMapFileCommand, Mode=OneTime}"/>
+                                                    <MenuItem Header="Scene Render" Command="{Binding AddSceneSourceCommand, Mode=OneTime}"/>
                                                     <Separator/>
-                                                    <MenuItem Header="Add Output Loopback" InputGestureText="Debug Feature" Command="{Binding AddLoopbackInput, Mode=OneTime}"/>
+                                                    <MenuItem Header="Output Loopback" InputGestureText="Debug Feature" Command="{Binding AddLoopbackInputCommand, Mode=OneTime}"/>
                                                 </MenuItem>
                                             </Menu>
                                             <Button Command="{Binding RemoveSelectedCommand}" Background="Transparent" BorderBrush="Transparent" Width="24">
@@ -278,7 +294,7 @@
                 -->
                 <GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Grid.Column="1" Margin="-3,0"/>
             </Grid>
-            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="0,-5,0,0"
+            <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" Margin="0,-5,0,-8"
                           helpers:GridLatchSplitter.IsEnabled="True"
                           helpers:GridLatchSplitter.ClosedSize="0"
                           helpers:GridLatchSplitter.TargetRow="{Binding ElementName=Row0}"
@@ -286,12 +302,6 @@
                           helpers:GridLatchSplitter.MaximumSize="400"
                           helpers:GridLatchSplitter.ThresholdSizeToClose="80"
                           helpers:GridLatchSplitter.ThresholdSizeToOpen="120"/>
-            <Border Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" Grid.Row="3">
-                <DockPanel>
-                    <TextBlock x:Name="ActivityBarTextBlock" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" x:Name="AverageTime" DockPanel.Dock="Right"/>
-                </DockPanel>
-            </Border>
         </Grid>
-    </Grid>
+    </DockPanel>
 </views:WindowEx>

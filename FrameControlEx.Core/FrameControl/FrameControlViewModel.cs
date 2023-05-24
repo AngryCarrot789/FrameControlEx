@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using FrameControlEx.Core.FrameControl.Scene;
-using FrameControlEx.Core.Settings;
 using FrameControlEx.Core.Utils;
 
 namespace FrameControlEx.Core.FrameControl {

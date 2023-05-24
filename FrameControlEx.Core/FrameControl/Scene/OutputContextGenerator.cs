@@ -37,10 +37,15 @@ namespace FrameControlEx.Core.FrameControl.Scene {
         }
 
         public void AddNewItemsContext(List<IContextEntry> list, OutputDeckViewModel deck) {
-            list.Add(new CommandContextEntry("Add FFmpeg/Recorder Output", deck.AddFFmpegOutputCommand));
-            list.Add(new CommandContextEntry("Add Memory-Mapped File Output", deck.AddMMFCommand));
+            List<IContextEntry> children = new List<IContextEntry>();
+            GroupContextEntry group = new GroupContextEntry("Add", "Shows all of the possible items to add", children);
+            list.Add(group);
+            list = children;
+
+            list.Add(new CommandContextEntry("FFmpeg/Recorder Output", deck.AddFFmpegOutputCommand));
+            list.Add(new CommandContextEntry("MemMapFile Output", deck.AddMMFCommand));
             list.Add(SeparatorEntry.Instance);
-            list.Add(new CommandContextEntry("Add buffered output (used for loopback)", deck.AddBufferedOutputCommand));
+            list.Add(new CommandContextEntry("Buffered Output (for loopback)", deck.AddBufferedOutputCommand));
         }
     }
 }

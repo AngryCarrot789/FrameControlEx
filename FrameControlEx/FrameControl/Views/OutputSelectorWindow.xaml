@@ -12,9 +12,6 @@
                   WindowStartupLocation="CenterOwner"
                   WindowStyle="ToolWindow" ResizeMode="NoResize"
                   Style="{DynamicResource CustomWindowStyleEx}">
-    <Window.Resources>
-        <views1:OutputFilterMultiConverter x:Key="IsEnabledConverter"/>
-    </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Key="Enter" Command="{Binding ConfirmCommand, Mode=OneTime}"/>
         <KeyBinding Key="Esc" Command="{Binding CancelCommand, Mode=OneTime}"/>
@@ -28,7 +25,7 @@
                     <Style TargetType="{x:Type ListBoxItem}" BasedOn="{StaticResource {x:Type ListBoxItem}}">
                         <Setter Property="IsEnabled">
                             <Setter.Value>
-                                <MultiBinding Converter="{StaticResource IsEnabledConverter}">
+                                <MultiBinding Converter="{x:Static views1:OutputFilterMultiConverter.Instance}">
                                     <Binding Path="."/>
                                     <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type views1:OutputSelectorWindow}}" Path="DataContext.IsItemEnabled"/>
                                 </MultiBinding>

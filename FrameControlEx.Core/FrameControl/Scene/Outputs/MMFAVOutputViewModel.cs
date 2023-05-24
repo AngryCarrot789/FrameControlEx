@@ -1,10 +1,6 @@
 using System;
 using System.Diagnostics;
-using System.IO;
 using System.IO.MemoryMappedFiles;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 using FrameControlEx.Core.Notifications;
 using FrameControlEx.Core.Utils;
@@ -51,8 +47,9 @@ namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
             this.EditMappedFileNameCommand = new AsyncRelayCommand(this.EditMappedFileNameAction);
         }
 
-        public override void OnAcceptFrame(SKSurface surface, in SKImageInfo frameInfo) {
-            base.OnAcceptFrame(surface, frameInfo);
+        public override void OnAcceptFrame(RenderContext context) {
+            base.OnAcceptFrame(context);
+            SKImageInfo frameInfo = context.FrameInfo;
             MemoryMappedFile mappedFile = this.GetFile(in frameInfo);
             if (mappedFile == null) {
                 return;
@@ -68,7 +65,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
 
                     view.Write(0, ref header);
                     SKPixmap pixmap = new SKPixmap();
-                    if (surface.PeekPixels(pixmap)) {
+                    if (context.Surface.PeekPixels(pixmap)) {
                         SafeMemoryMappedViewHandle safe = view.SafeMemoryMappedViewHandle;
                         byte* ptr = null;
                         safe.AcquirePointer(ref ptr);
@@ -206,8 +203,8 @@ namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
             return new MMFAVOutputViewModel();
         }
 
-        protected override void LoadThisIntoCopy(BaseIOViewModel vm) {
-            base.LoadThisIntoCopy(vm);
+        protected override void LoadThisIntoUserCopy(BaseIOViewModel vm) {
+            base.LoadThisIntoUserCopy(vm);
             if (vm is MMFAVOutputViewModel output) {
                 output.generateMapName = this.generateMapName;
                 output.mapName = this.mapName;

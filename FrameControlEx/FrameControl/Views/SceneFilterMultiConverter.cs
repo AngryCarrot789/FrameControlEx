@@ -5,14 +5,16 @@ using FrameControlEx.Core.FrameControl.Scene;
 using FrameControlEx.Core.Utils;
 
 namespace FrameControlEx.FrameControl.Views {
-    public class OutputFilterMultiConverter : IMultiValueConverter {
+    public class SceneFilterMultiConverter : IMultiValueConverter {
+        public static SceneFilterMultiConverter Instance { get; } = new SceneFilterMultiConverter();
+
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
             if (values.Length != 2) {
                 throw new Exception($"Expected 2 values, not {values.Length}");
             }
 
-            OutputViewModel vm = (OutputViewModel) values[0];
-            Predicate<OutputViewModel> func = (Predicate<OutputViewModel>) values[1];
+            SceneViewModel vm = (SceneViewModel) values[0];
+            Predicate<SceneViewModel> func = (Predicate<SceneViewModel>) values[1];
             return (func == null || func(vm)).Box();
         }
 

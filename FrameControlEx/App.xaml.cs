@@ -9,7 +9,6 @@ using System.Windows.Media;
 using FFmpeg.AutoGen;
 using FrameControlEx.Core;
 using FrameControlEx.Core.Actions;
-using FrameControlEx.Core.Imaging;
 using FrameControlEx.Core.Shortcuts.Managing;
 using FrameControlEx.Core.Shortcuts.ViewModels;
 using FrameControlEx.Core.Utils;

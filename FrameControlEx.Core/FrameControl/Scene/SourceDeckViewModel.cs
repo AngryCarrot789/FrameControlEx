@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -21,8 +20,9 @@ namespace FrameControlEx.Core.FrameControl.Scene {
         public int CountDisabled => this.Items.Count(x => !x.IsEnabled);
 
         public RelayCommand AddImageCommand { get; }
-        public RelayCommand AddMMFCommand { get; }
-        public RelayCommand AddLoopbackInput { get; }
+        public RelayCommand AddMemMapFileCommand { get; }
+        public RelayCommand AddLoopbackInputCommand { get; }
+        public RelayCommand AddSceneSourceCommand { get; }
 
         public RelayCommand EnableAllCommand { get; }
         public RelayCommand DisableAllCommand { get; }
@@ -40,7 +40,7 @@ namespace FrameControlEx.Core.FrameControl.Scene {
                 this.Add(source);
                 this.InvalidateVisual();
             });
-            this.AddMMFCommand = new RelayCommand(() => {
+            this.AddMemMapFileCommand = new RelayCommand(() => {
                 MMFAVSourceViewModel source = new MMFAVSourceViewModel {
                     ReadableName = $"MMF Source {this.Items.Count(x => x is MMFAVSourceViewModel) + 1}"
                 };
@@ -48,7 +48,7 @@ namespace FrameControlEx.Core.FrameControl.Scene {
                 this.Add(source);
                 this.InvalidateVisual();
             });
-            this.AddLoopbackInput = new RelayCommand(() => {
+            this.AddLoopbackInputCommand = new RelayCommand(() => {
                 LoopbackSourceViewModel source = new LoopbackSourceViewModel {
                     ReadableName = $"SIInput {this.Items.Count(x => x is LoopbackSourceViewModel) + 1}"
                 };
@@ -56,6 +56,14 @@ namespace FrameControlEx.Core.FrameControl.Scene {
                 this.Add(source);
                 this.InvalidateVisual();
             });
+            this.AddSceneSourceCommand = new RelayCommand(() => {
+                SceneSourceViewModel source = new SceneSourceViewModel {
+                    ReadableName = $"Scene Source {this.Items.Count(x => x is SceneSourceViewModel) + 1}"
+                };
+
+                this.Add(source);
+                this.InvalidateVisual();
+            }, () => false);
             this.EnableAllCommand = new RelayCommand(() => this.Items.ForEach(x => x.IsEnabled = true), () => this.Items.Any(x => !x.IsEnabled));
             this.DisableAllCommand = new RelayCommand(() => this.Items.ForEach(x => x.IsEnabled = false), () => this.Items.Any(x => x.IsEnabled));
             this.ToggleEnabledAllCommand = new RelayCommand(() => this.Items.ForEach(x => x.IsEnabled = !x.IsEnabled));

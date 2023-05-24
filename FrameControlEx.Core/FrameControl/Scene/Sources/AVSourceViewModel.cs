@@ -158,12 +158,12 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
 
         }
 
-        public virtual void OnRender(SKSurface surface, SKCanvas canvas, SKImageInfo frameInfo) {
+        public virtual void OnRender(RenderContext context) {
 
         }
 
-        protected override void LoadThisIntoCopy(BaseIOViewModel vm) {
-            base.LoadThisIntoCopy(vm);
+        protected override void LoadThisIntoUserCopy(BaseIOViewModel vm) {
+            base.LoadThisIntoUserCopy(vm);
             if (vm is AVSourceViewModel vs) { // syntax looks nicer than force cast
                 vs.pos = this.pos;
                 vs.scale = this.scale;

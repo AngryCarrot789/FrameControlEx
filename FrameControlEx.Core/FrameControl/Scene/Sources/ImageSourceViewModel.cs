@@ -72,15 +72,15 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             }
         }
 
-        public override void OnRender(SKSurface surface, SKCanvas canvas, SKImageInfo frameInfo) {
-            base.OnRender(surface, canvas, frameInfo);
+        public override void OnRender(RenderContext context) {
+            base.OnRender(context);
             if (this.Image is ImageFactory.SkiaImage img) {
                 Vector2 scale = this.Scale, pos = this.Pos, origin = this.ScaleOrigin;
-                SKMatrix matrix = canvas.TotalMatrix;
-                canvas.Translate(pos.X, pos.Y);
-                canvas.Scale(scale.X, scale.Y, img.image.Width * origin.X, img.image.Height * origin.Y);
-                canvas.DrawImage(img.image, 0, 0);
-                canvas.SetMatrix(matrix);
+                SKMatrix matrix = context.Canvas.TotalMatrix;
+                context.Canvas.Translate(pos.X, pos.Y);
+                context.Canvas.Scale(scale.X, scale.Y, img.image.Width * origin.X, img.image.Height * origin.Y);
+                context.Canvas.DrawImage(img.image, 0, 0);
+                context.Canvas.SetMatrix(matrix);
             }
         }
 
@@ -116,8 +116,8 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             return new ImageSourceViewModel();
         }
 
-        protected override void LoadThisIntoCopy(BaseIOViewModel vm) {
-            base.LoadThisIntoCopy(vm);
+        protected override void LoadThisIntoUserCopy(BaseIOViewModel vm) {
+            base.LoadThisIntoUserCopy(vm);
             if (vm is ImageSourceViewModel src) {
                 src.filePath = this.filePath;
             }

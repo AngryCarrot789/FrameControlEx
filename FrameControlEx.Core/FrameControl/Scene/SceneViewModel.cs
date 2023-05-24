@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Threading.Tasks;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;

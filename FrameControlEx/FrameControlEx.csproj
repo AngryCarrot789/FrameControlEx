@@ -113,6 +113,11 @@
       <DependentUpon>OutputSelectorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="FrameControl\Views\OutputSelectorViewModel.cs" />
+    <Compile Include="FrameControl\Views\SceneFilterMultiConverter.cs" />
+    <Compile Include="FrameControl\Views\SceneSelectorViewModel.cs" />
+    <Compile Include="FrameControl\Views\SceneSelectorWindow.xaml.cs">
+      <DependentUpon>SceneSelectorWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Resources\IconTypeToImageSourceConverter.cs" />
     <Compile Include="Scenes\Controls\BaseIOStateController.xaml.cs">
       <DependentUpon>BaseIOStateController.xaml</DependentUpon>
@@ -131,6 +136,9 @@
     </Compile>
     <Compile Include="Scenes\Controls\SceneSettingsControl.xaml.cs">
       <DependentUpon>SceneSettingsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Scenes\Controls\SceneSourceSettingsControl.xaml.cs">
+      <DependentUpon>SceneSourceSettingsControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Scenes\Controls\SIInputSettingsControl.xaml.cs">
       <DependentUpon>SIInputSettingsControl.xaml</DependentUpon>
@@ -226,6 +234,10 @@
     </Page>
     <Page Include="FrameControl\IOTemplateStyles.xaml" />
     <Page Include="FrameControl\Views\OutputSelectorWindow.xaml" />
+    <Page Include="FrameControl\Views\SceneSelectorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Scenes\Controls\BaseIOStateController.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -247,6 +259,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Scenes\Controls\SceneSettingsControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Scenes\Controls\SceneSourceSettingsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -418,7 +434,7 @@
     <Resource Include="Resources\Icons\UIGeneral\icons8-sync-48.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Imaging" />
+    <Folder Include="Imaging\" />
     <Folder Include="Settings\Pages\" />
   </ItemGroup>
   <ItemGroup>

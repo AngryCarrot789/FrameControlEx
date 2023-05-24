@@ -79,9 +79,9 @@ namespace FrameControlEx.Core.FrameControl.Scene {
         /// The main method for creating a complete clone of this <see cref="BaseIOViewModel"/>
         /// </summary>
         /// <returns></returns>
-        public virtual BaseIOViewModel CloneCore() {
+        public virtual BaseIOViewModel CreateUserCopy() {
             BaseIOViewModel clone = this.CreateInstanceCore();
-            this.LoadThisIntoCopy(clone);
+            this.LoadThisIntoUserCopy(clone);
             return clone;
         }
 
@@ -91,7 +91,7 @@ namespace FrameControlEx.Core.FrameControl.Scene {
         /// The data set into the given clone should only really be data that the user could have manually entered; cached data can be ignored
         /// </summary>
         /// <param name="vm">The cloned view model</param>
-        protected virtual void LoadThisIntoCopy(BaseIOViewModel vm) {
+        protected virtual void LoadThisIntoUserCopy(BaseIOViewModel vm) {
             vm.readableName = this.readableName;
             vm.IsEnabled = this.isEnabled;
         }

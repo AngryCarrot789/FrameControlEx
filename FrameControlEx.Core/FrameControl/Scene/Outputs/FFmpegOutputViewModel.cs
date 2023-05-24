@@ -58,14 +58,14 @@ namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
             }
         }
 
-        public override void OnAcceptFrame(SKSurface surface, in SKImageInfo frameInfo) {
-            base.OnAcceptFrame(surface, frameInfo);
+        public override void OnAcceptFrame(RenderContext context) {
+            base.OnAcceptFrame(context);
             if (!this.IsRunning || !this.mIsOpen) {
                 return;
             }
 
             try {
-                this.WriteFrame(surface);
+                this.WriteFrame(context.Surface);
             }
             catch (Exception e) {
                 try {

@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Threading.Tasks;
 using FrameControlEx.Core.FrameControl.Scene.Outputs;
 using SkiaSharp;
@@ -27,15 +28,14 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             }
         }
 
-        public override void OnRender(SKSurface surface, SKCanvas canvas, SKImageInfo frameInfo) {
-            base.OnRender(surface, canvas, frameInfo);
+        public override void OnRender(RenderContext context) {
+            base.OnRender(context);
             if (this.TargetOutput != null && this.TargetOutput.IsEnabled & this.TargetOutput.lastFrame != null) {
-                SKMatrix matrix = canvas.TotalMatrix;
-                canvas.Translate(this.PosX, this.PosY);
+                Vector2 scale = this.Scale, pos = this.Pos, origin = this.ScaleOrigin;
+                context.Canvas.Translate(pos.X, pos.Y);
                 SKImage frame = this.TargetOutput.lastFrame;
-                canvas.Scale(this.ScaleX, this.ScaleY, frame.Width * this.ScaleOriginX, frame.Height * this.ScaleOriginY);
-                canvas.DrawImage(frame, 0, 0);
-                canvas.SetMatrix(matrix);
+                context.Canvas.Scale(scale.X, scale.Y, frame.Width * origin.X, frame.Height * origin.Y);
+                context.Canvas.DrawImage(frame, 0, 0);
             }
         }
 
@@ -43,8 +43,8 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             return new LoopbackSourceViewModel();
         }
 
-        protected override void LoadThisIntoCopy(BaseIOViewModel vm) {
-            base.LoadThisIntoCopy(vm);
+        protected override void LoadThisIntoUserCopy(BaseIOViewModel vm) {
+            base.LoadThisIntoUserCopy(vm);
             if (vm is LoopbackSourceViewModel l) {
                 l.targetOutput = this.targetOutput;
             }

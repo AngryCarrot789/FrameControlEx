@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Numerics;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using FrameControlEx.Core.FrameControl;
 using FrameControlEx.Core.FrameControl.Scene;
-using FrameControlEx.Core.FrameControl.Scene.Outputs;
-using FrameControlEx.Core.FrameControl.Scene.Sources;
-using FrameControlEx.Core.Imaging;
 using FrameControlEx.Core.Notifications;
 using FrameControlEx.Core.Utils;
 using SkiaSharp;
@@ -30,6 +24,8 @@ namespace FrameControlEx.Views.Main {
         private readonly double[] buffer_time;
         private DateTime lastRenderTime = DateTime.Now;
 
+        private volatile int shouldRenderFrame;
+
         public FrameControlWindow() {
             this.InitializeComponent();
             this.DataContext = this.FrameControl = new FrameControlViewModel(this);
@@ -37,7 +33,8 @@ namespace FrameControlEx.Views.Main {
             this.FrameControl.SceneDeck.AddNewScene("Scene 1");
             this.FrameControl.RenderCallback = () => {
                 try {
-                    this.Dispatcher.Invoke(this.ViewPortElement.InvalidateVisual, DispatcherPriority.Render);
+                    this.shouldRenderFrame = 1;
+                    this.Dispatcher.Invoke(this.ViewPortElement.InvalidateVisual, DispatcherPriority.Loaded);
                 }
                 catch (TaskCanceledException) {
                     // prevents visual studios catching/breakpointing when the main window closes
@@ -116,6 +113,9 @@ namespace FrameControlEx.Views.Main {
         }
 
         private void ViewPortElement_OnPaintSurface(object sender, SKPaintSurfaceEventArgs e) {
+            if (Interlocked.CompareExchange(ref this.shouldRenderFrame, 0, 1) == 0)
+                return;
+
             DateTime now = DateTime.Now;
             TimeSpan diff = now - this.lastRenderTime;
             this.lastRenderTime = now;
@@ -125,39 +125,42 @@ namespace FrameControlEx.Views.Main {
 
             FrameControlViewModel frameControl = this.FrameControl ?? throw new Exception($"No {nameof(FrameControlViewModel)} available");
             SKSurface surface = e.Surface;
-            SKCanvas canvas = surface.Canvas;
             SKImageInfo rawImageInfo = e.RawInfo;
 
             SceneViewModel active = frameControl.SceneDeck.PrimarySelectedItem;
             if (active == null) {
-                canvas.Clear(SKColors.Black);
+                float x1 = 0, y1 = 0;
+                float x2 = rawImageInfo.Width, y2 = rawImageInfo.Height;
+
+                surface.Canvas.DrawVertices(SKVertexMode.Triangles, new SKPoint[] {
+                    new SKPoint(x1, y1),
+                    new SKPoint(x2, y1),
+                    new SKPoint(x2, y2),
+                    new SKPoint(x1, y1),
+                    new SKPoint(x2, y2),
+                    new SKPoint(x1, y2)
+                }, new SKColor[] {
+                    SKColors.Red,
+                    SKColors.Green,
+                    SKColors.Blue,
+                    SKColors.Red,
+                    SKColors.Blue,
+                    SKColors.White,
+                }, new SKPaint() {
+                });
+
+                // surface.Canvas.Clear(SKColors.Black);
                 return;
             }
 
-            if (active.ClearScreenOnRender) {
-                canvas.Clear(active.BackgroundColour);
-            }
-
-            IEnumerable<SourceViewModel> items = active.IsRenderOrderReversed ? active.SourceDeck.ReverseEnumerable() : active.SourceDeck.Items;
-            foreach (SourceViewModel source in items) {
-                if (!source.IsEnabled) {
-                    continue;
-                }
-
-                // TODO: Maybe create separate rendering classes for each type of source
-                if (source is AVSourceViewModel av) {
-                    av.OnTickVisual();
-                    av.OnRender(surface, canvas, rawImageInfo);
-                }
-
-            }
-
+            RenderContext context = new RenderContext(frameControl, surface, surface.Canvas, rawImageInfo);
+            context.RenderScene(active);
             // TODO: Maybe move this code somewhere else... maybe? dunno
 
             e.Surface.Flush();
             foreach (OutputViewModel output in frameControl.OutputDeck.Items) {
                 if (output.IsEnabled && output is IVisualOutput visual) {
-                    visual.OnAcceptFrame(surface, in rawImageInfo);
+                    visual.OnAcceptFrame(context);
                 }
             }
         }

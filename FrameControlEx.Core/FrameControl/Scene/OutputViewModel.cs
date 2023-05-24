@@ -6,10 +6,13 @@ namespace FrameControlEx.Core.FrameControl.Scene {
     /// </summary>
     public abstract class OutputViewModel : BaseIOViewModel {
         private OutputDeckViewModel deck;
-
         public OutputDeckViewModel Deck {
             get => this.deck;
-            set => this.RaisePropertyChanged(ref this.deck, value);
+            set {
+                OutputDeckViewModel old = this.deck;
+                this.RaisePropertyChanged(ref this.deck, value);
+                this.OnDeckChanged(old, value);
+            }
         }
 
         public AsyncRelayCommand RemoveCommand { get; }
@@ -33,6 +36,10 @@ namespace FrameControlEx.Core.FrameControl.Scene {
             }
 
             return true;
+        }
+
+        protected virtual void OnDeckChanged(OutputDeckViewModel oldDeck, OutputDeckViewModel newDeck) {
+
         }
     }
 }

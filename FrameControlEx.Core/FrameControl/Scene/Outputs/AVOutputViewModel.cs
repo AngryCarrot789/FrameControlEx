@@ -1,5 +1,3 @@
-using SkiaSharp;
-
 namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
     /// <summary>
     /// Base class for visual outputs (videos, images). These receive the fully rendered output
@@ -10,7 +8,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
 
         }
 
-        public virtual void OnAcceptFrame(SKSurface surface, in SKImageInfo frameInfo) {
+        public virtual void OnAcceptFrame(RenderContext context) {
 
         }
     }

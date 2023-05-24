@@ -1,6 +1,5 @@
 using System;
 using FrameControlEx.Core.Actions;
-using FrameControlEx.Core.FrameControl;
 using FrameControlEx.Core.Services;
 using FrameControlEx.Core.Settings;
 using FrameControlEx.Core.Shortcuts.Dialogs;

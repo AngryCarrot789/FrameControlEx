@@ -6,6 +6,8 @@ using FrameControlEx.Core.Utils;
 
 namespace FrameControlEx.FrameControl.Views {
     public class OutputFilterMultiConverter : IMultiValueConverter {
+        public static OutputFilterMultiConverter Instance { get; } = new OutputFilterMultiConverter();
+
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
             if (values.Length != 2) {
                 throw new Exception($"Expected 2 values, not {values.Length}");

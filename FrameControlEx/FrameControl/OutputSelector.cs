@@ -20,5 +20,20 @@ namespace FrameControlEx.FrameControl {
 
             return null;
         }
+
+        public async Task<SceneViewModel> SelectScene(SceneDeckViewModel deck, Predicate<SceneViewModel> filter) {
+            SceneSelectorWindow selectorWindow = new SceneSelectorWindow();
+            SceneSelectorViewModel vm = new SceneSelectorViewModel(deck, filter);
+            selectorWindow.DataContext = vm;
+            if (selectorWindow.ShowDialog() != true) {
+                return null;
+            }
+
+            if (filter == null || filter(vm.SelectedItem)) {
+                return vm.SelectedItem;
+            }
+
+            return null;
+        }
     }
 }

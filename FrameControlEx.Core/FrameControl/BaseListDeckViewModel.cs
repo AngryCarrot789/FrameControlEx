@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using FrameControlEx.Core.FrameControl.Scene;
 using FrameControlEx.Core.Utils;
 
 namespace FrameControlEx.Core.FrameControl {

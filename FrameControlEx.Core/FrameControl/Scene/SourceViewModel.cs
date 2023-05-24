@@ -12,7 +12,11 @@ namespace FrameControlEx.Core.FrameControl.Scene {
         private SourceDeckViewModel deck;
         public SourceDeckViewModel Deck {
             get => this.deck;
-            set => this.RaisePropertyChanged(ref this.deck, value);
+            set {
+                SourceDeckViewModel old = this.deck;
+                this.RaisePropertyChanged(ref this.deck, value);
+                this.OnDeckChanged(old, value);
+            }
         }
 
         public AsyncRelayCommand RemoveCommand { get; }
@@ -42,6 +46,10 @@ namespace FrameControlEx.Core.FrameControl.Scene {
 
             return true;
         }
+
+        protected virtual void OnDeckChanged(SourceDeckViewModel oldDeck, SourceDeckViewModel newDeck) {
+
+        }
     }
 
     public class SourceContextGenerator : IContextGenerator {
@@ -49,6 +57,15 @@ namespace FrameControlEx.Core.FrameControl.Scene {
 
         public void Generate(List<IContextEntry> list, IDataContext context) {
             if (context.TryGetContext(out SourceViewModel source)) {
+                if (context.TryGetContext(out SourceDeckViewModel deck)) {
+                    this.AddNewItemsContext(list, deck);
+                    list.Add(SeparatorEntry.Instance);
+                }
+                else if (source.Deck != null) {
+                    this.AddNewItemsContext(list, source.Deck);
+                    list.Add(SeparatorEntry.Instance);
+                }
+
                 list.Add(new CommandContextEntry("Rename", source.RenameCommand));
                 if (source is ImageSourceViewModel img) {
                     list.Add(new CommandContextEntry("Open Image...", img.SelectFileCommand));
@@ -65,15 +82,6 @@ namespace FrameControlEx.Core.FrameControl.Scene {
                 if (source.Deck != null) {
                     list.Add(new CommandContextEntry("Remove", source.RemoveCommand));
                 }
-
-                if (context.TryGetContext(out SourceDeckViewModel deck)) {
-                    list.Add(SeparatorEntry.Instance);
-                    this.AddNewItemsContext(list, deck);
-                }
-                else if (source.Deck != null) {
-                    list.Add(SeparatorEntry.Instance);
-                    this.AddNewItemsContext(list, source.Deck);
-                }
             }
             else if (context.TryGetContext(out SourceDeckViewModel deck)) {
                 this.AddNewItemsContext(list, deck);
@@ -81,10 +89,18 @@ namespace FrameControlEx.Core.FrameControl.Scene {
         }
 
         public void AddNewItemsContext(List<IContextEntry> list, SourceDeckViewModel deck) {
-            list.Add(new CommandContextEntry("Add Image", deck.AddImageCommand));
-            list.Add(new CommandContextEntry("Add MMF Source", deck.AddMMFCommand));
+            List<IContextEntry> children = new List<IContextEntry>();
+            GroupContextEntry group = new GroupContextEntry("Add", "Shows all of the possible items to add", children);
+            list.Add(group);
+            list = children;
+
+            list.Add(new CommandContextEntry("Image", deck.AddImageCommand));
+            list.Add(new CommandContextEntry("MemMapFile Source", deck.AddMemMapFileCommand));
+            list.Add(new CommandContextEntry("Scene Render", deck.AddSceneSourceCommand));
             list.Add(SeparatorEntry.Instance);
-            list.Add(new CommandContextEntry("Add output-loopback", deck.AddLoopbackInput));
+            list.Add(new CommandContextEntry("Output Loopback", deck.AddLoopbackInputCommand) {
+                Description = "Takes the rendered output and uses it as an input for the next frame"
+            });
         }
     }
 }

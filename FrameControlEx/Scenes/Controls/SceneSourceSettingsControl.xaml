@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="FrameControlEx.Scenes.Controls.ImageSourceSettingsControl"
+﻿<UserControl x:Class="FrameControlEx.Scenes.Controls.SceneSourceSettingsControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -8,7 +8,7 @@
              xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Sources;assembly=FrameControlEx.Core"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="250"
-             d:DataContext="{d:DesignInstance sources:ImageSourceViewModel}">
+             d:DataContext="{d:DesignInstance sources:SceneSourceViewModel}">
     <Grid>
         <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged}" Padding="5" VerticalAlignment="Top" HorizontalAlignment="Center" TextDecorations="Underline" FontWeight="Bold">
             <TextBlock.InputBindings>
@@ -16,11 +16,10 @@
             </TextBlock.InputBindings>
         </TextBlock>
         <DockPanel Margin="5,26,5,5">
-            <Grid Height="79" VerticalAlignment="Top" DockPanel.Dock="Top">
+            <Grid Height="50" VerticalAlignment="Top" DockPanel.Dock="Top">
                 <TextBlock Text="Image file path" Padding="5" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                <TextBox Text="{Binding FilePath, UpdateSourceTrigger=PropertyChanged}" Padding="4,2" Margin="0,26,24,29" VerticalContentAlignment="Center"/>
-                <Button Command="{Binding SelectFileCommand, Mode=OneTime}" Content="..." HorizontalAlignment="Right" Width="24" Margin="0,26,0,29" BorderThickness="0,1,1,1" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}"/>
-                <Button Command="{Binding RefreshCommand, Mode=OneTime}" Content="Refresh Image" Height="24" VerticalAlignment="Bottom"/>
+                <TextBox Text="{Binding TargetScene.ReadableName, UpdateSourceTrigger=PropertyChanged, FallbackValue='Select a scene'}" Padding="4,2" Margin="0,26,24,0" VerticalContentAlignment="Center"/>
+                <Button Command="{Binding SelectTargetCommand, Mode=OneTime}" Content="..." HorizontalAlignment="Right" Width="24" Margin="0,26,0,0" BorderThickness="0,1,1,1" BorderBrush="{DynamicResource AREghZyBrush.Tone4.Border.Static}"/>
             </Grid>
             <local:BaseIOStateController VerticalAlignment="Bottom" Margin="-5"  DockPanel.Dock="Bottom"/>
             <local:VisualMovementController VerticalAlignment="Bottom" Margin="0,0,0,10" DockPanel.Dock="Bottom"/>
