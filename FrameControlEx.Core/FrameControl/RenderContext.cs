@@ -49,9 +49,9 @@ namespace FrameControlEx.Core.FrameControl {
                 // TODO: Maybe create separate rendering classes for each type of source
                 if (source is AVSourceViewModel av) {
                     av.OnTickVisual();
-                    SKMatrix matrix = this.Canvas.TotalMatrix;
+                    this.Canvas.Save();
                     av.OnRender(this);
-                    this.Canvas.SetMatrix(matrix);
+                    this.Canvas.Restore();
                 }
             }
         }

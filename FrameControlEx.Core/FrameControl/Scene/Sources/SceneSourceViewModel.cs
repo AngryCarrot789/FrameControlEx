@@ -1,5 +1,7 @@
 using System.Numerics;
 using System.Threading.Tasks;
+using FrameControlEx.Core.Utils;
+using SkiaSharp;
 
 namespace FrameControlEx.Core.FrameControl.Scene.Sources {
     /// <summary>
@@ -35,11 +37,15 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             base.OnRender(context);
             if (this.TargetScene != null) {
                 // doens't work
-                Vector2 scale = this.Scale, pos = this.Pos, origin = this.ScaleOrigin;
                 context.Canvas.Save();
-                context.Canvas.ClipRect(SkiaSharp.SKRect.Create(pos.X, pos.Y, context.FrameInfo.Width, context.FrameInfo.Height));
-                context.Canvas.Scale(scale.X, scale.Y, context.FrameInfo.Width * origin.X, context.FrameInfo.Height * origin.Y);
-                context.Canvas.Translate(pos.X, pos.Y);
+
+                SKImageInfo frame = context.FrameInfo;
+                Rect rect = this.GetFullRectangle(new Vector2(frame.Width, frame.Height));
+                context.Canvas.ClipRect(SKRect.Create(rect.X1, rect.Y1, rect.Width, rect.Height));
+
+                Vector2 s = this.Scale, o = this.ScaleOrigin;
+                context.Canvas.Scale(s.X, s.Y, rect.Width * o.X, rect.Height * o.Y);
+                context.Canvas.Translate(rect.X1, rect.Y1);
                 context.RenderScene(this.TargetScene);
                 context.Canvas.Restore();
             }

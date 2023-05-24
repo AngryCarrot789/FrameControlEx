@@ -28,13 +28,64 @@
         <Border DockPanel.Dock="Top" IsHitTestVisible="True" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" VerticalAlignment="Top">
             <Menu HorizontalAlignment="Left" IsHitTestVisible="True">
                 <MenuItem Header="View">
-                    <MenuItem x:Name="ShowActivityBarMenuItem" IsCheckable="True" Header="Show Activity Bar (on the bottom)"/>
+                    <MenuItem x:Name="ShowActivityBarMenuItem" IsCheckable="True" IsChecked="True" Header="Show Activity Bar (on the bottom)"/>
                 </MenuItem>
             </Menu>
         </Border>
         <Border Visibility="{Binding ElementName=ShowActivityBarMenuItem, Path=IsChecked, Converter={StaticResource BoolToVisibleConverter}}" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" 
                 Height="20" VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
             <DockPanel>
+                <ToggleButton IsChecked="{Binding UsePrecisionTimingMode, Mode=TwoWay}"
+                              Content="P" VerticalAlignment="Stretch" HorizontalAlignment="Right" 
+                              DockPanel.Dock="Right" Margin="5,0,0,0" BorderThickness="0" Width="22" 
+                              Background="{DynamicResource AREghZyBrush.Tone4.Background.Static}"
+                              ToolTipService.ShowDuration="40000">
+                    <ToggleButton.ToolTip>
+                        <TextBlock TextWrapping="Wrap">
+                            <Run Text="Whether to use precision timing or not"/>
+                            <LineBreak/>
+                            <Run Text="Precision timing will generally use a lot more CPU, but will result in timings of ±0.2 fps"/>
+                            <LineBreak/>
+                            <Run Text="Non-precision will just use the thread sleep() function, which can generally only sleep for a minimum of 16.4ms (on windows), so achieving 60 fps may be hard without precision timing"/>
+                        </TextBlock>
+                    </ToggleButton.ToolTip>
+                    <ToggleButton.Style>
+                        <Style TargetType="{x:Type ToggleButton}">
+                            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Button.Static.Foreground}" />
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            <Setter Property="VerticalContentAlignment" Value="Center"/>
+                            <Setter Property="Padding" Value="1"/>
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                        <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                                            <ContentPresenter x:Name="contentPresenter" Focusable="False" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                              Margin="{TemplateBinding Padding}" RecognizesAccessKey="True"
+                                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsEnabled" Value="false">
+                                                <Setter Property="Background" TargetName="border" Value="{DynamicResource Button.Disabled.Background}"/>
+                                                <Setter Property="TextElement.Foreground" TargetName="contentPresenter" Value="{DynamicResource Button.Disabled.Foreground}"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="True">
+                                                <Setter Property="Background" TargetName="border" Value="#FF00B965"/>
+                                            </Trigger>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Background" TargetName="border" Value="#FFD92039"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ToggleButton.Style>
+                </ToggleButton>
                 <TextBlock x:Name="ActivityBarTextBlock" TextTrimming="CharacterEllipsis"/>
                 <TextBlock VerticalAlignment="Center" HorizontalAlignment="Right" x:Name="AverageTime" DockPanel.Dock="Right"/>
             </DockPanel>
@@ -97,10 +148,10 @@
                     </Viewbox>
                 </Border>
                 <Border Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="{DynamicResource AREghZyBrush.Tone4.Border.Static}" UseLayoutRounding="True" SnapsToDevicePixels="True"/>
-                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" 
+                <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent"
                               Margin="-3,0,-5,0"
-                              helpers:GridLatchSplitter.IsEnabled="True" 
-                              helpers:GridLatchSplitter.ClosedSize="0" 
+                              helpers:GridLatchSplitter.IsEnabled="True"
+                              helpers:GridLatchSplitter.ClosedSize="0"
                               helpers:GridLatchSplitter.TargetColumn="{Binding ElementName=Col0}"
                               helpers:GridLatchSplitter.MinimumSize="150"
                               helpers:GridLatchSplitter.MaximumSize="600"

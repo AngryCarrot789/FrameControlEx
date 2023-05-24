@@ -46,16 +46,18 @@ namespace FrameControlEx.Views.Main {
             // DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
             // timer.Interval = TimeSpan.FromMilliseconds(1);
             // timer.Tick += (sender, args) => {
+            //     this.shouldRenderFrame = 1;
             //     this.ViewPortElement.InvalidateVisual();
-            //     // this.ViewPortElement.UpdateLayout();
-            //     DateTime now = DateTime.Now;
-            //     TimeSpan diff = now - this.lastRenderTime;
-            //     this.lastRenderTime = now;
-            //     this.AddDateTime(diff.TotalMilliseconds);
-            //     double interval = this.GetAverageTime();
-            //     this.AverageTime.Text = $"{Math.Round(interval, 2).ToString().FitLength(8)}\t ({Math.Round(1000d / interval, 2).ToString().FitLength(6)} FPS)";
             // };
             // timer.Start();
+        }
+
+        protected override void OnActivated(EventArgs e) {
+            base.OnActivated(e);
+        }
+
+        protected override void OnDeactivated(EventArgs e) {
+            base.OnDeactivated(e);
         }
 
         protected override async Task<bool> OnClosingAsync() {
@@ -129,6 +131,7 @@ namespace FrameControlEx.Views.Main {
 
             SceneViewModel active = frameControl.SceneDeck.PrimarySelectedItem;
             if (active == null) {
+                // draw colourful background when no scenes are active
                 float x1 = 0, y1 = 0;
                 float x2 = rawImageInfo.Width, y2 = rawImageInfo.Height;
 

@@ -63,7 +63,7 @@ namespace FrameControlEx.Core.FrameControl.Scene {
 
                 this.Add(source);
                 this.InvalidateVisual();
-            }, () => false);
+            });
             this.EnableAllCommand = new RelayCommand(() => this.Items.ForEach(x => x.IsEnabled = true), () => this.Items.Any(x => !x.IsEnabled));
             this.DisableAllCommand = new RelayCommand(() => this.Items.ForEach(x => x.IsEnabled = false), () => this.Items.Any(x => x.IsEnabled));
             this.ToggleEnabledAllCommand = new RelayCommand(() => this.Items.ForEach(x => x.IsEnabled = !x.IsEnabled));

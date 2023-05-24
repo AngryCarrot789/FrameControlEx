@@ -21,7 +21,8 @@
             </Grid.Resources>
             <CheckBox IsChecked="{Binding ClearScreenOnRender}" Content="Clear Background On Render" VerticalAlignment="Top" Height="20" ToolTip="Whether or not to actually clear the output frame during each render. True is the default value. Disable for freaky results!"/>
             <Label Content="Background Colour: (picker coming soon)" VerticalAlignment="Top" Margin="0,21,0,0"/>
-            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="10,153,10,10"><Run Text="If it "/><Run Text="wasn't obvious enough, scenes are a way of grouping "/><Run Text="input"/><Run Text="s (aka sources)"/><LineBreak/><Run/><LineBreak/><Run Text="Only 1 scene "/><Run Text="can be"/><Run Text=" active at a time"/></TextBlock>
+            <!-- OneWayToSource sort of makes this work, but it breaks when the data context changes -->
+            <TextBox Text="{Binding BackgroundColour, Converter={StaticResource ColourConverter}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, FallbackValue=Black}" IsEnabled="{Binding ClearScreenOnRender}" Height="22" Margin="0,47,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Padding="3,0"/>
             <Grid Margin="0,74,0,0" Height="79" VerticalAlignment="Top">
                 <Label Content="Apply for all inputs/sources:" VerticalAlignment="Top"/>
                 <Grid Margin="0,26,0,29">
@@ -47,8 +48,7 @@
                     <TextBlock Text="{Binding SourceDeck.CountDisabled, Mode=OneWay, StringFormat={}{0} Disabled}" VerticalAlignment="Center" Grid.Column="2" Padding="2,0"/>
                 </Grid>
             </Grid>
-            <!-- OneWayToSource sort of makes this work, but it breaks when the data context changes -->
-            <TextBox Text="{Binding BackgroundColour, Converter={StaticResource ColourConverter}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, FallbackValue=Black}" IsEnabled="{Binding ClearScreenOnRender}" Height="22" Margin="0,47,0,0" TextWrapping="Wrap" VerticalAlignment="Top" VerticalContentAlignment="Center" Padding="3,0"/>
+            <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="10,153,10,10"><Run Text="If it "/><Run Text="wasn't obvious enough, scenes are a way of grouping "/><Run Text="input"/><Run Text="s (aka sources)"/><LineBreak/><Run/><LineBreak/><Run Text="Only 1 scene "/><Run Text="can be"/><Run Text=" active at a time"/></TextBlock>
         </Grid>
     </Grid>
 </UserControl>

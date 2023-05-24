@@ -1,8 +1,8 @@
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;
-using SkiaSharp;
 
 namespace FrameControlEx.Core.FrameControl.Scene.Sources {
     /// <summary>
@@ -102,6 +102,16 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
                 this.Scale = new Vector2(1, 1);
                 this.ScaleOrigin = new Vector2(0.5f, 0.5f);
             });
+        }
+
+        public Vector2 GetSize(Vector2 viewport) {
+            return viewport * this.Scale;
+        }
+
+        public Rect GetFullRectangle(Vector2 viewport) {
+            Vector2 scaleSize = viewport * this.Scale;
+            Vector2 scalePos = this.pos + ((viewport * this.scaleOrigin) - (scaleSize * this.scaleOrigin));
+            return new Rect(scalePos, scaleSize);
         }
 
         protected DoubleInputViewModel CreateVec2Editor(string msgA, string msgB, string title, float inputA, float inputB) {
