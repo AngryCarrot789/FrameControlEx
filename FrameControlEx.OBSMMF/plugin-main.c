@@ -16,10 +16,8 @@ You should have received a copy of the GNU General Public License along
 with this program. If not, see <https://www.gnu.org/licenses/>
 */
 
-// HOW TO BUILD THIS SHIT
-
 /*
-    Screw CMake, none of the obs plugin template build scripts work correctly; referencing QT libraries just breaks everything.
+    CMake obs plugin template build script doesn't work correctly; referencing QT libraries just breaks everything.
     Instead, I just manually linked the obs-studio and obs-build-dependencies
 
     If you have a drive with the letter E (e.g. E:\MyFiles), then all you have to do
@@ -50,6 +48,8 @@ with this program. If not, see <https://www.gnu.org/licenses/>
     "C:\Program Files\obs-studio\obs-plugins\64bit"
     or wheverever else your obs is installed, and possibly into 
     the 32 bit folder if you compiled this as 32 bit (why...)
+
+    however if you do link QT libs, it still breaks
 */
 
 #ifndef PLUGINNAME_H
@@ -60,18 +60,15 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include <obs-module.h>
 #include <obs-frontend-api.h>
-#include "TestDialog.h"
-
-#include <QtWidgets/qwidget.h>
 
 OBS_DECLARE_MODULE()
 OBS_MODULE_USE_DEFAULT_LOCALE(PLUGIN_NAME, "en-US")
 
 bool obs_module_load(void)
 {
-    // QWidget* main_window = (QWidget*)obs_frontend_get_main_window();
+    QWidget* wtg;
+    obs_frontend_get_main_window();
     // TestWidget* test = new TestWidget(main_window);
-    // obs_frontend_add_dock(test);
 
     blog(LOG_INFO, "Completely custom plugin loaded! Version: %s", PLUGIN_VERSION);
     return true;

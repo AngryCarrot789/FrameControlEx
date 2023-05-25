@@ -131,26 +131,26 @@ namespace FrameControlEx.Views.Main {
 
             SceneViewModel active = frameControl.SceneDeck.PrimarySelectedItem;
             if (active == null) {
-                // draw colourful background when no scenes are active
-                float x1 = 0, y1 = 0;
-                float x2 = rawImageInfo.Width, y2 = rawImageInfo.Height;
-
-                surface.Canvas.DrawVertices(SKVertexMode.Triangles, new SKPoint[] {
-                    new SKPoint(x1, y1),
-                    new SKPoint(x2, y1),
-                    new SKPoint(x2, y2),
-                    new SKPoint(x1, y1),
-                    new SKPoint(x2, y2),
-                    new SKPoint(x1, y2)
-                }, new SKColor[] {
-                    SKColors.Red,
-                    SKColors.Green,
-                    SKColors.Blue,
-                    SKColors.Red,
-                    SKColors.Blue,
-                    SKColors.White,
-                }, new SKPaint() {
-                });
+                // // draw colourful background when no scenes are active
+                // float x1 = 0, y1 = 0;
+                // float x2 = rawImageInfo.Width, y2 = rawImageInfo.Height;
+                // 
+                // surface.Canvas.DrawVertices(SKVertexMode.Triangles, new SKPoint[] {
+                //     new SKPoint(x1, y1),
+                //     new SKPoint(x2, y1),
+                //     new SKPoint(x2, y2),
+                //     new SKPoint(x1, y1),
+                //     new SKPoint(x2, y2),
+                //     new SKPoint(x1, y2)
+                // }, new SKColor[] {
+                //     SKColors.Red,
+                //     SKColors.Green,
+                //     SKColors.Blue,
+                //     SKColors.Red,
+                //     SKColors.Blue,
+                //     SKColors.White,
+                // }, new SKPaint() {
+                // });
 
                 // surface.Canvas.Clear(SKColors.Black);
                 return;

@@ -409,6 +409,7 @@
     <Content Include="Keymap.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\64ll02.png" />
     <SplashScreen Include="Views\StartupSplashScreen.png" />
     <Resource Include="Resources\AppIcon.ico" />
     <Resource Include="Resources\Icons\Credits.txt" />

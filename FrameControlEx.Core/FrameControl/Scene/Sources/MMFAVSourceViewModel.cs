@@ -92,7 +92,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
                     thing.Read(0, out header);
                 }
 
-                if (!header.isValid) {
+                if (!header.is_valid) {
                     return;
                 }
 

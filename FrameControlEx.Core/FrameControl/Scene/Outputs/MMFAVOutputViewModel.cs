@@ -60,7 +60,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
             using (MemoryMappedViewAccessor view = mappedFile.CreateViewAccessor(0, this.currentLength)) {
                 unsafe {
                     MEMMAPFILE_HEADER header = new MEMMAPFILE_HEADER() {
-                        isValid = true, width = frameInfo.Width, height = frameInfo.Height, bpp = (byte) frameInfo.BytesPerPixel
+                        is_valid = true, width = frameInfo.Width, height = frameInfo.Height, bpp = (byte) frameInfo.BytesPerPixel
                     };
 
                     view.Write(0, ref header);

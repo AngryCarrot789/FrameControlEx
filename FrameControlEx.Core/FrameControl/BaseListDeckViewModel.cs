@@ -36,6 +36,8 @@ namespace FrameControlEx.Core.FrameControl {
             }
         }
 
+        public bool IsEmpty => this.items.Count < 1;
+
         public AsyncRelayCommand AddCommand { get; }
         public AsyncRelayCommand RemoveSelectedCommand { get; }
         public RelayCommand MoveSelectedUpCommand { get; }
@@ -71,7 +73,7 @@ namespace FrameControlEx.Core.FrameControl {
         // }
 
         protected virtual void OnItemCollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-
+            this.RaisePropertyChanged(nameof(this.IsEmpty));
         }
 
         public virtual Task AddActionAsync() {

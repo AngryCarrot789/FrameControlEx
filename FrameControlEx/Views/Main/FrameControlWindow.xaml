@@ -141,9 +141,15 @@
                 <Border Background="{DynamicResource AREghZyBrush.Tone1.Background.Static}" Grid.Column="2">
                     <Viewbox>
                         <AdornerDecorator x:Name="SelectionAdornerDecorator">
-                            <wpf:SKElement Width="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Width, FallbackValue=500}"
-                                           Height="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Height, FallbackValue=500}"
-                                           x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
+                            <Grid>
+                                <Grid.Resources>
+                                    <converters:BoolToVisibilityConverter x:Key="Converter"/>
+                                </Grid.Resources>
+                                <wpf:SKElement Width="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Width, FallbackValue=500}"
+                                               Height="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Height, FallbackValue=500}"
+                                               x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
+                                <Image Source="/FrameControlEx;component/Resources/64ll02.png" Stretch="Fill" Visibility="{Binding SceneDeck.IsEmpty, Converter={StaticResource Converter}}"/>
+                            </Grid>
                         </AdornerDecorator>
                     </Viewbox>
                 </Border>
