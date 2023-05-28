@@ -1,30 +1,24 @@
 using System;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
 using System.Threading.Tasks;
-using FrameControlEx.Core.Utils;
 
 namespace FrameControlEx.Core.Views.Dialogs.Modal {
     /// <summary>
-    /// A helper view model for managing message dialogs that can have multiple buttons
+    /// A base dialog for dynamic dialogs that can save their
     /// </summary>
-    public abstract class BaseWindowDialogViewModel : BaseDynamicDialogViewModel {
-        protected string header;
-        protected string message;
+    public abstract class BaseProcessDialogViewModel : BaseDynamicDialogViewModel {
+        protected string automaticResult;
         protected bool showAlwaysUseNextResultOption;
         protected bool isAlwaysUseThisOptionChecked;
         protected bool canShowAlwaysUseNextResultForCurrentQueueOption;
         protected bool isAlwaysUseThisOptionForCurrentQueueChecked;
 
-        public string Header {
-            get => this.header;
-            set => this.RaisePropertyChanged(ref this.header, value);
-        }
-
-        public string Message {
-            get => this.message;
-            set => this.RaisePropertyChanged(ref this.message, value);
+        public string AutomaticResult {
+            get => this.automaticResult;
+            set {
+                this.EnsureNotReadOnly();
+                this.RaisePropertyChanged(ref this.automaticResult, value);
+            }
         }
 
         /// <summary>
@@ -83,58 +77,44 @@ namespace FrameControlEx.Core.Views.Dialogs.Modal {
             }
         }
 
-        protected BaseWindowDialogViewModel(string primaryResult = null, string defaultResult = null) : base(primaryResult, defaultResult) {
+        protected BaseProcessDialogViewModel(string primaryResult = null, string defaultResult = null) : base(primaryResult, defaultResult) {
+
         }
 
-        public Task<string> ShowAsync(string titlebar, string header, string message) {
+        public override Task<string> ShowAsync() {
             if (this.AutomaticResult != null) {
                 return Task.FromResult(this.AutomaticResult);
             }
 
-            if (titlebar != null)
-                this.Titlebar = titlebar;
-            if (header != null)
-                this.Header = header;
-            if  (message != null)
-                this.Message = message;
-            return this.ShowAsync();
+            return base.ShowAsync();
         }
 
-        public Task<string> ShowAsync(string titlebar, string message) {
-            return this.ShowAsync(titlebar, null, message);
-        }
-
-        public Task<string> ShowAsync(string message) {
-            return this.ShowAsync(null, message);
-        }
-
-        public async Task<string> ShowAsync() {
-            if (this.AutomaticResult != null) {
-                return this.AutomaticResult;
-            }
-
+        public override string GetResult(bool? result, DialogButton button) {
             string output;
-            this.UpdateButtons();
-            bool? result = await this.ShowDialogAsync();
-            DialogButton button = this.lastClickedButton;
-            this.lastClickedButton = null;
             if (result == true) {
-                if (button != null) {
+                if (button == null) {
+                    output = this.PrimaryResult;
+                }
+                else {
                     output = button.ActionType;
                     if (output != null && this.IsAlwaysUseThisOptionChecked) { // (output != null || this.AllowNullButtonActionForAutoResult)
                         this.AutomaticResult = output;
                     }
                 }
-                else {
-                    output = this.PrimaryResult;
-                }
             }
             else {
                 output = this.DefaultResult;
             }
+
             return output;
         }
 
-        protected abstract Task<bool?> ShowDialogAsync();
+        public override void MarkReadOnly() {
+            if (this.ShowAlwaysUseNextResultOption) {
+                throw new InvalidOperationException($"Cannot set read-only when {nameof(BaseProcessDialogViewModel.ShowAlwaysUseNextResultOption)}");
+            }
+
+            base.MarkReadOnly();
+        }
     }
 }

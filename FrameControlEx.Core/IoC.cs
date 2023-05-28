@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.Reflection;
 using FrameControlEx.Core.Actions;
 using FrameControlEx.Core.Services;
 using FrameControlEx.Core.Settings;
@@ -14,25 +16,50 @@ namespace FrameControlEx.Core {
 
         public static SimpleIoC Instance { get; } = new SimpleIoC();
 
+        public static T Provide<T>() {
+            return Instance.Provide<T>();
+        }
+
         public static ActionManager ActionManager { get; } = new ActionManager();
         public static ShortcutManager ShortcutManager { get; set; }
-        public static IShortcutManagerDialogService ShortcutManagerDialog { get; set; }
+        public static IShortcutManagerDialogService ShortcutManagerDialog => Provide<IShortcutManagerDialogService>();
         public static Action<string> OnShortcutModified { get; set; }
         public static Action<string> BroadcastShortcutActivity { get; set; }
 
         public static IDispatcher Dispatcher { get; set; }
-        public static IClipboardService Clipboard { get; set; }
-        public static IMessageDialogService MessageDialogs { get; set; }
-        public static IFilePickDialogService FilePicker { get; set; }
-        public static IUserInputDialogService UserInput { get; set; }
-        public static IExplorerService ExplorerService { get; set; }
-        public static IKeyboardDialogService KeyboardDialogs { get; set; }
-        public static IMouseDialogService MouseDialogs { get; set; }
-        public static IOutputSelector BufferSelector { get; set; }
+        public static IClipboardService Clipboard => Provide<IClipboardService>();
+        public static IMessageDialogService MessageDialogs => Provide<IMessageDialogService>();
+        public static IFilePickDialogService FilePicker => Provide<IFilePickDialogService>();
+        public static IUserInputDialogService UserInput => Provide<IUserInputDialogService>();
+        public static IExplorerService ExplorerService => Provide<IExplorerService>();
+        public static IKeyboardDialogService KeyboardDialogs => Provide<IKeyboardDialogService>();
+        public static IMouseDialogService MouseDialogs => Provide<IMouseDialogService>();
+        public static IOutputSelector BufferSelector => Provide<IOutputSelector>();
 
         public static SettingsManagerViewModel Settings { get; } = new SettingsManagerViewModel();
 
         static IoC() {
+        }
+
+        public static void Init() {
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+                foreach (TypeInfo typeInfo in assembly.DefinedTypes) {
+                    ServiceAttribute attribute = typeInfo.GetCustomAttribute<ServiceAttribute>();
+                    if (attribute != null && attribute.Type != null) {
+                        object instance;
+                        try {
+                            instance = Activator.CreateInstance(typeInfo);
+                        }
+                        catch (Exception e) {
+                            Debug.WriteLine($"Failed to create implementation of {attribute.Type} as {typeInfo}");
+                            Debug.WriteLine(e);
+                            continue;
+                        }
+
+                        Instance.Register(attribute.Type, instance);
+                    }
+                }
+            }
         }
 
         public static bool IsAppRunning {

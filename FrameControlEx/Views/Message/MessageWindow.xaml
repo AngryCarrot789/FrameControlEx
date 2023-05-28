@@ -19,10 +19,10 @@
                   Style="{DynamicResource CustomWindowStyleEx}">
     <Window.Resources>
         <converters:EmptyStringToVisibilityConverter x:Key="StringToVisibility"/>
-        <converters:BoolToVisibilityConverter x:Key="BoolToVisConverter" TrueValue="Visible" FalseValue="Visible"/>
+        <!-- <converters:BoolToVisibilityConverter x:Key="BoolToVisConverter" TrueValue="Visible" FalseValue="Visible"/>-->
         <!-- ShowUseNextResultForCurrentQueueOptionToVisibilityConverter -->
         <converters:BoolConverterAND x:Key="BoolAND"/>
-        <message2:ThingyConverter x:Key="NotSureWhatToNameThis"/>
+        <!-- <message2:CurrentQueueCheckBoxConverter x:Key="NotSureWhatToNameThis"/> -->
     </Window.Resources>
     <DockPanel x:Name="WindowContentRoot">
         <Border DockPanel.Dock="Bottom" VerticalAlignment="Bottom" x:Name="ButtonBarBorder" Padding="10,0" Background="{DynamicResource AREghZyBrush.Tone4.Background.Static}">

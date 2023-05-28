@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO.MemoryMappedFiles;
+using System.Numerics;
 using System.Threading.Tasks;
 using FrameControlEx.Core.Notifications;
 using FrameControlEx.Core.Utils;
@@ -15,7 +16,7 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
     /// </summary>
     public class MMFAVSourceViewModel : AVSourceViewModel {
         private MemoryMappedFile file;
-        private byte[] pixels;
+        private Vector2 lastFrameSize;
 
         private string mapName;
         public string MapName {
@@ -38,41 +39,9 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             this.EditMappedFileNameCommand = new AsyncRelayCommand(this.EditMappedFileNameAction);
         }
 
-        // public override void OnAcceptFrame(SKSurface surface, in SKImageInfo frameInfo) {
-        //     base.OnAcceptFrame(surface, frameInfo);
-        //     MemoryMappedFile mappedFile = this.GetFile(in frameInfo);
-        //     if (mappedFile == null) {
-        //         return;
-        //     }
-//
-        //     this.lastInfo = frameInfo;
-//
-        //     using (MemoryMappedViewAccessor view = mappedFile.CreateViewAccessor(0, this.currentLength)) {
-        //         unsafe {
-        //             MEMMAPFILE_HEADER header = new MEMMAPFILE_HEADER() {
-        //                 width = frameInfo.Width, height = frameInfo.Height, bpp = (byte) frameInfo.BytesPerPixel
-        //             };
-//
-        //             view.Write(0, ref header);
-        //             SKPixmap pixmap = new SKPixmap();
-        //             if (surface.PeekPixels(pixmap)) {
-        //                 SafeMemoryMappedViewHandle safe = view.SafeMemoryMappedViewHandle;
-        //                 byte* ptr = null;
-        //                 safe.AcquirePointer(ref ptr);
-        //                 try {
-        //                     Buffer.MemoryCopy((void*) pixmap.GetPixels(), ptr + sizeof(MEMMAPFILE_HEADER), this.currentLength, this.currentLength);
-        //                 }
-        //                 finally {
-        //                     safe.ReleasePointer();
-        //                 }
-        //             }
-//
-        //             view.Flush();
-        //         }
-        //     }
-//
-        //     // write frame to file
-        // }
+        public override Vector2 GetRawSize() {
+            throw new NotImplementedException();
+        }
 
         public override void OnRender(RenderContext context) {
             base.OnRender(context);
@@ -98,35 +67,28 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
 
                 long bytes = header.width * header.height * header.bpp;
                 using (MemoryMappedViewAccessor thing = mmf.CreateViewAccessor(sizeof(MEMMAPFILE_HEADER), bytes, MemoryMappedFileAccess.Read)) {
-                    if (this.pixels == null || this.pixels.Length != bytes) {
-                        this.pixels = new byte[bytes];
+                    SafeMemoryMappedViewHandle safe = thing.SafeMemoryMappedViewHandle;
+
+                    byte* src = null;
+                    safe.AcquirePointer(ref src);
+                    try {
+                        // src + sizeof(MEMMAPFILE_HEADER) | this is required otherwise weird stuff happens
+                        // remove sizeof(MEMMAPFILE_HEADER) to have a weird stuff!
+                        SKImage image = SKImage.FromPixels(context.FrameInfo, (IntPtr) src + sizeof(MEMMAPFILE_HEADER));
+                        this.lastFrameSize = new Vector2(image.Width, image.Height);
+
+                        Vector2 scale = this.Scale, pos = this.Pos, origin = this.ScaleOrigin;
+                        SKMatrix matrix = context.Canvas.TotalMatrix;
+                        context.Canvas.Translate(pos.X, pos.Y);
+                        context.Canvas.Scale(scale.X, scale.Y, image.Width * origin.X, image.Height * origin.Y);
+                        context.Canvas.DrawImage(image, 0, 0);
+                        context.Canvas.SetMatrix(matrix);
+                        context.Canvas.Flush();
+                        image.Dispose();
                     }
-
-                    fixed (byte* dest = this.pixels) {
-                        SafeMemoryMappedViewHandle safe = thing.SafeMemoryMappedViewHandle;
-
-                        byte* src = null;
-                        safe.AcquirePointer(ref src);
-                        try {
-                            // src + sizeof(MEMMAPFILE_HEADER) | this is required otherwise weird stuff happens
-                            // remove sizeof(MEMMAPFILE_HEADER) to have a weird stuff!
-                            SKImage image = SKImage.FromPixels(context.FrameInfo, (IntPtr) src + sizeof(MEMMAPFILE_HEADER));
-                            System.Numerics.Vector2 scale = this.Scale, pos = this.Pos, origin = this.ScaleOrigin;
-                            SKMatrix matrix = context.Canvas.TotalMatrix;
-                            context.Canvas.Translate(pos.X, pos.Y);
-                            context.Canvas.Scale(scale.X, scale.Y, image.Width * origin.X, image.Height * origin.Y);
-                            context.Canvas.DrawImage(image, 0, 0);
-                            context.Canvas.SetMatrix(matrix);
-                            context.Canvas.Flush();
-                            image.Dispose();
-                            // Buffer.MemoryCopy(src + sizeof(MEMMAPFILE_HEADER), dest, bytes, bytes);
-                        }
-                        finally {
-                            safe.ReleasePointer();
-                        }
-
+                    finally {
+                        safe.ReleasePointer();
                     }
-                    // SafeMemoryMappedViewHandle safe = thing.SafeMemoryMappedViewHandle;
                 }
             }
         }

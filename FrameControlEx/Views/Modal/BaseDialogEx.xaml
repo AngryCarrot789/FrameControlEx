@@ -10,7 +10,7 @@
                   xmlns:attached="clr-namespace:FrameControlEx.Themes.Attached"
                   mc:Ignorable="d"
                   Title="BaseDialogEx" Height="450" Width="800"
-                  d:DataContext="{d:DesignInstance modal1:BaseDynamicDialogViewModel}"
+                  d:DataContext="{d:DesignInstance modal1:BaseProcessDialogViewModel}"
                   Style="{DynamicResource CustomWindowStyleEx}">
     <Window.Resources>
         <converters:EmptyStringToVisibilityConverter x:Key="StringToVisibility"/>

@@ -240,6 +240,7 @@
                                     <Button Command="{Binding MoveSelectedDownCommand, Mode=OneTime}" Background="Transparent" BorderBrush="Transparent" Width="24">
                                         <TextBlock Text="↓" FontSize="18" Margin="0,-3,0,0" UseLayoutRounding="False" SnapsToDevicePixels="False"/>
                                     </Button>
+                                    <controls1:NumberDragger Width="75" Minimum="-500" Maximum="1000" Value="300"/>
                                 </StackPanel>
                             </Border>
                         </Grid>

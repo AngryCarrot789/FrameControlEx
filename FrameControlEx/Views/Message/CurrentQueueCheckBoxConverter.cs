@@ -4,7 +4,7 @@ using System.Windows.Data;
 using FrameControlEx.Converters;
 
 namespace FrameControlEx.Views.Message {
-    public class ThingyConverter : IMultiValueConverter {
+    public class CurrentQueueCheckBoxConverter : IMultiValueConverter {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture) {
             if (values == null || values.Length != 3) {
                 throw new Exception("Expected 3 elements, not " + (values != null ? values.Length.ToString() : "null"));

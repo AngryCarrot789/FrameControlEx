@@ -1,7 +1,9 @@
 using System.Windows;
+using FrameControlEx.Core;
 using FrameControlEx.Core.Services;
 
 namespace FrameControlEx.Services {
+    [Service(typeof(IClipboardService))]
     public class ClipboardService : IClipboardService {
         public string ReadableText {
             get => Clipboard.GetText(TextDataFormat.UnicodeText);

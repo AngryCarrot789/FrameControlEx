@@ -152,6 +152,7 @@
     </Compile>
     <Compile Include="Services\ClipboardService.cs" />
     <Compile Include="Services\WinExplorerService.cs" />
+    <Compile Include="Settings\ColourTheme\ColourSelector.cs" />
     <Compile Include="Settings\SettingsViewModel.cs" />
     <Compile Include="Settings\SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
@@ -211,7 +212,7 @@
     <Compile Include="Views\Message\MessageWindow.xaml.cs">
       <DependentUpon>MessageWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Message\ThingyConverter.cs" />
+    <Compile Include="Views\Message\CurrentQueueCheckBoxConverter.cs" />
     <Compile Include="Views\Modal\BaseDialogEx.xaml.cs">
       <DependentUpon>BaseDialogEx.xaml</DependentUpon>
     </Compile>
@@ -439,6 +440,10 @@
     <Folder Include="Settings\Pages\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ColorPicker\ColorPicker.csproj">
+      <Project>{bcadf739-8c98-4f70-9e50-4c0b38752a68}</Project>
+      <Name>ColorPicker</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FrameControlEx.Core\FrameControlEx.Core.csproj">
       <Project>{abd8e759-682d-4038-a2c2-1b2a72c7b52a}</Project>
       <Name>FrameControlEx.Core</Name>

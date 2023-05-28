@@ -1,10 +1,8 @@
 ﻿using ColorPicker.Models;
 using System.Windows;
 
-namespace ColorPicker
-{
-    public partial class StandardColorPicker : DualPickerControlBase
-    {
+namespace ColorPicker {
+    public partial class StandardColorPicker : DualPickerControlBase {
         public static readonly DependencyProperty SmallChangeProperty =
             DependencyProperty.Register(nameof(SmallChange), typeof(double), typeof(StandardColorPicker),
                 new PropertyMetadata(1.0));
@@ -17,27 +15,23 @@ namespace ColorPicker
             = DependencyProperty.Register(nameof(PickerType), typeof(PickerType), typeof(StandardColorPicker),
                 new PropertyMetadata(PickerType.HSV));
 
-        public double SmallChange
-        {
-            get => (double)GetValue(SmallChangeProperty);
-            set => SetValue(SmallChangeProperty, value);
+        public double SmallChange {
+            get => (double) this.GetValue(SmallChangeProperty);
+            set => this.SetValue(SmallChangeProperty, value);
         }
 
-        public bool ShowAlpha
-        {
-            get => (bool)GetValue(ShowAlphaProperty);
-            set => SetValue(ShowAlphaProperty, value);
+        public bool ShowAlpha {
+            get => (bool) this.GetValue(ShowAlphaProperty);
+            set => this.SetValue(ShowAlphaProperty, value);
         }
 
-        public PickerType PickerType
-        {
-            get => (PickerType)GetValue(PickerTypeProperty);
-            set => SetValue(PickerTypeProperty, value);
+        public PickerType PickerType {
+            get => (PickerType) this.GetValue(PickerTypeProperty);
+            set => this.SetValue(PickerTypeProperty, value);
         }
 
-        public StandardColorPicker() : base()
-        {
-            InitializeComponent();
+        public StandardColorPicker() : base() {
+            this.InitializeComponent();
         }
     }
 }

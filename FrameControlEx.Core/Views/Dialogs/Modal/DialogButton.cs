@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using FrameControlEx.Core.Views.Dialogs.Message;
 
 namespace FrameControlEx.Core.Views.Dialogs.Modal {
     public class DialogButton : BaseViewModel {
@@ -65,15 +66,20 @@ namespace FrameControlEx.Core.Views.Dialogs.Modal {
             return Task.CompletedTask;
         }
 
-        public virtual DialogButton Clone(BaseDynamicDialogViewModel dialog) {
+        public virtual DialogButton Clone(BaseProcessDialogViewModel dialog) {
             return new DialogButton(dialog, this.ActionType, this.Text, this.CanUseAsAutomaticResult) {
                 IsEnabled = this.IsEnabled, ToolTip = this.ToolTip
             };
         }
 
         public void UpdateState() {
-            if (this.Dialog.IsAlwaysUseThisOptionChecked || this.Dialog.IsAlwaysUseThisOptionForCurrentQueueChecked) {
-                this.IsEnabled = this.CanUseAsAutomaticResult;
+            if (this.Dialog is MessageDialog dialog) {
+                if (dialog.IsAlwaysUseThisOptionChecked || dialog.IsAlwaysUseThisOptionForCurrentQueueChecked) {
+                    this.IsEnabled = this.CanUseAsAutomaticResult;
+                }
+                else {
+                    this.IsEnabled = true;
+                }
             }
             else {
                 this.IsEnabled = true;

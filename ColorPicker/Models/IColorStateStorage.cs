@@ -1,7 +1,5 @@
-﻿namespace ColorPicker.Models
-{
-    public interface IColorStateStorage
-    {
+﻿namespace ColorPicker.Models {
+    public interface IColorStateStorage {
         ColorState ColorState { get; set; }
     }
 }

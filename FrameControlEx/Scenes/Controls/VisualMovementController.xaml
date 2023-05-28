@@ -5,37 +5,37 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FrameControlEx.Scenes.Controls"
              xmlns:helpers="clr-namespace:FrameControlEx.Controls.Helpers"
-             xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Sources;assembly=FrameControlEx.Core"
+             xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Sources;assembly=FrameControlEx.Core" xmlns:controls="clr-namespace:FrameControlEx.Controls"
              mc:Ignorable="d" 
-             Height="168" d:DesignWidth="400"
+             Height="98" d:DesignWidth="400"
              d:DataContext="{d:DesignInstance sources:AVSourceViewModel}">
     <Grid>
         <Grid Margin="0,0,0,24">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="55"/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="75"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="1"/>
                 <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="1"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Pos X" VerticalAlignment="Center" Padding="3,1" Grid.Row="0" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditPosCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
-            <TextBlock Text="Pos Y" VerticalAlignment="Center" Padding="3,1" Grid.Row="1" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditPosCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
-            <TextBlock Text="Scale X" VerticalAlignment="Center" Padding="3,1" Grid.Row="2" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
-            <TextBlock Text="Scale Y" VerticalAlignment="Center" Padding="3,1" Grid.Row="3" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
-            <TextBlock Text="Origin X" VerticalAlignment="Center" Padding="3,1" Grid.Row="4" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleOriginCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
-            <TextBlock Text="Origin Y" VerticalAlignment="Center" Padding="3,1" Grid.Row="5" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleOriginCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
+            <TextBlock Padding="3,1" Grid.Row="0" VerticalAlignment="Center" Text="Position" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditPosCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
+            <TextBlock Padding="3,1" Grid.Row="2" VerticalAlignment="Center" Text="Scale X" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
+            <TextBlock Padding="3,1" Grid.Row="4" VerticalAlignment="Center" Text="Origin X" helpers:AttachedInteractivity.DoubleClickCommand="{Binding EditScaleOriginCommand, Mode=OneTime}" Height="18" Margin="0,3"/>
 
-            <Slider Grid.Column="1" Grid.Row="0" Value="{Binding PosX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-4000" Maximum="4000" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft"/>
-            <Slider Grid.Column="1" Grid.Row="1" Value="{Binding PosY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-4000" Maximum="4000" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft"/>
-            <Slider Grid.Column="1" Grid.Row="2" Value="{Binding ScaleX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-15" Maximum="15" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.02" SmallChange="0.001"/>
-            <Slider Grid.Column="1" Grid.Row="3" Value="{Binding ScaleY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-15" Maximum="15" TickFrequency="10" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.02" SmallChange="0.001"/>
-            <Slider Grid.Column="1" Grid.Row="4" Value="{Binding ScaleOriginX, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-5" Maximum="5" TickFrequency="1" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.01" SmallChange="0.001"/>
-            <Slider Grid.Column="1" Grid.Row="5" Value="{Binding ScaleOriginY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Minimum="-5" Maximum="5" TickFrequency="1" AutoToolTipPrecision="4" AutoToolTipPlacement="TopLeft" LargeChange="0.01" SmallChange="0.001"/>
+            <controls:NumberDragger Grid.Column="1" Grid.Row="0" Padding="6,2,2,2" RoundedPlaces="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Minimum="-1000000" Maximum="1000000" Value="{Binding PosX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <controls:NumberDragger Grid.Column="2" Grid.Row="0" Padding="6,2,2,2" RoundedPlaces="2" VerticalAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Minimum="-1000000" Maximum="1000000" Value="{Binding PosY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <controls:NumberDragger Grid.Column="1" Grid.Row="2" Padding="6,2,2,2" RoundedPlaces="4" VerticalAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Minimum="-1000000" Maximum="1000000" TinyChange="0.0001" SmallChange="0.001" LargeChange="0.01" MassiveChange="2" Value="{Binding ScaleX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <controls:NumberDragger Grid.Column="2" Grid.Row="2" Padding="6,2,2,2" RoundedPlaces="4" VerticalAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Minimum="-1000000" Maximum="1000000" TinyChange="0.0001" SmallChange="0.001" LargeChange="0.01" MassiveChange="2" Value="{Binding ScaleY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <controls:NumberDragger Grid.Column="1" Grid.Row="4" Padding="6,2,2,2" RoundedPlaces="4" VerticalAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Minimum="-1000000" Maximum="1000000" TinyChange="0.0001" SmallChange="0.001" LargeChange="0.01" MassiveChange="2" Value="{Binding ScaleOriginX, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <controls:NumberDragger Grid.Column="2" Grid.Row="4" Padding="6,2,2,2" RoundedPlaces="4" VerticalAlignment="Center" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Minimum="-1000000" Maximum="1000000" TinyChange="0.0001" SmallChange="0.001" LargeChange="0.01" MassiveChange="2" Value="{Binding ScaleOriginY, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <Separator Grid.Row="1" Grid.ColumnSpan="3" Padding="0" Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            <Separator Grid.Row="3" Grid.ColumnSpan="3" Padding="0" Margin="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
         </Grid>
         <Button Content="Reset All" VerticalAlignment="Bottom" Height="24" Command="{Binding ResetCommand, Mode=OneTime}"/>
     </Grid>

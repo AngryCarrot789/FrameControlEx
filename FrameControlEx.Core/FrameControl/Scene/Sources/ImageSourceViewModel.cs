@@ -72,6 +72,15 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             }
         }
 
+        public override Vector2 GetRawSize() {
+            if (this.Image is ImageFactory.SkiaImage img) {
+                return new Vector2(img.image.Width, img.image.Height);
+            }
+            else {
+                return Vector2.Zero;
+            }
+        }
+
         public override void OnRender(RenderContext context) {
             base.OnRender(context);
             if (this.Image is ImageFactory.SkiaImage img) {

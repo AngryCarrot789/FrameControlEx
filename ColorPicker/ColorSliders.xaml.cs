@@ -1,9 +1,7 @@
 ﻿using System.Windows;
 
-namespace ColorPicker
-{
-    public partial class ColorSliders : PickerControlBase
-    {
+namespace ColorPicker {
+    public partial class ColorSliders : PickerControlBase {
         public static readonly DependencyProperty SmallChangeProperty =
             DependencyProperty.Register(nameof(SmallChange), typeof(double), typeof(ColorSliders),
                 new PropertyMetadata(1.0));
@@ -12,22 +10,18 @@ namespace ColorPicker
             DependencyProperty.Register(nameof(ShowAlpha), typeof(bool), typeof(ColorSliders),
                 new PropertyMetadata(true));
 
-        public double SmallChange
-        {
-            get => (double)GetValue(SmallChangeProperty);
-            set => SetValue(SmallChangeProperty, value);
+        public double SmallChange {
+            get => (double) this.GetValue(SmallChangeProperty);
+            set => this.SetValue(SmallChangeProperty, value);
         }
 
-        public bool ShowAlpha
-        {
-            get => (bool)GetValue(ShowAlphaProperty);
-            set => SetValue(ShowAlphaProperty, value);
+        public bool ShowAlpha {
+            get => (bool) this.GetValue(ShowAlphaProperty);
+            set => this.SetValue(ShowAlphaProperty, value);
         }
 
-        public ColorSliders() : base()
-        {
-            InitializeComponent();
+        public ColorSliders() : base() {
+            this.InitializeComponent();
         }
-
     }
 }

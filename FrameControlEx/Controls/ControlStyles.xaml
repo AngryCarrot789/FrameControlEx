@@ -33,13 +33,22 @@
     <Style TargetType="{x:Type controls:NumberDragger}">
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Focusable" Value="True"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="TinyChange"    Value="0.01"/>
+        <Setter Property="SmallChange"   Value="0.1"/>
+        <Setter Property="LargeChange"   Value="1"/>
+        <Setter Property="MassiveChange" Value="5"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:NumberDragger}">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-                        <Grid>
-                            <TextBlock x:Name="PART_TextBlock" Padding="2,1" Background="Transparent"/>
-                            <TextBox x:Name="PART_TextBox" VerticalContentAlignment="Center" BorderThickness="0" Background="Transparent"/>
+                    <Border Background="{TemplateBinding Background}" 
+                            BorderBrush="{TemplateBinding BorderBrush}" 
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid Margin="{TemplateBinding Padding}" 
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                            <TextBlock Text="0" x:Name="PART_TextBlock" Padding="2,0,2,0" Background="Transparent" TextDecorations="Underline"/>
+                            <TextBox   Text="0" x:Name="PART_TextBox" VerticalContentAlignment="Center" BorderThickness="0" Background="Transparent"/>
                         </Grid>
                     </Border>
                 </ControlTemplate>

@@ -3,13 +3,11 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 
-namespace ColorPicker
-{
-    public class DualPickerControlBase : PickerControlBase, ISecondColorStorage, IHintColorStateStorage
-    {
+namespace ColorPicker {
+    public class DualPickerControlBase : PickerControlBase, ISecondColorStorage, IHintColorStateStorage {
         public static readonly DependencyProperty SecondColorStateProperty =
-                DependencyProperty.Register(nameof(SecondColorState), typeof(ColorState), typeof(DualPickerControlBase),
-                    new PropertyMetadata(new ColorState(1, 1, 1, 1, 0, 0, 1, 0, 0, 1), OnSecondColorStatePropertyChange));
+            DependencyProperty.Register(nameof(SecondColorState), typeof(ColorState), typeof(DualPickerControlBase),
+                new PropertyMetadata(new ColorState(1, 1, 1, 1, 0, 0, 1, 0, 0, 1), OnSecondColorStatePropertyChange));
 
         public static readonly DependencyProperty SecondaryColorProperty =
             DependencyProperty.Register(nameof(SecondaryColor), typeof(Color), typeof(DualPickerControlBase),
@@ -17,22 +15,20 @@ namespace ColorPicker
 
         private readonly SecondColorDecorator secondColorDecorator;
         private readonly HintColorDecorator hintColorDecorator;
-        public ColorState SecondColorState
-        {
-            get => (ColorState)GetValue(SecondColorStateProperty);
-            set => SetValue(SecondColorStateProperty, value);
+
+        public ColorState SecondColorState {
+            get => (ColorState) this.GetValue(SecondColorStateProperty);
+            set => this.SetValue(SecondColorStateProperty, value);
         }
 
-        public NotifyableColor SecondColor
-        {
+        public NotifyableColor SecondColor {
             get;
             set;
         }
 
-        public Color SecondaryColor
-        {
-            get => (Color)GetValue(SecondaryColorProperty);
-            set => SetValue(SecondaryColorProperty, value);
+        public Color SecondaryColor {
+            get => (Color) this.GetValue(SecondaryColorProperty);
+            set => this.SetValue(SecondaryColorProperty, value);
         }
 
 
@@ -44,31 +40,27 @@ namespace ColorPicker
             DependencyProperty.Register(nameof(HintColor), typeof(Color), typeof(DualPickerControlBase),
                 new PropertyMetadata(Colors.Transparent, OnHintColorPropertyChanged));
 
-        public ColorState HintColorState
-        {
-            get => (ColorState)GetValue(HintColorStateProperty);
-            set => SetValue(HintColorStateProperty, value);
+        public ColorState HintColorState {
+            get => (ColorState) this.GetValue(HintColorStateProperty);
+            set => this.SetValue(HintColorStateProperty, value);
         }
 
-        public NotifyableColor HintNotifyableColor
-        {
+        public NotifyableColor HintNotifyableColor {
             get;
             set;
         }
 
-        public Color HintColor
-        {
-            get { return (Color)GetValue(HintColorProperty); }
-            set { SetValue(HintColorProperty, value); }
+        public Color HintColor {
+            get { return (Color) this.GetValue(HintColorProperty); }
+            set { this.SetValue(HintColorProperty, value); }
         }
 
         public static readonly DependencyProperty UseHintColorProperty =
             DependencyProperty.Register(nameof(UseHintColor), typeof(bool), typeof(DualPickerControlBase), new PropertyMetadata(false));
 
-        public bool UseHintColor
-        {
-            get { return (bool)GetValue(UseHintColorProperty); }
-            set { SetValue(UseHintColorProperty, value); }
+        public bool UseHintColor {
+            get { return (bool) this.GetValue(UseHintColorProperty); }
+            set { this.SetValue(UseHintColorProperty, value); }
         }
 
 
@@ -78,68 +70,58 @@ namespace ColorPicker
         private bool ignoreHintNotifyableColorChange = false;
         private bool ignoreHintColorPropertyChange = false;
 
-        public DualPickerControlBase() : base()
-        {
-            secondColorDecorator = new SecondColorDecorator(this);
-            hintColorDecorator = new HintColorDecorator(this);
+        public DualPickerControlBase() : base() {
+            this.secondColorDecorator = new SecondColorDecorator(this);
+            this.hintColorDecorator = new HintColorDecorator(this);
 
-            SecondColor = new NotifyableColor(secondColorDecorator);
-            SecondColor.PropertyChanged += (sender, args) =>
-            {
-                if (!ignoreSecondaryColorChange)
-                {
-                    ignoreSecondaryColorPropertyChange = true;
-                    SecondaryColor = System.Windows.Media.Color.FromArgb(
-                        (byte)Math.Round(SecondColor.A),
-                        (byte)Math.Round(SecondColor.RGB_R),
-                        (byte)Math.Round(SecondColor.RGB_G),
-                        (byte)Math.Round(SecondColor.RGB_B));
-                    ignoreSecondaryColorPropertyChange = false;
+            this.SecondColor = new NotifyableColor(this.secondColorDecorator);
+            this.SecondColor.PropertyChanged += (sender, args) => {
+                if (!this.ignoreSecondaryColorChange) {
+                    this.ignoreSecondaryColorPropertyChange = true;
+                    this.SecondaryColor = System.Windows.Media.Color.FromArgb(
+                        (byte) Math.Round(this.SecondColor.A),
+                        (byte) Math.Round(this.SecondColor.RGB_R),
+                        (byte) Math.Round(this.SecondColor.RGB_G),
+                        (byte) Math.Round(this.SecondColor.RGB_B));
+                    this.ignoreSecondaryColorPropertyChange = false;
                 }
             };
 
-            HintNotifyableColor = new NotifyableColor(hintColorDecorator);
-            HintNotifyableColor.PropertyChanged += (sender, args) =>
-            {
-                if (!ignoreHintNotifyableColorChange)
-                {
-                    ignoreHintColorPropertyChange = true;
-                    HintColor = System.Windows.Media.Color.FromArgb(
-                        (byte)Math.Round(HintNotifyableColor.A),
-                        (byte)Math.Round(HintNotifyableColor.RGB_R),
-                        (byte)Math.Round(HintNotifyableColor.RGB_G),
-                        (byte)Math.Round(HintNotifyableColor.RGB_B));
-                    ignoreHintColorPropertyChange = false;
+            this.HintNotifyableColor = new NotifyableColor(this.hintColorDecorator);
+            this.HintNotifyableColor.PropertyChanged += (sender, args) => {
+                if (!this.ignoreHintNotifyableColorChange) {
+                    this.ignoreHintColorPropertyChange = true;
+                    this.HintColor = System.Windows.Media.Color.FromArgb(
+                        (byte) Math.Round(this.HintNotifyableColor.A),
+                        (byte) Math.Round(this.HintNotifyableColor.RGB_R),
+                        (byte) Math.Round(this.HintNotifyableColor.RGB_G),
+                        (byte) Math.Round(this.HintNotifyableColor.RGB_B));
+                    this.ignoreHintColorPropertyChange = false;
                 }
             };
         }
 
-        public void SwapColors()
-        {
-            var temp = ColorState;
-            ColorState = SecondColorState;
-            SecondColorState = temp;
+        public void SwapColors() {
+            var temp = this.ColorState;
+            this.ColorState = this.SecondColorState;
+            this.SecondColorState = temp;
         }
 
-        public void SetMainColorFromHintColor()
-        {
-            ColorState = HintColorState;
+        public void SetMainColorFromHintColor() {
+            this.ColorState = this.HintColorState;
         }
 
-        private static void OnSecondColorStatePropertyChange(DependencyObject d, DependencyPropertyChangedEventArgs args)
-        {
-            ((DualPickerControlBase)d).SecondColor.UpdateEverything((ColorState)args.OldValue);
+        private static void OnSecondColorStatePropertyChange(DependencyObject d, DependencyPropertyChangedEventArgs args) {
+            ((DualPickerControlBase) d).SecondColor.UpdateEverything((ColorState) args.OldValue);
         }
 
-        private static void OnHintColorStatePropertyChange(DependencyObject d, DependencyPropertyChangedEventArgs args)
-        {
-            ((DualPickerControlBase)d).HintNotifyableColor.UpdateEverything((ColorState)args.OldValue);
+        private static void OnHintColorStatePropertyChange(DependencyObject d, DependencyPropertyChangedEventArgs args) {
+            ((DualPickerControlBase) d).HintNotifyableColor.UpdateEverything((ColorState) args.OldValue);
         }
 
-        private static void OnHintColorPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args)
-        {
-            var sender = (DualPickerControlBase)d;
-            Color newValue = (Color)args.NewValue;
+        private static void OnHintColorPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs args) {
+            var sender = (DualPickerControlBase) d;
+            Color newValue = (Color) args.NewValue;
             if (sender.ignoreHintColorPropertyChange)
                 return;
             sender.ignoreHintNotifyableColorChange = true;
@@ -150,12 +132,11 @@ namespace ColorPicker
             sender.ignoreHintNotifyableColorChange = false;
         }
 
-        private static void OnSecondaryColorPropertyChange(DependencyObject d, DependencyPropertyChangedEventArgs args)
-        {
-            var sender = (DualPickerControlBase)d;
+        private static void OnSecondaryColorPropertyChange(DependencyObject d, DependencyPropertyChangedEventArgs args) {
+            var sender = (DualPickerControlBase) d;
             if (sender.ignoreSecondaryColorPropertyChange)
                 return;
-            Color newValue = (Color)args.NewValue;
+            Color newValue = (Color) args.NewValue;
             sender.ignoreSecondaryColorChange = true;
             sender.SecondColor.A = newValue.A;
             sender.SecondColor.RGB_R = newValue.R;

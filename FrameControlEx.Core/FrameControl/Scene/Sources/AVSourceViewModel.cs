@@ -104,14 +104,36 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             });
         }
 
-        public Vector2 GetSize(Vector2 viewport) {
-            return viewport * this.Scale;
+        /// <summary>
+        /// Gets the amount of pixels that this source takes up
+        /// </summary>
+        /// <returns></returns>
+        public abstract Vector2 GetRawSize();
+
+        public static Rect CalculateOutputRect(Rect vp, Vector2 pos, Vector2 scale, Vector2 origin) {
+            // Calculate the scaled size based on the original size and scale factors
+            float scaledWidth = vp.Width * scale.X;
+            float scaledHeight = vp.Height * scale.Y;
+
+            // Calculate the scaled position based on the original position and scale factors
+            float scaledX = pos.X + (vp.Width * (origin.X - 0.5f) * (1 - scale.X));
+            float scaledY = pos.Y + (vp.Height * (origin.Y - 0.5f) * (1 - scale.Y));
+
+            // Create the output rect using the scaled position and size
+            Rect outputRect = new Rect(scaledX, scaledY, scaledWidth, scaledHeight);
+
+            return outputRect;
         }
 
-        public Rect GetFullRectangle(Vector2 viewport) {
-            Vector2 scaleSize = viewport * this.Scale;
-            Vector2 scalePos = this.pos + ((viewport * this.scaleOrigin) - (scaleSize * this.scaleOrigin));
-            return new Rect(scalePos, scaleSize);
+        public Rect GetFullRectangle() {
+            Vector2 size = this.GetRawSize();
+            Vector2 scaledSize = size * this.scale;
+            Vector2 realPos = this.pos + (scaledSize * this.scaleOrigin);
+            return new Rect(realPos, scaledSize);
+
+            // Vector2 scaleSize = vp * this.Scale;
+            // Vector2 scalePos = this.pos + ((vp * this.scaleOrigin) - (scaleSize * this.scaleOrigin));
+            // return new Rect(scalePos, scaleSize);
         }
 
         protected DoubleInputViewModel CreateVec2Editor(string msgA, string msgB, string title, float inputA, float inputB) {

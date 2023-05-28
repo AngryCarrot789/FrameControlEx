@@ -5,7 +5,20 @@ namespace FrameControlEx.Core.Views.Dialogs.Message {
     /// <summary>
     /// A helper view model for managing message dialogs that can have multiple buttons
     /// </summary>
-    public partial class MessageDialog : BaseDynamicDialogViewModel {
+    public class MessageDialog : BaseProcessDialogViewModel {
+        protected string header;
+        protected string message;
+
+        public string Header {
+            get => this.header;
+            set => this.RaisePropertyChanged(ref this.header, value);
+        }
+
+        public string Message {
+            get => this.message;
+            set => this.RaisePropertyChanged(ref this.message, value);
+        }
+
         /// <summary>
         /// Creates a new instance of <see cref="MessageDialog"/>
         /// </summary>
@@ -18,6 +31,27 @@ namespace FrameControlEx.Core.Views.Dialogs.Message {
         /// This dialog's default result, which is the result used if the dialog closed without a button (e.g. clicking esc or some dodgy Win32 usage)
         /// </param>
         public MessageDialog(string primaryResult = null, string defaultResult = null) : base(primaryResult, defaultResult) {
+        }
+
+        public Task<string> ShowAsync(string titlebar, string header, string message) {
+            if (this.AutomaticResult != null)
+                return Task.FromResult(this.AutomaticResult);
+
+            if (titlebar != null)
+                this.Titlebar = titlebar;
+            if (header != null)
+                this.Header = header;
+            if  (message != null)
+                this.Message = message;
+            return this.ShowAsync();
+        }
+
+        public Task<string> ShowAsync(string titlebar, string message) {
+            return this.ShowAsync(titlebar, null, message);
+        }
+
+        public Task<string> ShowAsync(string message) {
+            return this.ShowAsync(null, message);
         }
 
         /// <summary>
@@ -46,7 +80,7 @@ namespace FrameControlEx.Core.Views.Dialogs.Message {
             return IoC.MessageDialogs.ShowDialogAsync(this);
         }
 
-        public override BaseDynamicDialogViewModel CloneCore() {
+        public override BaseProcessDialogViewModel CloneCore() {
             return this.Clone();
         }
 

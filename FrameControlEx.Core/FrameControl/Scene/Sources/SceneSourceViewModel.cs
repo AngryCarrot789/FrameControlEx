@@ -33,14 +33,17 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             }
         }
 
+        public override Vector2 GetRawSize() {
+            return new Vector2();
+        }
+
         public override void OnRender(RenderContext context) {
             base.OnRender(context);
             if (this.TargetScene != null) {
                 // doens't work
                 context.Canvas.Save();
 
-                SKImageInfo frame = context.FrameInfo;
-                Rect rect = this.GetFullRectangle(new Vector2(frame.Width, frame.Height));
+                Rect rect = this.GetFullRectangle();
                 context.Canvas.ClipRect(SKRect.Create(rect.X1, rect.Y1, rect.Width, rect.Height));
 
                 Vector2 s = this.Scale, o = this.ScaleOrigin;

@@ -28,6 +28,15 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             }
         }
 
+        public override Vector2 GetRawSize() {
+            SKImage frame = this.targetOutput?.lastFrame;
+            if (frame == null) {
+                return Vector2.Zero;
+            }
+
+            return new Vector2(frame.Width, frame.Height);
+        }
+
         public override void OnRender(RenderContext context) {
             base.OnRender(context);
             if (this.TargetOutput != null && this.TargetOutput.IsEnabled & this.TargetOutput.lastFrame != null) {

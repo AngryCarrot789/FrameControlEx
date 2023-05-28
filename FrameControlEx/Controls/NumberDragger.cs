@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -9,225 +10,467 @@ namespace FrameControlEx.Controls {
     [TemplatePart(Name = "PART_TextBlock", Type = typeof(TextBlock))]
     [TemplatePart(Name = "PART_TextBox", Type = typeof(TextBox))]
     public class NumberDragger : RangeBase {
+        public static readonly DependencyProperty TinyChangeProperty =
+            DependencyProperty.Register(
+                "TinyChange",
+                typeof(double),
+                typeof(NumberDragger),
+                new PropertyMetadata(0.01d));
+
+        public static readonly DependencyProperty MassiveChangeProperty =
+            DependencyProperty.Register(
+                "MassiveChange",
+                typeof(double),
+                typeof(NumberDragger),
+                new PropertyMetadata(1d));
+
+        protected static readonly DependencyPropertyKey IsDraggingPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "IsDragging",
+                typeof(bool),
+                typeof(NumberDragger),
+                new PropertyMetadata(BoolBox.False,
+                    (d, e) => ((NumberDragger) d).OnIsDraggingChanged((bool) e.OldValue, (bool) e.NewValue)));
+
+        public static readonly DependencyProperty IsDraggingProperty = IsDraggingPropertyKey.DependencyProperty;
+
+        public static readonly DependencyProperty OrientationProperty =
+            DependencyProperty.Register(
+                "Orientation",
+                typeof(Orientation),
+                typeof(NumberDragger),
+                new PropertyMetadata(Orientation.Horizontal,
+                    (d, e) => ((NumberDragger) d).OnOrientationChanged((Orientation) e.OldValue, (Orientation) e.NewValue)));
+
+        public static readonly DependencyPropertyKey IsEditingTextBoxPropertyKey =
+            DependencyProperty.RegisterReadOnly(
+                "IsEditingTextBox",
+                typeof(bool),
+                typeof(NumberDragger),
+                new PropertyMetadata(BoolBox.False,
+                    (d, e) => ((NumberDragger) d).OnIsEditingTextBoxChanged((bool) e.OldValue, (bool) e.NewValue),
+                    (d, v) => ((NumberDragger) d).OnCoerceIsEditingTextBox((bool) v)));
+
+        public static readonly DependencyProperty IsEditingTextBoxProperty = IsEditingTextBoxPropertyKey.DependencyProperty;
+
+        public static readonly DependencyProperty RoundedPlacesProperty =
+            DependencyProperty.Register(
+                "RoundedPlaces",
+                typeof(int),
+                typeof(NumberDragger),
+                new PropertyMetadata(4,
+                    (d, e) => ((NumberDragger) d).OnRoundedPlacesChanged((int) e.OldValue, (int) e.NewValue)));
+
+        public static readonly DependencyProperty LockCursorWhileDraggingProperty =
+            DependencyProperty.Register(
+                "LockCursorWhileDragging",
+                typeof(bool),
+                typeof(NumberDragger),
+                new PropertyMetadata(BoolBox.False, (d, e) => throw new NotImplementedException("Locking the mouse cursor is currently unsupported")));
+
         private TextBlock PART_TextBlock;
         private TextBox PART_TextBox;
-        private bool isEditingDirectly;
+        private Point? lastClickPoint;
+        private Point? lastMouseMove;
+        private double? previousValue;
+        private bool ignoreMouseMove;
 
-        public static readonly DependencyProperty IsVerticalProperty = DependencyProperty.Register("IsVertical", typeof(bool), typeof(NumberDragger), new PropertyMetadata(BoolBox.False));
-        public static readonly DependencyPropertyKey IsDraggingPropertyKey = DependencyProperty.RegisterReadOnly("IsDragging", typeof(bool), typeof(NumberDragger), new PropertyMetadata(BoolBox.False));
-        public static readonly DependencyProperty ValueMultiplierProperty = DependencyProperty.Register("ValueMultiplier", typeof(double), typeof(NumberDragger), new PropertyMetadata(1d));
+        public double TinyChange {
+            get => (double) this.GetValue(TinyChangeProperty);
+            set => this.SetValue(TinyChangeProperty, value);
+        }
 
-        public bool IsVertical {
-            get => (bool) this.GetValue(IsVerticalProperty);
-            set => this.SetValue(IsVerticalProperty, value.Box());
+        /// <summary>
+        /// The amount to add per pixel of change while dragging
+        /// </summary>
+        public double MassiveChange {
+            get => (double) this.GetValue(MassiveChangeProperty);
+            set => this.SetValue(MassiveChangeProperty, value);
         }
 
         public bool IsDragging {
-            get => (bool) this.GetValue(IsDraggingPropertyKey.DependencyProperty);
-            private set => this.SetValue(IsDraggingPropertyKey, value.Box());
+            get => (bool) this.GetValue(IsDraggingProperty);
+            protected set => this.SetValue(IsDraggingPropertyKey, value.Box());
         }
 
-        public double ValueMultiplier {
-            get { return (double) this.GetValue(ValueMultiplierProperty); }
-            set { this.SetValue(ValueMultiplierProperty, value); }
+        public Orientation Orientation {
+            get => (Orientation) this.GetValue(OrientationProperty);
+            set => this.SetValue(OrientationProperty, value);
         }
 
-        private bool isMouseDown;
-        private Point lastMouseClick;
-        private Point lastMouseMove;
-        private double oldValue;
+        public bool IsEditingTextBox {
+            get => (bool) this.GetValue(IsEditingTextBoxProperty);
+            protected set => this.SetValue(IsEditingTextBoxPropertyKey, value.Box());
+        }
+
+        public int RoundedPlaces {
+            get => (int) this.GetValue(RoundedPlacesProperty);
+            set => this.SetValue(RoundedPlacesProperty, value);
+        }
+
+        private bool isUpdatingExternalMouse;
+
+        public bool LockCursorWhileDragging {
+            get => (bool) this.GetValue(LockCursorWhileDraggingProperty);
+            set => this.SetValue(LockCursorWhileDraggingProperty, value.Box());
+        }
+
+        public double RoundedValue => this.GetRoundedValue(this.Value);
 
         public NumberDragger() {
-
-        }
-
-        protected override void OnValueChanged(double oldValue, double newValue) {
-            base.OnValueChanged(oldValue, newValue);
-            if (this.PART_TextBox == null || this.PART_TextBlock == null) {
-                return;
-            }
-
-            string text = Math.Round(newValue, 2).ToString();
-            this.PART_TextBox.Text = text;
-            this.PART_TextBox.Text = text;
+            this.Loaded += (s, e) => {
+                this.CoerceValue(IsEditingTextBoxProperty);
+                this.UpdateText();
+                this.UpdateCursor();
+            };
         }
 
         public override void OnApplyTemplate() {
             base.OnApplyTemplate();
             this.PART_TextBlock = this.GetTemplateChild("PART_TextBlock") as TextBlock ?? throw new Exception("Missing template part: " + nameof(this.PART_TextBlock));
             this.PART_TextBox = this.GetTemplateChild("PART_TextBox") as TextBox ?? throw new Exception("Missing template part: " + nameof(this.PART_TextBox));
+            this.PART_TextBox.Focusable = true;
             this.PART_TextBox.KeyDown += this.OnTextBoxKeyDown;
-            this.PART_TextBox.LostFocus += (sender, args) => {
-                this.HideEditor();
+            this.PART_TextBox.GotFocus += (s, e) => {
+                if (this.PART_TextBox.IsFocused || this.PART_TextBox.IsMouseCaptured) {
+                    this.IsEditingTextBox = true;
+                }
             };
 
-            this.HideEditor();
-            string text = Math.Round(this.Value, 2).ToString();
-            this.PART_TextBox.Text = text;
-            this.PART_TextBlock.Text = text;
+            this.PART_TextBox.LostFocus += (s, e) => {
+                this.IsEditingTextBox = false;
+            };
 
-            this.PART_TextBlock.MouseLeftButtonDown += this.PART_TextBlockOnMouseDown;
-            this.PART_TextBlock.MouseMove += this.PART_TextBlockOnMouseMove;
-            this.PART_TextBlock.MouseLeftButtonUp += this.PART_TextBlockOnMouseUp;
+            this.CoerceValue(IsEditingTextBoxProperty);
         }
 
-        private void PART_TextBlockOnMouseDown(object sender, MouseButtonEventArgs e) {
+        public double GetRoundedValue(double value) {
+            return Math.Round(value, this.RoundedPlaces);
+        }
+
+        protected virtual void OnIsDraggingChanged(bool oldValue, bool newValue) {
+
+        }
+
+        protected virtual void OnOrientationChanged(Orientation oldValue, Orientation newValue) {
             if (this.IsDragging) {
-                return;
+                this.CancelDrag();
             }
 
-            e.Handled = true;
-            this.Focus();
-            this.CaptureMouse();
-            this.isMouseDown = true;
+            this.IsEditingTextBox = false;
         }
 
-        private void PART_TextBlockOnMouseUp(object sender, MouseButtonEventArgs e) {
-            if (this.IsMouseCaptured && this.IsDragging) {
-                e.Handled = true;
-                this.OnCompleteDrag(false);
+        protected virtual void OnIsEditingTextBoxChanged(bool oldValue, bool newValue) {
+            if (newValue && this.IsDragging) {
+                this.CancelDrag();
             }
-            else if (this.isMouseDown) {
-                this.EnableEditor();
-                this.isMouseDown = false;
+
+            this.UpdateText();
+            if (oldValue != newValue) {
+                this.PART_TextBox.Focus();
+                this.PART_TextBox.SelectAll();
             }
         }
 
-        private void PART_TextBlockOnMouseMove(object sender, MouseEventArgs e) {
-            if (this.isEditingDirectly)
-                return;
+        private bool OnCoerceIsEditingTextBox(bool isEditing) {
+            if (this.PART_TextBox == null || this.PART_TextBlock == null) {
+                return isEditing;
+            }
 
-            Point pos = e.GetPosition(this);
-            if (!this.IsDragging) {
-                if (e.LeftButton != MouseButtonState.Pressed) {
-                    this.isMouseDown = false;
-                    return;
-                }
+            if (isEditing) {
+                this.PART_TextBox.Visibility = Visibility.Visible;
+                this.PART_TextBlock.Visibility = Visibility.Hidden;
+            }
+            else {
+                this.PART_TextBox.Visibility = Visibility.Hidden;
+                this.PART_TextBlock.Visibility = Visibility.Visible;
+            }
 
-                double change;
-                if (this.IsVertical) {
-                    change = Math.Abs(pos.Y - this.lastMouseClick.Y);
+            this.UpdateCursor();
+            return isEditing;
+        }
+
+        public void UpdateCursor() {
+            Cursor cursor;
+            switch (this.Orientation) {
+                case Orientation.Horizontal:
+                    cursor = Cursors.SizeWE;
+                    break;
+                case Orientation.Vertical:
+                    cursor = Cursors.SizeNS;
+                    break;
+                default:
+                    cursor = Cursors.Arrow;
+                    break;
+            }
+
+            if (this.IsDragging) {
+                this.Cursor = cursor;
+                this.PART_TextBlock.ClearValue(CursorProperty);
+            }
+            else {
+                if (this.IsEditingTextBox) {
+                    this.PART_TextBlock.ClearValue(CursorProperty);
+                    this.ClearValue(CursorProperty);
                 }
                 else {
-                    change = Math.Abs(pos.X - this.lastMouseClick.X);
+                    this.Cursor = cursor;
+                    this.PART_TextBlock.Cursor = cursor;
                 }
+            }
+        }
 
-                if (change < 5d) {
+        protected virtual void OnRoundedPlacesChanged(int? oldValue, int? newValue) {
+            if (newValue != null) {
+                this.UpdateText();
+            }
+        }
+
+        protected override void OnValueChanged(double oldValue, double newValue) {
+            base.OnValueChanged(oldValue, newValue);
+            this.UpdateText();
+        }
+
+        protected void UpdateText() {
+            string text = this.RoundedValue.ToString();
+            if (this.IsEditingTextBox) {
+                if (this.PART_TextBox == null)
                     return;
+                this.PART_TextBox.Text = text;
+            }
+            else {
+                if (this.PART_TextBlock == null)
+                    return;
+                this.PART_TextBlock.Text = text;
+            }
+        }
+
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e) {
+            if (!this.IsDragging) {
+                e.Handled = true;
+                this.Focus();
+
+                this.ignoreMouseMove = true;
+                try {
+                    this.CaptureMouse();
+                    Debug.WriteLine("Mouse Captured");
+                }
+                finally {
+                    this.ignoreMouseMove = false;
                 }
 
-                this.IsDragging = true;
-                this.lastMouseClick = this.lastMouseMove = e.GetPosition(this);
-                this.OnBeginDrag();
+                this.lastMouseMove = this.lastClickPoint = e.GetPosition(this);
+                this.UpdateCursor();
+            }
+
+            base.OnMouseLeftButtonDown(e);
+        }
+
+        protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e) {
+            e.Handled = true;
+            if (this.IsDragging) {
+                this.CompleteDrag();
+            }
+            else if (this.IsMouseOver) {
+                if (this.IsMouseCaptured) {
+                    this.ReleaseMouseCapture();
+                    Debug.WriteLine("Mouse Capture Released");
+                }
+
+                this.IsEditingTextBox = true;
+                this.UpdateCursor();
+            }
+
+            base.OnMouseLeftButtonUp(e);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e) {
+            base.OnMouseMove(e);
+            if (this.ignoreMouseMove || this.isUpdatingExternalMouse) {
+                return;
+            }
+
+            if (this.IsEditingTextBox) {
+                if (this.IsDragging) {
+                    Debug.WriteLine("IsDragging and IsEditingTextBox were both true");
+                    this.previousValue = null;
+                    this.CancelDrag();
+                }
+
+                return;
             }
 
             if (e.LeftButton != MouseButtonState.Pressed) {
-                this.OnCompleteDrag(true);
+                if (this.IsDragging) {
+                    this.CompleteDrag();
+                }
+
                 return;
             }
 
-            double delta;
-            if (this.IsVertical) {
-                delta = Math.Abs(pos.Y - this.lastMouseMove.Y);
-                if (delta < 0.5d) {
+            if (Keyboard.IsKeyDown(Key.Escape) && this.IsDragging) {
+                this.CancelDrag();
+                return;
+            }
+
+            Point mouse = e.GetPosition(this);
+            if (this.lastClickPoint is Point lastClick && !this.IsDragging) {
+                if (Math.Abs(mouse.X - lastClick.X) < 5d && Math.Abs(mouse.Y - lastClick.Y) < 5d) {
                     return;
                 }
+
+                this.BeginMouseDrag();
+            }
+
+            if (!this.IsDragging) {
+                return;
+            }
+
+            if (this.IsEditingTextBox) {
+                Debug.WriteLine("IsEditingTextBox and IsDragging were both true");
+                this.IsEditingTextBox = false;
+            }
+
+            if (!(this.lastMouseMove is Point lastMouse)) {
+                return;
+            }
+
+            double change;
+            switch (this.Orientation) {
+                case Orientation.Horizontal: {
+                    change = mouse.X - lastMouse.X;
+                    break;
+                }
+                case Orientation.Vertical: {
+                    change = mouse.Y - lastMouse.Y;
+                    break;
+                }
+                default: {
+                    throw new Exception("Invalid orientation: " + this.Orientation);
+                }
+            }
+
+            bool isShiftDown = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+            bool isCtrlDown = (Keyboard.Modifiers & ModifierKeys.Control) != 0;
+
+            if (isShiftDown) {
+                if (isCtrlDown) {
+                    change *= this.TinyChange;
+                }
+                else {
+                    change *= this.SmallChange;
+                }
+            }
+            else if (isCtrlDown) {
+                change *= this.MassiveChange;
             }
             else {
-                delta = Math.Abs(pos.X - this.lastMouseMove.X);
-                if (delta < 0.5d) {
-                    return;
-                }
+                change *= this.LargeChange;
             }
 
-            if (!this.OnDragDelta(delta)) {
-                this.lastMouseMove = pos;
+            double roundedValue = Maths.Clamp(this.GetRoundedValue(this.Value + change), this.Minimum, this.Maximum);
+            if (Maths.Equals(this.RoundedValue, roundedValue)) {
+                return;
             }
-        }
 
-        private void OnTextBoxKeyDown(object sender, KeyEventArgs e) {
-            if (e.Key == Key.Escape) {
-                this.HideEditor();
-            }
-            else if (e.Key == Key.Enter) {
-                if (double.TryParse(((TextBox) sender).Text, out double value)) {
-                    this.Value = value;
-                }
-
-                this.HideEditor();
-            }
+            this.Value = roundedValue;
+            this.lastMouseMove = mouse;
         }
 
         protected override void OnKeyDown(KeyEventArgs e) {
             base.OnKeyDown(e);
-            if (this.isEditingDirectly)
+            if (!this.IsDragging || e.Key != Key.Escape) {
                 return;
-
-            if (e.Key == Key.Enter) {
-                this.OnCompleteDrag(e.Key == Key.Enter);
-                e.Handled = true;
             }
-            else if (e.Key == Key.Escape) {
-                this.OnCompleteDrag(true);
-                e.Handled = true;
+
+            e.Handled = true;
+            this.CancelInputEdit();
+            if (this.IsDragging) {
+                this.CancelDrag();
+            }
+
+            this.IsEditingTextBox = false;
+        }
+
+        private void OnTextBoxKeyDown(object sender, KeyEventArgs e) {
+            if (!this.IsDragging && this.IsEditingTextBox) {
+                if (e.Key != Key.Enter && e.Key != Key.Escape) {
+                    return;
+                }
+
+                if (e.Key == Key.Enter && double.TryParse(this.PART_TextBox.Text, out double value)) {
+                    this.CompleteInputEdit(value);
+                }
+                else {
+                    this.CancelInputEdit();
+                }
             }
         }
 
-        public void OnBeginDrag() {
-            if (this.isEditingDirectly)
-                return;
-
-            this.oldValue = this.Value;
-            this.PART_TextBox.Visibility = Visibility.Collapsed;
-            this.PART_TextBlock.Visibility = Visibility.Visible;
-            this.HideEditor();
-        }
-
-        public bool OnDragDelta(double delta) {
-            if (this.isEditingDirectly)
-                return false;
-
-            double change;
-            if (Keyboard.IsKeyDown(Key.LeftShift)) {
-                change = this.SmallChange * delta;
-            }
-            else {
-                change = this.LargeChange * delta;
+        protected override void OnLostFocus(RoutedEventArgs e) {
+            base.OnLostFocus(e);
+            if (this.IsDragging) {
+                this.CancelDrag();
             }
 
-            change *= this.ValueMultiplier;
-            this.Value += change;
-            this.HideEditor();
-            return false;
+            this.IsEditingTextBox = false;
         }
 
-        public void OnCompleteDrag(bool cancel) {
-            if (this.isEditingDirectly)
-                return;
+        public void CompleteInputEdit(double value) {
+            this.IsEditingTextBox = false;
+            this.Value = value;
+            this.UpdateCursor();
+        }
 
+        public void CancelInputEdit() {
+            this.IsEditingTextBox = false;
+            this.UpdateText();
+            this.UpdateCursor();
+        }
+
+        public void BeginMouseDrag() {
+            this.IsEditingTextBox = false;
+            this.previousValue = this.Value;
+            this.Focus();
+            this.CaptureMouse();
+            Debug.WriteLine("[BeginMouseDrag] Mouse Captured");
+            this.IsDragging = true;
+            this.UpdateCursor();
+        }
+
+        public void CompleteDrag() {
+            this.CleanUpDrag();
+            this.previousValue = null;
+        }
+
+        public void CancelDrag() {
+            this.CleanUpDrag();
+            if (this.previousValue is double oldVal) {
+                this.previousValue = null;
+                this.Value = oldVal;
+            }
+        }
+
+        protected void CleanUpDrag() {
             if (!this.IsDragging)
                 return;
             if (this.IsMouseCaptured)
                 this.ReleaseMouseCapture();
             this.ClearValue(IsDraggingPropertyKey);
 
-            if (cancel) {
-                this.Value = this.oldValue;
-            }
+            this.lastMouseMove = null;
+            this.lastClickPoint = null;
 
-            this.HideEditor();
-        }
-
-        public void EnableEditor() {
-            this.isEditingDirectly = true;
-            this.PART_TextBox.Visibility = Visibility.Visible;
-            this.PART_TextBlock.Visibility = Visibility.Collapsed;
-        }
-
-        public void HideEditor() {
-            this.isEditingDirectly = false;
-            this.PART_TextBox.Visibility = Visibility.Collapsed;
-            this.PART_TextBlock.Visibility = Visibility.Visible;
+            this.UpdateCursor();
         }
     }
+
+    // internal static class MouseUtils {
+    //     [DllImport("user32.dll")]
+    //     public static extern bool SetCursorPos(int x, int y);
+    // 
+    //     public static void SetCursorPos(Point position) {
+    //         SetCursorPos((int) position.X, (int) position.Y);
+    //     }
+    // }
 }

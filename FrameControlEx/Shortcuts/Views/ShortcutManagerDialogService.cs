@@ -1,8 +1,10 @@
+using FrameControlEx.Core;
 using FrameControlEx.Core.Shortcuts.Dialogs;
 using FrameControlEx.Core.Shortcuts.Managing;
 using FrameControlEx.Core.Shortcuts.ViewModels;
 
 namespace FrameControlEx.Shortcuts.Views {
+    [Service(typeof(IShortcutManagerDialogService))]
     public class ShortcutManagerDialogService : IShortcutManagerDialogService {
         private ShortcutEditorWindow window;
 

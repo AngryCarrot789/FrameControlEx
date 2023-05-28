@@ -39,21 +39,14 @@ namespace FrameControlEx {
                 Directory.SetCurrentDirectory(dir);
             }
 
+            IoC.Init();
             ShortcutManager.Instance = new WPFShortcutManager();
             ActionManager.Instance = new ActionManager();
             this.RegisterActions();
 
             InputStrokeViewModel.KeyToReadableString = KeyStrokeStringConverter.ToStringFunction;
             InputStrokeViewModel.MouseToReadableString = MouseStrokeStringConverter.ToStringFunction;
-            IoC.MessageDialogs = new MessageDialogService();
             IoC.Dispatcher = new DispatcherDelegate(this.Dispatcher);
-            IoC.Clipboard = new ClipboardService();
-            IoC.FilePicker = new FilePickDialogService();
-            IoC.UserInput = new UserInputDialogService();
-            IoC.ExplorerService = new WinExplorerService();
-            IoC.KeyboardDialogs = new KeyboardDialogService();
-            IoC.MouseDialogs = new MouseDialogService();
-            IoC.ShortcutManagerDialog = new ShortcutManagerDialogService();
             IoC.OnShortcutModified = (x) => {
                 if (!string.IsNullOrWhiteSpace(x)) {
                     ShortcutManager.Instance.InvalidateShortcutCache();
@@ -69,8 +62,6 @@ namespace FrameControlEx {
                     }
                 }
             };
-
-            IoC.BufferSelector = new OutputSelector();
 
             string keymapFilePath = Path.GetFullPath(@"Keymap.xml");
             if (File.Exists(keymapFilePath)) {
