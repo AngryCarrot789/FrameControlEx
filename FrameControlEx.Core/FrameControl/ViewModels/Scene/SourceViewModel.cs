@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using FrameControlEx.Core.Actions.Contexts;
 using FrameControlEx.Core.AdvancedContextService;
 using FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base;
-using FrameControlEx.Core.FrameControl.Scene.Sources;
+using FrameControlEx.Core.FrameControl.ViewModels.Scene.Sources;
 
-namespace FrameControlEx.Core.FrameControl.Scene {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene {
     /// <summary>
     /// A view model that stores information about a video or audio source/input
     /// </summary>
@@ -19,7 +19,7 @@ namespace FrameControlEx.Core.FrameControl.Scene {
             get => this.deck;
             set {
                 SourceDeckViewModel old = this.deck;
-                this.Model.Deck = value.Model;
+                this.Model.Deck = value?.Model;
                 this.RaisePropertyChanged(ref this.deck, value);
                 this.OnDeckChanged(old, value);
             }

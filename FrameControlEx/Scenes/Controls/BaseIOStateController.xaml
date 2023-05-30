@@ -4,11 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FrameControlEx.Scenes.Controls"
-             xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.Scene;assembly=FrameControlEx.Core"
              xmlns:converters="clr-namespace:FrameControlEx.Converters"
+             xmlns:scene="clr-namespace:FrameControlEx.Core.FrameControl.ViewModels.Scene;assembly=FrameControlEx.Core"
              mc:Ignorable="d" 
              Height="34" d:DesignWidth="250"
-             d:DataContext="{d:DesignInstance sources:BaseIOViewModel}">
+             d:DataContext="{d:DesignInstance scene:BaseIOViewModel}">
     <UserControl.Resources>
         <converters:BoolToBrushConverter x:Key="IsEnabledToBrushConverter" TrueValue="#FF20DC3A" FalseValue="#FFC92222"/>
     </UserControl.Resources>

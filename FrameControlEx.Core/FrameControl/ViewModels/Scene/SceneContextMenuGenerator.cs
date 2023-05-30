@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using FrameControlEx.Core.Actions.Contexts;
 using FrameControlEx.Core.AdvancedContextService;
 
-namespace FrameControlEx.Core.FrameControl.Scene {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene {
     public class SceneContextMenuGenerator : IContextGenerator {
         public static SceneContextMenuGenerator Instance { get; } = new SceneContextMenuGenerator();
 

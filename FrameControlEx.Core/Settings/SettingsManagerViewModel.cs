@@ -1,5 +1,6 @@
 using System;
 using FrameControlEx.Core.FrameControl;
+using FrameControlEx.Core.FrameControl.ViewModels;
 
 namespace FrameControlEx.Core.Settings {
     public class SettingsManagerViewModel : BaseViewModel {

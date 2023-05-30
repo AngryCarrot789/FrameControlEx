@@ -42,14 +42,14 @@ namespace FrameControlEx.Core.Utils {
             List<Exception> suppressed = GetSuppressed(e, false);
             if (suppressed != null && suppressed.Count > 0) {
                 foreach (Exception ex in suppressed) {
-                    GetEnclosedStackTrace(ex, list, message, trace, SUPPRESSED_CAPTION, "    ", dejaVu);
+                    GetEnclosedStackTrace(ex, list, message, fileInfo, trace, SUPPRESSED_CAPTION, "    ", dejaVu);
                 }
             }
 
             // Print cause, if any
             Exception cause = e.InnerException;
             if (cause != null) {
-                GetEnclosedStackTrace(cause, list, message, trace, CAUSE_CAPTION, "", dejaVu);
+                GetEnclosedStackTrace(cause, list, message, fileInfo, trace, CAUSE_CAPTION, "", dejaVu);
             }
 
             StringBuilder sb = new StringBuilder(2048);
@@ -77,7 +77,7 @@ namespace FrameControlEx.Core.Utils {
             }
         }
 
-        public static void GetEnclosedStackTrace(Exception e, List<string> list, bool message, StackFrame[] enclosing, String caption, String prefix, HashSet<Exception> dejaVu) {
+        public static void GetEnclosedStackTrace(Exception e, List<string> list, bool message, bool fileInfo, StackFrame[] enclosing, String caption, String prefix, HashSet<Exception> dejaVu) {
             if (dejaVu.Contains(e)) {
                 list.Add($"[CIRCULAR REFERENCE: {GetExceptionHeader(e, message)}]");
                 return;
@@ -85,7 +85,7 @@ namespace FrameControlEx.Core.Utils {
 
             dejaVu.Add(e);
             // Compute number of frames in common between throwable and enclosing trace
-            StackFrame[] trace = new StackTrace(e).GetFrames() ?? new StackFrame[0];
+            StackFrame[] trace = new StackTrace(e, fileInfo).GetFrames() ?? new StackFrame[0];
             int m = trace.Length - 1;
             int n = enclosing.Length - 1;
             while (m >= 0 && n >= 0 && trace[m].Equals(enclosing[n])) {
@@ -106,14 +106,14 @@ namespace FrameControlEx.Core.Utils {
             List<Exception> suppressed = GetSuppressed(e, false);
             if (suppressed != null && suppressed.Count > 0) {
                 foreach (Exception ex in suppressed) {
-                    GetEnclosedStackTrace(ex, list, message, trace, SUPPRESSED_CAPTION, prefix + "    ", dejaVu);
+                    GetEnclosedStackTrace(ex, list, message, fileInfo, trace, SUPPRESSED_CAPTION, prefix + "    ", dejaVu);
                 }
             }
 
             // Print cause, if any
             Exception cause = e.InnerException;
             if (cause != null) {
-                GetEnclosedStackTrace(cause, list, message, trace, CAUSE_CAPTION, prefix, dejaVu);
+                GetEnclosedStackTrace(cause, list, message, fileInfo, trace, CAUSE_CAPTION, prefix, dejaVu);
             }
         }
 

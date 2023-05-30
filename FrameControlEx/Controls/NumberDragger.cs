@@ -34,6 +34,13 @@ namespace FrameControlEx.Controls {
 
         public static readonly DependencyProperty IsDraggingProperty = IsDraggingPropertyKey.DependencyProperty;
 
+        public static readonly DependencyProperty CompleteEditOnTextBoxLostFocusProperty =
+            DependencyProperty.Register(
+                "CompleteEditOnTextBoxLostFocus",
+                typeof(bool?),
+                typeof(NumberDragger),
+                new PropertyMetadata(BoolBox.True));
+
         public static readonly DependencyProperty OrientationProperty =
             DependencyProperty.Register(
                 "Orientation",
@@ -41,6 +48,20 @@ namespace FrameControlEx.Controls {
                 typeof(NumberDragger),
                 new PropertyMetadata(Orientation.Horizontal,
                     (d, e) => ((NumberDragger) d).OnOrientationChanged((Orientation) e.OldValue, (Orientation) e.NewValue)));
+
+        public static readonly DependencyProperty HorizontalIncrementProperty =
+            DependencyProperty.Register(
+                "HorizontalIncrement",
+                typeof(HorizontalIncrement),
+                typeof(NumberDragger),
+                new PropertyMetadata(HorizontalIncrement.LeftDecrRightIncr));
+
+        public static readonly DependencyProperty VerticalIncrementProperty =
+            DependencyProperty.Register(
+                "VerticalIncrement",
+                typeof(VerticalIncrement),
+                typeof(NumberDragger),
+                new PropertyMetadata(VerticalIncrement.UpDecrDownIncr));
 
         public static readonly DependencyPropertyKey IsEditingTextBoxPropertyKey =
             DependencyProperty.RegisterReadOnly(
@@ -68,6 +89,22 @@ namespace FrameControlEx.Controls {
                 typeof(NumberDragger),
                 new PropertyMetadata(BoolBox.False, (d, e) => throw new NotImplementedException("Locking the mouse cursor is currently unsupported")));
 
+        public static readonly DependencyProperty DisplayTextOverrideProperty =
+            DependencyProperty.Register(
+                "DisplayTextOverride",
+                typeof(string),
+                typeof(NumberDragger),
+                new PropertyMetadata(null));
+
+        /// <summary>
+        /// Gets or sets a value that is displayed while the value preview is active, instead of displaying the
+        /// actual value. A text box will still appear if the control is clicked
+        /// </summary>
+        public string DisplayTextOverride {
+            get => (string) this.GetValue(DisplayTextOverrideProperty);
+            set => this.SetValue(DisplayTextOverrideProperty, value);
+        }
+
         private TextBlock PART_TextBlock;
         private TextBox PART_TextBox;
         private Point? lastClickPoint;
@@ -93,9 +130,24 @@ namespace FrameControlEx.Controls {
             protected set => this.SetValue(IsDraggingPropertyKey, value.Box());
         }
 
+        public bool? CompleteEditOnTextBoxLostFocus {
+            get => (bool?) this.GetValue(CompleteEditOnTextBoxLostFocusProperty);
+            set => this.SetValue(CompleteEditOnTextBoxLostFocusProperty, value.BoxNullable());
+        }
+
         public Orientation Orientation {
             get => (Orientation) this.GetValue(OrientationProperty);
             set => this.SetValue(OrientationProperty, value);
+        }
+
+        public HorizontalIncrement HorizontalIncrement {
+            get => (HorizontalIncrement) this.GetValue(HorizontalIncrementProperty);
+            set => this.SetValue(HorizontalIncrementProperty, value);
+        }
+
+        public VerticalIncrement VerticalIncrement {
+            get => (VerticalIncrement) this.GetValue(VerticalIncrementProperty);
+            set => this.SetValue(VerticalIncrementProperty, value);
         }
 
         public bool IsEditingTextBox {
@@ -138,6 +190,12 @@ namespace FrameControlEx.Controls {
             };
 
             this.PART_TextBox.LostFocus += (s, e) => {
+                if (this.IsEditingTextBox && this.CompleteEditOnTextBoxLostFocus is bool complete) {
+                    if (!complete || !this.TryCompleteEdit()) {
+                        this.CancelInputEdit();
+                    }
+                }
+
                 this.IsEditingTextBox = false;
             };
 
@@ -170,6 +228,12 @@ namespace FrameControlEx.Controls {
                 this.PART_TextBox.Focus();
                 this.PART_TextBox.SelectAll();
             }
+
+            this.UpdateCursor();
+        }
+
+        protected virtual void OnDisplayTextOverrideChanged(string oldValue, string newValue) {
+            this.UpdateText();
         }
 
         private bool OnCoerceIsEditingTextBox(bool isEditing) {
@@ -186,7 +250,6 @@ namespace FrameControlEx.Controls {
                 this.PART_TextBlock.Visibility = Visibility.Visible;
             }
 
-            this.UpdateCursor();
             return isEditing;
         }
 
@@ -232,15 +295,17 @@ namespace FrameControlEx.Controls {
         }
 
         protected void UpdateText() {
-            string text = this.RoundedValue.ToString();
             if (this.IsEditingTextBox) {
                 if (this.PART_TextBox == null)
                     return;
-                this.PART_TextBox.Text = text;
+                this.PART_TextBox.Text = this.RoundedValue.ToString();
             }
             else {
                 if (this.PART_TextBlock == null)
                     return;
+                string text = this.DisplayTextOverride;
+                if (string.IsNullOrEmpty(text))
+                    text = this.RoundedValue.ToString();
                 this.PART_TextBlock.Text = text;
             }
         }
@@ -335,8 +400,10 @@ namespace FrameControlEx.Controls {
                 return;
             }
 
+
             double change;
-            switch (this.Orientation) {
+            Orientation orientation = this.Orientation;
+            switch (orientation) {
                 case Orientation.Horizontal: {
                     change = mouse.X - lastMouse.X;
                     break;
@@ -346,7 +413,7 @@ namespace FrameControlEx.Controls {
                     break;
                 }
                 default: {
-                    throw new Exception("Invalid orientation: " + this.Orientation);
+                    throw new Exception("Invalid orientation: " + orientation);
                 }
             }
 
@@ -368,7 +435,16 @@ namespace FrameControlEx.Controls {
                 change *= this.LargeChange;
             }
 
-            double roundedValue = Maths.Clamp(this.GetRoundedValue(this.Value + change), this.Minimum, this.Maximum);
+            double newValue;
+            if ((orientation == Orientation.Horizontal && this.HorizontalIncrement == HorizontalIncrement.LeftDecrRightIncr) ||
+                (orientation == Orientation.Vertical && this.VerticalIncrement == VerticalIncrement.UpDecrDownIncr)) {
+                newValue = this.Value + change;
+            }
+            else {
+                newValue = this.Value - change;
+            }
+
+            double roundedValue = Maths.Clamp(this.GetRoundedValue(newValue), this.Minimum, this.Maximum);
             if (Maths.Equals(this.RoundedValue, roundedValue)) {
                 return;
             }
@@ -379,7 +455,7 @@ namespace FrameControlEx.Controls {
 
         protected override void OnKeyDown(KeyEventArgs e) {
             base.OnKeyDown(e);
-            if (!this.IsDragging || e.Key != Key.Escape) {
+            if (e.Handled || !this.IsDragging || e.Key != Key.Escape) {
                 return;
             }
 
@@ -393,16 +469,13 @@ namespace FrameControlEx.Controls {
         }
 
         private void OnTextBoxKeyDown(object sender, KeyEventArgs e) {
-            if (!this.IsDragging && this.IsEditingTextBox) {
-                if (e.Key != Key.Enter && e.Key != Key.Escape) {
-                    return;
-                }
+            if (!e.Handled && !this.IsDragging && this.IsEditingTextBox) {
+                if ((e.Key == Key.Enter || e.Key == Key.Escape)) {
+                    if (e.Key != Key.Enter || !this.TryCompleteEdit()) {
+                        this.CancelInputEdit();
+                    }
 
-                if (e.Key == Key.Enter && double.TryParse(this.PART_TextBox.Text, out double value)) {
-                    this.CompleteInputEdit(value);
-                }
-                else {
-                    this.CancelInputEdit();
+                    e.Handled = true;
                 }
             }
         }
@@ -416,16 +489,23 @@ namespace FrameControlEx.Controls {
             this.IsEditingTextBox = false;
         }
 
+        public bool TryCompleteEdit() {
+            if (double.TryParse(this.PART_TextBox.Text, out double value)) {
+                this.CompleteInputEdit(value);
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
         public void CompleteInputEdit(double value) {
             this.IsEditingTextBox = false;
             this.Value = value;
-            this.UpdateCursor();
         }
 
         public void CancelInputEdit() {
             this.IsEditingTextBox = false;
-            this.UpdateText();
-            this.UpdateCursor();
         }
 
         public void BeginMouseDrag() {

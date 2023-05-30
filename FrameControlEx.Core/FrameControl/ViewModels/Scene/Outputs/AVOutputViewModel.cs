@@ -1,6 +1,6 @@
 using FrameControlEx.Core.FrameControl.Models.Scene.Outputs.Base;
 
-namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene.Outputs {
     /// <summary>
     /// Base class for visual outputs (videos, images). These receive the fully rendered output
     /// frame and can do whatever they want with it (they really shouldn't modify the frame though)

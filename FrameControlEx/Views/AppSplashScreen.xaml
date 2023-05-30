@@ -4,9 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FrameControlEx.Views"
+        xmlns:controls="clr-namespace:FrameControlEx.Controls"
         mc:Ignorable="d"
-        Title="AppSplashScreen" Height="420" Width="650">
+        Title="AppSplashScreen" Height="400" Width="650"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None" 
+        AllowsTransparency="True"
+        ResizeMode="NoResize"
+        Background="{DynamicResource AREghZyBrush.Tone5.Background.Static}"
+        BorderBrush="{DynamicResource AREghZyBrush.Tone5.Border.Static}"
+        BorderThickness="3">
     <Grid>
-        
+        <TextBlock Text="Frame Control" FontSize="72" FontFamily="Consolas" VerticalAlignment="Top" TextAlignment="Center" Margin="0,10"/>
+        <TextBlock x:Name="CurrentActivityTextBlock" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Padding="10" FontSize="12"/>
     </Grid>
 </Window>

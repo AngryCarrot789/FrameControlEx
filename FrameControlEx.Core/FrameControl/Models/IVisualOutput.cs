@@ -1,4 +1,4 @@
-namespace FrameControlEx.Core.FrameControl.Scene {
+namespace FrameControlEx.Core.FrameControl.Models {
     public interface IVisualOutput {
         /// <summary>
         /// Accepts the given render context, containing the information about a rendered frame, including the frame size/info

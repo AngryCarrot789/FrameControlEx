@@ -1,4 +1,4 @@
-namespace FrameControlEx.Core.FrameControl {
+namespace FrameControlEx.Core.FrameControl.ViewModels {
     /// <summary>
     /// Contains settings for the frame control app. These settings can be templated so that users can easily switch between templates (e.g. different resolutions, fps, etc)
     /// </summary>

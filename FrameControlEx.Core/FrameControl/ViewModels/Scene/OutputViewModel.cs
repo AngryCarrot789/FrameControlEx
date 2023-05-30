@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using FrameControlEx.Core.FrameControl.Models.Scene.Outputs.Base;
 
-namespace FrameControlEx.Core.FrameControl.Scene {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene {
     /// <summary>
     /// A view model that stores information about an output
     /// </summary>

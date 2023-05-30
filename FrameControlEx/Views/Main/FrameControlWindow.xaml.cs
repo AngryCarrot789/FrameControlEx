@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using FrameControlEx.Core.FrameControl;
-using FrameControlEx.Core.FrameControl.Scene;
+using FrameControlEx.Core.FrameControl.Models;
+using FrameControlEx.Core.FrameControl.Models.Scene;
+using FrameControlEx.Core.FrameControl.Models.Scene.Outputs.Base;
+using FrameControlEx.Core.FrameControl.ViewModels;
 using FrameControlEx.Core.Notifications;
 using FrameControlEx.Core.Utils;
+using FrameControlEx.Utils;
 using SkiaSharp;
 using SkiaSharp.Views.Desktop;
 
@@ -28,19 +35,20 @@ namespace FrameControlEx.Views.Main {
 
         public FrameControlWindow() {
             this.InitializeComponent();
-            this.DataContext = this.FrameControl = new FrameControlViewModel(this);
-
-            this.FrameControl.SceneDeck.AddNewScene("Scene 1");
-            this.FrameControl.RenderCallback = () => {
+            this.DataContext = this.FrameControl = new FrameControlViewModel(this, new FrameControlModel());
+            this.FrameControl.Model.RenderCallback = () => {
                 try {
-                    this.shouldRenderFrame = 1;
-                    this.Dispatcher.Invoke(this.ViewPortElement.InvalidateVisual, DispatcherPriority.Loaded);
+                    if (Interlocked.CompareExchange(ref this.shouldRenderFrame, 1, 0) == 0) {
+                        // this.ViewPortElement.FireRenderAsync();
+                        this.Dispatcher.Invoke(this.ViewPortElement.InvalidateVisual);
+                    }
                 }
-                catch (TaskCanceledException) {
-                    // prevents visual studios catching/breakpointing when the main window closes
+                catch (TaskCanceledException) { // prevents visual studios catch this when the main window closes
+                    this.shouldRenderFrame = 0;
                 }
             };
 
+            // this.ViewPortElement.OnRenderAsync = this.Render;
             this.buffer_time = new double[20];
 
             // DispatcherTimer timer = new DispatcherTimer(DispatcherPriority.Render);
@@ -52,24 +60,15 @@ namespace FrameControlEx.Views.Main {
             // timer.Start();
         }
 
-        protected override void OnActivated(EventArgs e) {
-            base.OnActivated(e);
-        }
-
-        protected override void OnDeactivated(EventArgs e) {
-            base.OnDeactivated(e);
-        }
-
         protected override async Task<bool> OnClosingAsync() {
             this.PushNotification(new NotificationViewModel() {
                 Message = "Stopping render thread and cleaning up resources..."
             });
 
-            // so that the message shows in the window
-            await Task.Run(async () => {
-                await this.Dispatcher.Invoke(this.FrameControl.OnDisposeAsync, DispatcherPriority.Background);
-            });
+            await DispatcherUtils.WaitUntilBackgroundActivity(this.Dispatcher);
 
+            // so that the message shows in the window
+            await this.Dispatcher.Invoke(this.FrameControl.OnDisposeAsync, DispatcherPriority.Background);
             return true;
         }
 
@@ -114,6 +113,44 @@ namespace FrameControlEx.Views.Main {
             }
         }
 
+        public async Task Render(SKPaintSurfaceEventArgs e) {
+            if (Interlocked.CompareExchange(ref this.shouldRenderFrame, 0, 1) != 1) {
+                return;
+            }
+
+            DateTime now = DateTime.Now;
+            TimeSpan diff = now - this.lastRenderTime;
+            this.lastRenderTime = now;
+            this.AddDateTime(diff.TotalMilliseconds);
+            double interval = this.GetAverageTime();
+            this.AverageTime.Dispatcher.InvokeAsync(() => {
+                this.AverageTime.Text = $"INTERVAL: {Math.Round(interval, 2).ToString().FitLength(6)}\t ({Math.Round(1000d / interval, 2).ToString().FitLength(8)} FPS)";
+            });
+
+            FrameControlViewModel frameControl = this.FrameControl ?? throw new Exception($"No {nameof(FrameControlViewModel)} available");
+            SKSurface surface = e.Surface;
+            SKImageInfo rawImageInfo = e.RawInfo;
+
+            SceneModel active = frameControl.SceneDeck.PrimarySelectedItem?.Model;
+            if (active == null) {
+                return;
+            }
+
+            RenderContext context = new RenderContext(frameControl, surface, surface.Canvas, rawImageInfo);
+            await context.RenderSceneAsync(active);
+            // TODO: Maybe move this code somewhere else... maybe? dunno
+
+            e.Surface.Flush();
+            List<OutputModel> outputs = frameControl.OutputDeck.Model.Outputs.ToList();
+            await Task.Run(() => {
+                foreach (OutputModel output in outputs) {
+                    if (output.IsEnabled && output is IVisualOutput visual) {
+                        visual.OnAcceptFrame(context);
+                    }
+                }
+            });
+        }
+
         private void ViewPortElement_OnPaintSurface(object sender, SKPaintSurfaceEventArgs e) {
             if (Interlocked.CompareExchange(ref this.shouldRenderFrame, 0, 1) == 0)
                 return;
@@ -129,7 +166,7 @@ namespace FrameControlEx.Views.Main {
             SKSurface surface = e.Surface;
             SKImageInfo rawImageInfo = e.RawInfo;
 
-            SceneViewModel active = frameControl.SceneDeck.PrimarySelectedItem;
+            SceneModel active = frameControl.SceneDeck.PrimarySelectedItem?.Model;
             if (active == null) {
                 // // draw colourful background when no scenes are active
                 // float x1 = 0, y1 = 0;
@@ -161,7 +198,7 @@ namespace FrameControlEx.Views.Main {
             // TODO: Maybe move this code somewhere else... maybe? dunno
 
             e.Surface.Flush();
-            foreach (OutputViewModel output in frameControl.OutputDeck.Items) {
+            foreach (OutputModel output in frameControl.OutputDeck.Model.Outputs) {
                 if (output.IsEnabled && output is IVisualOutput visual) {
                     visual.OnAcceptFrame(context);
                 }

@@ -4,7 +4,7 @@ using FrameControlEx.Core.FrameControl.Models.Scene;
 using FrameControlEx.Core.Utils;
 using SkiaSharp;
 
-namespace FrameControlEx.Core.FrameControl.Scene {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene {
     public class SceneViewModel : BaseViewModel, IDisposable {
         public string DisplayName {
             get => this.Model.DisplayName;

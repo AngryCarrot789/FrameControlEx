@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using FrameControlEx.Core.FrameControl.Models.Scene.Sources;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;
 
-namespace FrameControlEx.Core.FrameControl.Scene.Sources {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene.Sources {
     /// <summary>
     /// A memory-mapped frame source view model. This reads the current frame from a memory-mapped file. Memory mapped files are
     /// typically accessible across processes, and this class does not care as long as you provide a name

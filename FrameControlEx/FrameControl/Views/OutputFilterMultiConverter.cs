@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using System.Windows.Data;
-using FrameControlEx.Core.FrameControl.Scene;
+using FrameControlEx.Core.FrameControl.ViewModels.Scene;
 using FrameControlEx.Core.Utils;
 
 namespace FrameControlEx.FrameControl.Views {

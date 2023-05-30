@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using FrameControlEx.Core;
-using FrameControlEx.Core.FrameControl.Scene;
+using FrameControlEx.Core.FrameControl.ViewModels.Scene;
 using FrameControlEx.Core.Services;
 using FrameControlEx.FrameControl.Views;
 

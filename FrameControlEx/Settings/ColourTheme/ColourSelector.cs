@@ -1,5 +1,4 @@
 using ColorPicker;
-using ColorPicker.Models;
 using FrameControlEx.Core.Settings.ColourTheme;
 
 namespace FrameControlEx.Settings.ColourTheme {

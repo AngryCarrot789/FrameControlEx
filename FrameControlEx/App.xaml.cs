@@ -6,34 +6,39 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Threading;
 using FFmpeg.AutoGen;
 using FrameControlEx.Core;
 using FrameControlEx.Core.Actions;
+using FrameControlEx.Core.FrameControl;
 using FrameControlEx.Core.Shortcuts.Managing;
 using FrameControlEx.Core.Shortcuts.ViewModels;
 using FrameControlEx.Core.Utils;
-using FrameControlEx.FrameControl;
-using FrameControlEx.Services;
 using FrameControlEx.Shortcuts;
 using FrameControlEx.Shortcuts.Converters;
-using FrameControlEx.Shortcuts.Dialogs;
-using FrameControlEx.Shortcuts.Views;
 using FrameControlEx.Utils;
-using FrameControlEx.Views.FilePicking;
+using FrameControlEx.Views;
 using FrameControlEx.Views.Main;
-using FrameControlEx.Views.Message;
-using FrameControlEx.Views.UserInputs;
 
 namespace FrameControlEx {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
     public partial class App : Application {
+        private AppSplashScreen splash;
+
         public void RegisterActions() {
             ActionManager.SearchAndRegisterActions(ActionManager.Instance);
         }
 
+        private async Task SetActivity(string activity) {
+            this.splash.CurrentActivity = activity;
+            await this.Dispatcher.InvokeAsync(() => {
+            }, DispatcherPriority.ApplicationIdle);
+        }
+
         public async Task InitApp() {
+            await this.SetActivity("Loading services...");
             string[] envArgs = Environment.GetCommandLineArgs();
             if (envArgs.Length > 0 && Path.GetDirectoryName(envArgs[0]) is string dir && dir.Length > 0) {
                 Directory.SetCurrentDirectory(dir);
@@ -63,6 +68,7 @@ namespace FrameControlEx {
                 }
             };
 
+            await this.SetActivity("Loading keymap...");
             string keymapFilePath = Path.GetFullPath(@"Keymap.xml");
             if (File.Exists(keymapFilePath)) {
                 using (FileStream stream = File.OpenRead(keymapFilePath)) {
@@ -74,6 +80,7 @@ namespace FrameControlEx {
                 await IoC.MessageDialogs.ShowMessageAsync("No keymap available", "Keymap file does not exist: " + keymapFilePath + $".\nCurrent directory: {Directory.GetCurrentDirectory()}\nCommand line args:{string.Join("\n", Environment.GetCommandLineArgs())}");
             }
 
+            await this.SetActivity("Loading FFmpeg...");
             ffmpeg.avdevice_register_all();
         }
 
@@ -86,6 +93,11 @@ namespace FrameControlEx {
             // Dialogs may be shown, becoming the main window, possibly causing the
             // app to shutdown when the mode is OnMainWindowClose or OnLastWindowClose
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
+            this.MainWindow = this.splash = new AppSplashScreen();
+            this.splash.Show();
+
+            this.splash.CurrentActivity = "Initialising application...";
             try {
                 await this.InitApp();
             }
@@ -101,11 +113,20 @@ namespace FrameControlEx {
                 return;
             }
 
-            this.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            BitmapFactory.Instance = new WPFBitmapFactory();
 
+            await this.SetActivity("Loading I/O registry...");
+            IORegistry.RegisterStandard();
+
+            await this.SetActivity("Loading Frame Control Window...");
             FrameControlWindow window = new FrameControlWindow();
+
+            this.splash.Close();
             this.MainWindow = window;
+            this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             window.Show();
+
+            window.FrameControl.SceneDeck.CreateScene("Scene 1", true);
 
             // string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "WPFStyles.xaml");
             // using (Stream stream = new BufferedStream(new FileStream(path, FileMode.Create), 16384)) {

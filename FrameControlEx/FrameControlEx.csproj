@@ -105,7 +105,10 @@
     <Compile Include="AdvancedContextService\Static\StaticMenuSeparator.cs" />
     <Compile Include="AdvancedContextService\Static\StaticShortcutMenuItem.cs" />
     <Compile Include="Controls\Helpers\ListBoxHelper.cs" />
+    <Compile Include="Controls\HorizontalIncrement.cs" />
     <Compile Include="Controls\NumberDragger.cs" />
+    <Compile Include="Controls\OutlinedTextBlock.cs" />
+    <Compile Include="Controls\VerticalIncrement.cs" />
     <Compile Include="Converters\SKColorConverter.cs" />
     <Compile Include="FrameControl\IOItemTemplateSelector.cs" />
     <Compile Include="FrameControl\OutputSelector.cs" />
@@ -204,10 +207,14 @@
     <Compile Include="Utils\DispatcherUtils.cs" />
     <Compile Include="Utils\KeyUtils.cs" />
     <Compile Include="Utils\TextPointerUtils.cs" />
+    <Compile Include="Views\AppSplashScreen.xaml.cs">
+      <DependentUpon>AppSplashScreen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\BaseDialog.cs" />
     <Compile Include="Views\BaseWindow.cs" />
     <Compile Include="Views\FilePicking\FilePickDialogService.cs" />
     <Compile Include="Views\FilePicking\FolderPicker.cs" />
+    <Compile Include="Views\Main\SkiaViewPort.cs" />
     <Compile Include="Views\Message\MessageDialogService.cs" />
     <Compile Include="Views\Message\MessageWindow.xaml.cs">
       <DependentUpon>MessageWindow.xaml</DependentUpon>
@@ -226,6 +233,7 @@
     <Compile Include="Views\UserInputs\UserInputDialogService.cs" />
     <Compile Include="Views\WindowEx.cs" />
     <Compile Include="Views\WindowViewBase.cs" />
+    <Compile Include="WPFBitmapFactory.cs" />
     <Page Include="AdvancedContextService\ContextStyles.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -277,6 +285,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Scenes\Controls\VisualMovementController.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\AppSplashScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -402,6 +414,7 @@
     </None>
     <None Include="Resources\Icons\FileIcon.psd" />
     <None Include="Resources\Icons\TagArrayIcon.psd" />
+    <None Include="Resources\SplashScreen.psd" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -410,8 +423,8 @@
     <Content Include="Keymap.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\SplashScreen.png" />
     <Resource Include="Resources\64ll02.png" />
-    <SplashScreen Include="Views\StartupSplashScreen.png" />
     <Resource Include="Resources\AppIcon.ico" />
     <Resource Include="Resources\Icons\Credits.txt" />
     <Resource Include="Resources\Icons\FileIcon-Region.png" />

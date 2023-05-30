@@ -2,12 +2,12 @@ using System;
 using System.Diagnostics;
 using System.IO.MemoryMappedFiles;
 using System.Numerics;
-using FrameControlEx.Core.FrameControl.Scene;
+using FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base;
 using FrameControlEx.Core.Utils;
 using Microsoft.Win32.SafeHandles;
 using SkiaSharp;
 
-namespace FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base {
+namespace FrameControlEx.Core.FrameControl.Models.Scene.Sources {
     /// <summary>
     /// A memory-mapped frame source. This reads the current frame from a memory-mapped file. Memory mapped files are
     /// typically accessible across processes, and this class does not care as long as you provide a name
@@ -21,7 +21,6 @@ namespace FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base {
         public string MapName { get; set; }
 
         private bool isAutoConnectionFault;
-
         public bool IsAutoConnectionFault {
             get => this.isAutoConnectionFault;
             set {
@@ -50,8 +49,7 @@ namespace FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base {
                 return null;
             }
 
-            this.file = mmf;
-            return mmf;
+            return this.file = mmf;
         }
 
         public void InvalidateFile() {
@@ -68,6 +66,18 @@ namespace FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base {
             this.IsAutoConnectionFault = false;
         }
 
+        protected override void DisposeCore(ExceptionStack e) {
+            base.DisposeCore(e);
+            if (this.file != null) {
+                try {
+                    this.file.Dispose();
+                }
+                catch (Exception ex) {
+                    e.Push(ex);
+                }
+            }
+        }
+
         public override void OnRender(RenderContext context) {
             base.OnRender(context);
             if (string.IsNullOrWhiteSpace(this.MapName) || this.IsAutoConnectionFault) {
@@ -81,17 +91,17 @@ namespace FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base {
             }
 
             unsafe {
-                MEMMAPFILE_HEADER header;
-                using (MemoryMappedViewAccessor thing = mmf.CreateViewAccessor(0, sizeof(MEMMAPFILE_HEADER), MemoryMappedFileAccess.Read)) {
+                MemMapFileHeader header;
+                using (MemoryMappedViewAccessor thing = mmf.CreateViewAccessor(0, sizeof(MemMapFileHeader), MemoryMappedFileAccess.Read)) {
                     thing.Read(0, out header);
                 }
 
-                if (!header.is_valid) {
+                if (!header.isValid) {
                     return;
                 }
 
                 long bytes = header.width * header.height * header.bpp;
-                using (MemoryMappedViewAccessor thing = mmf.CreateViewAccessor(sizeof(MEMMAPFILE_HEADER), bytes, MemoryMappedFileAccess.Read)) {
+                using (MemoryMappedViewAccessor thing = mmf.CreateViewAccessor(sizeof(MemMapFileHeader), bytes, MemoryMappedFileAccess.Read)) {
                     SafeMemoryMappedViewHandle safe = thing.SafeMemoryMappedViewHandle;
 
                     byte* src = null;
@@ -99,7 +109,7 @@ namespace FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base {
                     try {
                         // src + sizeof(MEMMAPFILE_HEADER) | this is required otherwise weird stuff happens
                         // remove sizeof(MEMMAPFILE_HEADER) to have a weird stuff!
-                        SKImage image = SKImage.FromPixels(context.FrameInfo, (IntPtr) src + sizeof(MEMMAPFILE_HEADER));
+                        SKImage image = SKImage.FromPixels(context.FrameInfo, (IntPtr) src + sizeof(MemMapFileHeader));
                         this.lastFrameSize = new Vector2(image.Width, image.Height);
 
                         Vector2 scale = this.Scale, pos = this.Pos, origin = this.ScaleOrigin;

@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+using FrameControlEx.Core.FrameControl.Models;
 using FrameControlEx.Core.FrameControl.Models.Scene;
 using FrameControlEx.Core.FrameControl.Models.Scene.Sources;
 using FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base;
-using FrameControlEx.Core.FrameControl.Scene.Sources;
+using FrameControlEx.Core.FrameControl.ViewModels.Scene.Sources;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs.Message;
 
-namespace FrameControlEx.Core.FrameControl.Scene {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene {
     /// <summary>
     /// A view model for storing all sources for a specific scene
     /// </summary>

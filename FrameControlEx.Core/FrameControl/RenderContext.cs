@@ -1,6 +1,10 @@
 using System.Collections.Generic;
-using FrameControlEx.Core.FrameControl.Scene;
-using FrameControlEx.Core.FrameControl.Scene.Sources;
+using System.Linq;
+using System.Threading.Tasks;
+using FrameControlEx.Core.FrameControl.Models;
+using FrameControlEx.Core.FrameControl.Models.Scene;
+using FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base;
+using FrameControlEx.Core.FrameControl.ViewModels;
 using SkiaSharp;
 
 namespace FrameControlEx.Core.FrameControl {
@@ -35,25 +39,57 @@ namespace FrameControlEx.Core.FrameControl {
             this.FrameInfo = rawFrameInfo;
         }
 
-        public void RenderScene(SceneViewModel scene) {
+        public void RenderScene(SceneModel scene) {
             if (scene.ClearScreenOnRender) {
                 this.Canvas.Clear(scene.BackgroundColour);
             }
 
-            IEnumerable<SourceViewModel> items = scene.IsRenderOrderReversed ? scene.SourceDeck.ReverseEnumerable() : scene.SourceDeck.Items;
-            foreach (SourceViewModel source in items) {
+            IEnumerable<SourceModel> items = scene.SourceDeck.Sources;
+            if (scene.IsRenderOrderReversed) {
+                items = items.Reverse();
+            }
+
+            foreach (SourceModel source in items) {
                 if (!source.IsEnabled) {
                     continue;
                 }
 
                 // TODO: Maybe create separate rendering classes for each type of source
-                if (source is AVSourceViewModel av) {
-                    av.OnTickVisual();
+                if (source is IVisualSource visual) {
+                    visual.OnTickVisual();
                     this.Canvas.Save();
-                    av.OnRender(this);
+                    visual.OnRender(this);
                     this.Canvas.Restore();
                 }
             }
+        }
+
+        public async Task RenderSceneAsync(SceneModel scene) {
+            if (scene.ClearScreenOnRender) {
+                this.Canvas.Clear(scene.BackgroundColour);
+            }
+
+            IEnumerable<SourceModel> items = scene.SourceDeck.Sources;
+            if (scene.IsRenderOrderReversed) {
+                items = items.Reverse();
+            }
+
+            List<SourceModel> list = items.ToList();
+            await Task.Run(() => {
+                foreach (SourceModel source in list) {
+                    if (!source.IsEnabled) {
+                        continue;
+                    }
+
+                    // TODO: Maybe create separate rendering classes for each type of source
+                    if (source is IVisualSource visual) {
+                        visual.OnTickVisual();
+                        this.Canvas.Save();
+                        visual.OnRender(this);
+                        this.Canvas.Restore();
+                    }
+                }
+            });
         }
     }
 }

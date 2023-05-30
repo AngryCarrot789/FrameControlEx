@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using FrameControlEx.Core.FrameControl.Models;
-using FrameControlEx.Core.FrameControl.Scene;
+using FrameControlEx.Core.FrameControl.ViewModels.Scene;
 using FrameControlEx.Core.Utils;
 
-namespace FrameControlEx.Core.FrameControl {
+namespace FrameControlEx.Core.FrameControl.ViewModels {
     public class FrameControlViewModel : BaseViewModel {
         public SceneDeckViewModel SceneDeck { get; }
         public OutputDeckViewModel OutputDeck { get; }

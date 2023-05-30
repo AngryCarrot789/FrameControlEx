@@ -1,10 +1,7 @@
 using System.Numerics;
-using FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base;
-using FrameControlEx.Core.FrameControl.Scene;
-using FrameControlEx.Core.FrameControl.Scene.Sources;
 using FrameControlEx.Core.RBC;
 
-namespace FrameControlEx.Core.FrameControl.Models.Scene {
+namespace FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base {
     /// <summary>
     /// An audio-visual source; capable of providing audio and video (duh). This contains
     /// a position, scale, scale origin, etc, to represent the standard controls for an input/source

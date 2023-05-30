@@ -6,7 +6,7 @@ using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs;
 using SkiaSharp;
 
-namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene.Outputs {
     // https://github.com/denesik/ffmpeg_video_encoder/blob/main/ffmpeg_encode.cpp
 
     public class FFmpegOutputViewModel : AVOutputViewModel {

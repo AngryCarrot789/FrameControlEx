@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FrameControlEx.Core.Utils;
 
-namespace FrameControlEx.Core.FrameControl {
+namespace FrameControlEx.Core.FrameControl.ViewModels {
     /// <summary>
     /// A base view model for a list in which items can be added, removed, moved up/down, etc
     /// </summary>

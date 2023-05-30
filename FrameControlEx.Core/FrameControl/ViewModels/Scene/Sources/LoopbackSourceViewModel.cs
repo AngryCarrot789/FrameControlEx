@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using FrameControlEx.Core.FrameControl.Models.Scene.Sources;
-using FrameControlEx.Core.FrameControl.Scene.Outputs;
+using FrameControlEx.Core.FrameControl.ViewModels.Scene.Outputs;
 
-namespace FrameControlEx.Core.FrameControl.Scene.Sources {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene.Sources {
     public class LoopbackSourceViewModel : AVSourceViewModel {
         public new LoopbackSourceModel Model => (LoopbackSourceModel) ((BaseIOViewModel) this).Model;
 

@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FrameControlEx.Scenes.Controls"
              xmlns:converters="clr-namespace:FrameControlEx.Converters"
-             xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Sources;assembly=FrameControlEx.Core"
+             xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.ViewModels.Scene.Sources;assembly=FrameControlEx.Core"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="250"
              d:DataContext="{d:DesignInstance sources:ImageSourceViewModel}">

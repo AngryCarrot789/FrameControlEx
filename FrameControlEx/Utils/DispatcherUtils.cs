@@ -5,6 +5,14 @@ using System.Windows.Threading;
 
 namespace FrameControlEx.Utils {
     public static class DispatcherUtils {
+        public static Task WaitUntilRenderPhase(Dispatcher dispatcher) {
+            return dispatcher.InvokeAsync(() => { }, DispatcherPriority.Render).Task;
+        }
+
+        public static Task WaitUntilBackgroundActivity(Dispatcher dispatcher) {
+            return dispatcher.InvokeAsync(() => { }, DispatcherPriority.Background).Task;
+        }
+
         public static Task InvokeAsync(Action action) {
             Application app = Application.Current;
             Dispatcher dispatcher;

@@ -4,7 +4,7 @@ using FrameControlEx.Core.FrameControl.Models.Scene;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;
 
-namespace FrameControlEx.Core.FrameControl.Scene {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene {
     /// <summary>
     /// Base class for sources and outputs
     /// </summary>

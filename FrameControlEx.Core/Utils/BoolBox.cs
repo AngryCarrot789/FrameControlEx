@@ -13,8 +13,8 @@ namespace FrameControlEx.Core.Utils {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object BoxNullable(bool value) {
-            return value ? NullableTrue : NullableFalse;
+        public static object BoxNullable(this bool? value) {
+            return value == null ? null : (value == true ? NullableTrue : NullableFalse);
         }
     }
 }

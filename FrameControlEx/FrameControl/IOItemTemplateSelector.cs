@@ -1,6 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
-using FrameControlEx.Core.FrameControl.Scene;
+using FrameControlEx.Core.FrameControl.ViewModels.Scene;
 
 namespace FrameControlEx.FrameControl {
     public class IOItemTemplateSelector : DataTemplateSelector {

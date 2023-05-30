@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using FrameControlEx.Core.FrameControl.Scene;
+using FrameControlEx.Core.FrameControl.ViewModels.Scene;
 
 namespace FrameControlEx.Core.Services {
     public interface IOutputSelector {

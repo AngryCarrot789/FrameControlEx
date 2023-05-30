@@ -1,5 +1,5 @@
 using System;
-using FrameControlEx.Core.FrameControl.Scene;
+using FrameControlEx.Core.FrameControl.ViewModels.Scene;
 using FrameControlEx.Core.Views.Dialogs;
 
 namespace FrameControlEx.FrameControl.Views {

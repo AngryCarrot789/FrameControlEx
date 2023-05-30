@@ -1,6 +1,9 @@
 using System;
 
 namespace FrameControlEx.Core.Views.Dialogs.UserInputs {
+    /// <summary>
+    /// A class used for validating user input
+    /// </summary>
     public class InputValidator {
         public delegate bool IsInputInvalidDelegate(string input, out string errorMessage);
 

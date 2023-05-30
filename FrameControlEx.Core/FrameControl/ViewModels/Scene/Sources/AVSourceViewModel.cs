@@ -5,13 +5,17 @@ using FrameControlEx.Core.FrameControl.Models.Scene.Sources.Base;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;
 
-namespace FrameControlEx.Core.FrameControl.Scene.Sources {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene.Sources {
     /// <summary>
     /// Base class for audio visual sources. These contain a position, scale,
     /// scale origin, etc, that represent the standard controls for an input/source
     /// </summary>
     public abstract class AVSourceViewModel : SourceViewModel {
         public new AVSourceModel Model => (AVSourceModel) ((BaseIOViewModel) this).Model;
+
+        private float bothPos;
+        private float bothScale;
+        private float bothScaleOrigin;
 
         public float PosX {
             get => this.Pos.X;
@@ -21,6 +25,16 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
         public float PosY {
             get => this.Pos.Y;
             set => this.Pos = new Vector2(this.Pos.X, value);
+        }
+
+        public float BothPos {
+            get => this.bothPos;
+            set {
+                float actualValue = value - this.bothPos;
+                this.Pos += new Vector2(actualValue);
+                this.RaisePropertyChanged();
+                this.bothPos = value;
+            }
         }
 
         public float ScaleX {
@@ -33,6 +47,16 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
             set => this.Scale = new Vector2(this.Scale.X, value);
         }
 
+        public float BothScale {
+            get => this.bothScale;
+            set {
+                float actualValue = value - this.bothScale;
+                this.Scale += new Vector2(actualValue);
+                this.RaisePropertyChanged();
+                this.bothScale = value;
+            }
+        }
+
         public float ScaleOriginX {
             get => this.ScaleOrigin.X;
             set => this.ScaleOrigin = new Vector2(value, this.ScaleOrigin.Y);
@@ -41,6 +65,16 @@ namespace FrameControlEx.Core.FrameControl.Scene.Sources {
         public float ScaleOriginY {
             get => this.ScaleOrigin.Y;
             set => this.ScaleOrigin = new Vector2(this.ScaleOrigin.X, value);
+        }
+
+        public float BothScaleOrigin {
+            get => this.bothScaleOrigin;
+            set {
+                float actualValue = value - this.bothScaleOrigin;
+                this.ScaleOrigin += new Vector2(actualValue);
+                this.RaisePropertyChanged();
+                this.bothScaleOrigin = value;
+            }
         }
 
         /// <summary>

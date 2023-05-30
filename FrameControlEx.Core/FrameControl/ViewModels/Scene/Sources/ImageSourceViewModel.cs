@@ -5,7 +5,7 @@ using FrameControlEx.Core.FrameControl.Models.Scene.Sources;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs;
 
-namespace FrameControlEx.Core.FrameControl.Scene.Sources {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene.Sources {
     public class ImageSourceViewModel : AVSourceViewModel {
         public new ImageSourceModel Model => (ImageSourceModel) ((BaseIOViewModel) this).Model;
 

@@ -4,7 +4,7 @@ using FrameControlEx.Core.FrameControl.Models.Scene.Outputs;
 using FrameControlEx.Core.Utils;
 using FrameControlEx.Core.Views.Dialogs.UserInputs;
 
-namespace FrameControlEx.Core.FrameControl.Scene.Outputs {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene.Outputs {
     /// <summary>
     /// A memory-mapped file based output. This writes the current frame to a memory-mapped file for other processes to read from
     /// </summary>

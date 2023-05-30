@@ -5,12 +5,12 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FrameControlEx.Scenes.Controls"
              xmlns:converters="clr-namespace:FrameControlEx.Converters"
-             xmlns:scene="clr-namespace:FrameControlEx.Core.FrameControl.Scene;assembly=FrameControlEx.Core"
+             xmlns:scene="clr-namespace:FrameControlEx.Core.FrameControl.ViewModels.Scene;assembly=FrameControlEx.Core"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="250"
              d:DataContext="{d:DesignInstance scene:SceneViewModel}">
     <Grid>
-        <TextBlock Text="{Binding ReadableName, UpdateSourceTrigger=PropertyChanged}" Padding="5" VerticalAlignment="Top" HorizontalAlignment="Center" TextDecorations="Underline" FontWeight="Bold">
+        <TextBlock Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" Padding="5" VerticalAlignment="Top" HorizontalAlignment="Center" TextDecorations="Underline" FontWeight="Bold">
             <TextBlock.InputBindings>
                 <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding RenameCommand, Mode=OneTime}"/>
             </TextBlock.InputBindings>
@@ -44,8 +44,8 @@
                         <ColumnDefinition Width="5"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding SourceDeck.CountEnabled, Mode=OneWay, StringFormat={}{0} Enabled}" VerticalAlignment="Center" Padding="2,0"/>
-                    <TextBlock Text="{Binding SourceDeck.CountDisabled, Mode=OneWay, StringFormat={}{0} Disabled}" VerticalAlignment="Center" Grid.Column="2" Padding="2,0"/>
+                    <TextBlock Text="{Binding SourceDeck.CountOfEnabled, Mode=OneWay, StringFormat={}{0} Enabled}" VerticalAlignment="Center" Padding="2,0"/>
+                    <TextBlock Text="{Binding SourceDeck.CountOfDisabled, Mode=OneWay, StringFormat={}{0} Disabled}" VerticalAlignment="Center" Grid.Column="2" Padding="2,0"/>
                 </Grid>
             </Grid>
             <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" Margin="10,153,10,10"><Run Text="If it "/><Run Text="wasn't obvious enough, scenes are a way of grouping "/><Run Text="input"/><Run Text="s (aka sources)"/><LineBreak/><Run/><LineBreak/><Run Text="Only 1 scene "/><Run Text="can be"/><Run Text=" active at a time"/></TextBlock>

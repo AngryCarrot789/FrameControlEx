@@ -44,11 +44,13 @@
                     <Border Background="{TemplateBinding Background}" 
                             BorderBrush="{TemplateBinding BorderBrush}" 
                             BorderThickness="{TemplateBinding BorderThickness}">
-                        <Grid Margin="{TemplateBinding Padding}" 
-                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" 
-                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
-                            <TextBlock Text="0" x:Name="PART_TextBlock" Padding="2,0,2,0" Background="Transparent" TextDecorations="Underline"/>
-                            <TextBox   Text="0" x:Name="PART_TextBox" VerticalContentAlignment="Center" BorderThickness="0" Background="Transparent"/>
+                        <Grid Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                            <TextBlock Text="0" x:Name="PART_TextBlock" Padding="2,0,2,0" 
+                                       Background="Transparent"
+                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                            <TextBox   Text="0" x:Name="PART_TextBox" VerticalContentAlignment="Center"
+                                       HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                       BorderThickness="0" Background="Transparent" HorizontalAlignment="Stretch"/>
                         </Grid>
                     </Border>
                 </ControlTemplate>

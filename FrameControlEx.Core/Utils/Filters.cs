@@ -10,6 +10,8 @@ namespace FrameControlEx.Core.Utils {
                    AddAllFiles().
                    ToString();
 
+        public static readonly string FrameControlSceneDeckType = Filter.Of().Add("Scene Deck", "fcsd").AddAllFiles().ToString();
+
         public static readonly string VideoFormatsAndAll =
             Filter.Of().
                    Add("MP4 Container", "mp4").

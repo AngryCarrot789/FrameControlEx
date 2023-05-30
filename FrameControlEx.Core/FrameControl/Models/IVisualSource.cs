@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace FrameControlEx.Core.FrameControl.Scene {
+namespace FrameControlEx.Core.FrameControl.Models {
     public interface IVisualSource {
         Vector2 Pos { get; }
         Vector2 Scale { get; }

@@ -4,8 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:FrameControlEx.Scenes.Controls"
-             xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.Scene.Sources;assembly=FrameControlEx.Core" 
              xmlns:controls="clr-namespace:FrameControlEx.Scenes.Controls"
+             xmlns:sources="clr-namespace:FrameControlEx.Core.FrameControl.ViewModels.Scene.Sources;assembly=FrameControlEx.Core"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="250"
              d:DataContext="{d:DesignInstance sources:MMFAVSourceViewModel}">
@@ -17,7 +17,7 @@
         </TextBlock>
         <DockPanel Margin="5,26,5,5">
             <Grid DockPanel.Dock="Top" Height="75">
-                <CheckBox IsChecked="{Binding IsAutoConnectFaulted}" IsEnabled="{Binding IsAutoConnectFaulted}" Content="MMF Fault. Uncheck to try restore" Height="20" VerticalAlignment="Top"/>
+                <CheckBox IsChecked="{Binding IsAutoConnectionFault}" IsEnabled="{Binding IsAutoConnectionFault}" Content="MMF Fault. Uncheck to try restore" Height="20" VerticalAlignment="Top"/>
                 <Grid Margin="0,25,0,0" Height="50" VerticalAlignment="Top">
                     <TextBox Text="{Binding MapName, Mode=OneWay}" IsReadOnly="True" AcceptsReturn="False" Padding="4,2" Margin="0,26,24,0" VerticalContentAlignment="Center"/>
                     <TextBlock Text="Memory-Map Name" Padding="5" VerticalAlignment="Top" HorizontalAlignment="Left"/>

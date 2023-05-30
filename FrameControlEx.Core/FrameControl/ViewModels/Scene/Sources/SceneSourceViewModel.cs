@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using FrameControlEx.Core.FrameControl.Models.Scene.Sources;
 
-namespace FrameControlEx.Core.FrameControl.Scene.Sources {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene.Sources {
     /// <summary>
     /// A source that renders a target scene
     /// </summary>

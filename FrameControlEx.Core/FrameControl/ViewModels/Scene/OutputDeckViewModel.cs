@@ -4,10 +4,10 @@ using System.Threading.Tasks;
 using FrameControlEx.Core.FrameControl.Models.Scene;
 using FrameControlEx.Core.FrameControl.Models.Scene.Outputs;
 using FrameControlEx.Core.FrameControl.Models.Scene.Outputs.Base;
-using FrameControlEx.Core.FrameControl.Scene.Outputs;
+using FrameControlEx.Core.FrameControl.ViewModels.Scene.Outputs;
 using FrameControlEx.Core.Views.Dialogs.Message;
 
-namespace FrameControlEx.Core.FrameControl.Scene {
+namespace FrameControlEx.Core.FrameControl.ViewModels.Scene {
     /// <summary>
     /// A view model for storing all outputs for a specific scene
     /// </summary>
