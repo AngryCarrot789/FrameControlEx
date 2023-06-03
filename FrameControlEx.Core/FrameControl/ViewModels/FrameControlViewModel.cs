@@ -31,10 +31,7 @@ namespace FrameControlEx.Core.FrameControl.ViewModels {
             this.SceneDeck = new SceneDeckViewModel(this);
             this.OutputDeck = new OutputDeckViewModel(this);
             IoC.Settings.OnSettingsModified += this.OnSettingsModified;
-            this.SwitchPrecisionTimingModeCommand = new AsyncRelayCommand(async () => {
-                await this.SwitchPrecisionMode();
-            });
-
+            this.SwitchPrecisionTimingModeCommand = new AsyncRelayCommand(this.SwitchPrecisionMode);
             this.OnSettingsModified(IoC.Settings.ActiveSettings);
             this.Model.Timer.Start(this.UsePrecisionTimingMode);
         }

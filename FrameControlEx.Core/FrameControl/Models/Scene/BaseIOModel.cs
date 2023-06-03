@@ -40,6 +40,9 @@ namespace FrameControlEx.Core.FrameControl.Models.Scene {
 
         public virtual void WriteToRBE(RBEDictionary data) {
             // Save memory by not writing basic stuff if it is defaulted
+            if (!(this.TypeId is string id))
+                throw new Exception($"Model Type is not registered: {this.GetType()}");
+            data.SetString(nameof(this.TypeId), id);
             if (!string.IsNullOrEmpty(this.ReadableName))
                 data.SetString(nameof(this.ReadableName), this.ReadableName);
             if (!this.IsEnabled)

@@ -31,6 +31,8 @@ namespace FrameControlEx.Views.Main {
         private readonly double[] buffer_time;
         private DateTime lastRenderTime = DateTime.Now;
 
+        private readonly object render_lock = new object();
+
         private volatile int shouldRenderFrame;
 
         public FrameControlWindow() {
@@ -38,10 +40,15 @@ namespace FrameControlEx.Views.Main {
             this.DataContext = this.FrameControl = new FrameControlViewModel(this, new FrameControlModel());
             this.FrameControl.Model.RenderCallback = () => {
                 try {
+                    // non-async rendering
                     if (Interlocked.CompareExchange(ref this.shouldRenderFrame, 1, 0) == 0) {
-                        // this.ViewPortElement.FireRenderAsync();
                         this.Dispatcher.Invoke(this.ViewPortElement.InvalidateVisual);
                     }
+
+                    // async rendering
+                    // lock (this.render_lock) {
+                    //     this.ViewPortElement.DrawToNextBitmapAsync();
+                    // }
                 }
                 catch (TaskCanceledException) { // prevents visual studios catch this when the main window closes
                     this.shouldRenderFrame = 0;
@@ -113,47 +120,36 @@ namespace FrameControlEx.Views.Main {
             }
         }
 
-        public async Task Render(SKPaintSurfaceEventArgs e) {
+        private void ViewPortElement_OnPaintSurface(object sender, SKPaintSurfaceEventArgs e) {
+            // // draw colourful background when no scenes are active
+            // float x1 = 0, y1 = 0;
+            // float x2 = rawImageInfo.Width, y2 = rawImageInfo.Height;
+            //
+            // surface.Canvas.DrawVertices(SKVertexMode.Triangles, new SKPoint[] {
+            //     new SKPoint(x1, y1),
+            //     new SKPoint(x2, y1),
+            //     new SKPoint(x2, y2),
+            //     new SKPoint(x1, y1),
+            //     new SKPoint(x2, y2),
+            //     new SKPoint(x1, y2)
+            // }, new SKColor[] {
+            //     SKColors.Red,
+            //     SKColors.Green,
+            //     SKColors.Blue,
+            //     SKColors.Red,
+            //     SKColors.Blue,
+            //     SKColors.White,
+            // }, new SKPaint() {
+            // });
+
+            // surface.Canvas.Clear(SKColors.Black);
+            this.PaintNonAsync(e);
+        }
+
+        private void PaintNonAsync(SKPaintSurfaceEventArgs e) {
             if (Interlocked.CompareExchange(ref this.shouldRenderFrame, 0, 1) != 1) {
                 return;
             }
-
-            DateTime now = DateTime.Now;
-            TimeSpan diff = now - this.lastRenderTime;
-            this.lastRenderTime = now;
-            this.AddDateTime(diff.TotalMilliseconds);
-            double interval = this.GetAverageTime();
-            this.AverageTime.Dispatcher.InvokeAsync(() => {
-                this.AverageTime.Text = $"INTERVAL: {Math.Round(interval, 2).ToString().FitLength(6)}\t ({Math.Round(1000d / interval, 2).ToString().FitLength(8)} FPS)";
-            });
-
-            FrameControlViewModel frameControl = this.FrameControl ?? throw new Exception($"No {nameof(FrameControlViewModel)} available");
-            SKSurface surface = e.Surface;
-            SKImageInfo rawImageInfo = e.RawInfo;
-
-            SceneModel active = frameControl.SceneDeck.PrimarySelectedItem?.Model;
-            if (active == null) {
-                return;
-            }
-
-            RenderContext context = new RenderContext(frameControl, surface, surface.Canvas, rawImageInfo);
-            await context.RenderSceneAsync(active);
-            // TODO: Maybe move this code somewhere else... maybe? dunno
-
-            e.Surface.Flush();
-            List<OutputModel> outputs = frameControl.OutputDeck.Model.Outputs.ToList();
-            await Task.Run(() => {
-                foreach (OutputModel output in outputs) {
-                    if (output.IsEnabled && output is IVisualOutput visual) {
-                        visual.OnAcceptFrame(context);
-                    }
-                }
-            });
-        }
-
-        private void ViewPortElement_OnPaintSurface(object sender, SKPaintSurfaceEventArgs e) {
-            if (Interlocked.CompareExchange(ref this.shouldRenderFrame, 0, 1) == 0)
-                return;
 
             DateTime now = DateTime.Now;
             TimeSpan diff = now - this.lastRenderTime;
@@ -168,35 +164,40 @@ namespace FrameControlEx.Views.Main {
 
             SceneModel active = frameControl.SceneDeck.PrimarySelectedItem?.Model;
             if (active == null) {
-                // // draw colourful background when no scenes are active
-                // float x1 = 0, y1 = 0;
-                // float x2 = rawImageInfo.Width, y2 = rawImageInfo.Height;
-                // 
-                // surface.Canvas.DrawVertices(SKVertexMode.Triangles, new SKPoint[] {
-                //     new SKPoint(x1, y1),
-                //     new SKPoint(x2, y1),
-                //     new SKPoint(x2, y2),
-                //     new SKPoint(x1, y1),
-                //     new SKPoint(x2, y2),
-                //     new SKPoint(x1, y2)
-                // }, new SKColor[] {
-                //     SKColors.Red,
-                //     SKColors.Green,
-                //     SKColors.Blue,
-                //     SKColors.Red,
-                //     SKColors.Blue,
-                //     SKColors.White,
-                // }, new SKPaint() {
-                // });
-
-                // surface.Canvas.Clear(SKColors.Black);
                 return;
             }
 
             RenderContext context = new RenderContext(frameControl, surface, surface.Canvas, rawImageInfo);
-            context.RenderScene(active);
-            // TODO: Maybe move this code somewhere else... maybe? dunno
+            context.RenderScene(active, false);
+            e.Surface.Flush();
+            foreach (OutputModel output in frameControl.OutputDeck.Model.Outputs) {
+                if (output.IsEnabled && output is IVisualOutput visual) {
+                    visual.OnAcceptFrame(context);
+                }
+            }
+        }
 
+        private void PaintAsync(SKPaintSurfaceEventArgs e) {
+            DateTime now = DateTime.Now;
+            TimeSpan diff = now - this.lastRenderTime;
+            this.lastRenderTime = now;
+            this.AddDateTime(diff.TotalMilliseconds);
+            double interval = this.GetAverageTime();
+            this.Dispatcher.InvokeAsync(() => {
+                this.AverageTime.Text = $"INTERVAL: {Math.Round(interval, 2).ToString().FitLength(6)}\t ({Math.Round(1000d / interval, 2).ToString().FitLength(8)} FPS)";
+            });
+
+            FrameControlViewModel frameControl = this.FrameControl ?? throw new Exception($"No {nameof(FrameControlViewModel)} available");
+            SKSurface surface = e.Surface;
+            SKImageInfo rawImageInfo = e.RawInfo;
+
+            SceneModel active = frameControl.SceneDeck.PrimarySelectedItem?.Model;
+            if (active == null) {
+                return;
+            }
+
+            RenderContext context = new RenderContext(frameControl, surface, surface.Canvas, rawImageInfo);
+            context.RenderScene(active, true);
             e.Surface.Flush();
             foreach (OutputModel output in frameControl.OutputDeck.Model.Outputs) {
                 if (output.IsEnabled && output is IVisualOutput visual) {

@@ -1,6 +1,7 @@
 using System;
 using FrameControlEx.Core.FrameControl;
 using FrameControlEx.Core.FrameControl.ViewModels;
+using FrameControlEx.Core.Utils;
 
 namespace FrameControlEx.Core.Settings {
     public class SettingsManagerViewModel : BaseViewModel {
@@ -21,8 +22,7 @@ namespace FrameControlEx.Core.Settings {
 
         public SettingsManagerViewModel() {
             this.ActiveSettings = new SettingsViewModel {
-                Width = 1920,
-                Height = 1080,
+                ViewPortSize = new Vec2i(1920, 1080),
                 FrameRate = 60
             };
         }

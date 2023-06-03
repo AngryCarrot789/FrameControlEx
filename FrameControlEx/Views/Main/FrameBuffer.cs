@@ -5,7 +5,7 @@ using FrameControlEx.Core.Utils;
 using SkiaSharp;
 
 namespace FrameControlEx.Views.Main {
-    public class FrameBufferWB {
+    public class FrameBuffer {
         private volatile WriteableBitmap bitmap;
         private volatile IntPtr backBuffer;
         private readonly CASLock drawLock;
@@ -17,8 +17,8 @@ namespace FrameControlEx.Views.Main {
 
         public WriteableBitmap Bitmap => this.bitmap;
 
-        public FrameBufferWB() {
-            this.drawLock = new CASLock();
+        public FrameBuffer(string debugName = null) {
+            this.drawLock = new CASLock(debugName);
         }
 
         public bool Lock(bool force) {
@@ -30,14 +30,22 @@ namespace FrameControlEx.Views.Main {
         }
 
         public bool UpdateBitmap(SKImageInfo info) {
-            using (CASLockUsage usage = this.drawLock.Use()) {
+            if (!this.drawLock.Lock(true)) {
+                return false;
+            }
+
+            try {
                 this.frameInfo = info;
                 this.bitmap = new WriteableBitmap(info.Width, info.Height, 96d, 96d, PixelFormats.Pbgra32, null);
                 this.bitmap.Lock();
                 this.backBuffer = this.bitmap.BackBuffer;
                 this.bitmap.Unlock();
-                return true;
             }
+            finally {
+                this.drawLock.Unlock();
+            }
+
+            return true;
         }
 
         public bool GetBackBuffer(out IntPtr buffer) {

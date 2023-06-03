@@ -109,8 +109,12 @@
                     <ScrollViewer VerticalScrollBarVisibility="Auto">
                         <ContentPresenter Content="{Binding}">
                             <ContentPresenter.Resources>
-                                <DataTemplate DataType="{x:Type viewModels:FrameControlViewModel}">
-                                </DataTemplate>
+                                <!-- 
+                                    THIS CAUSES SO MUCH XAML DESIGNER LAG WTFFFFFF
+                                    <DataTemplate DataType="{x:Type viewModels:FrameControlViewModel}">
+                                    </DataTemplate>
+                                -->
+                                
                                 <!-- INPUTS -->
                                 <DataTemplate DataType="{x:Type scene:SceneViewModel}">
                                     <controls:SceneSettingsControl DataContext="{Binding}"/>
@@ -151,11 +155,14 @@
                                 <!--
                                 <main:SkiaViewPort Width="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Width, FallbackValue=500}"
                                                    Height="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Height, FallbackValue=500}"
-                                                   x:Name="ViewPortElement"/>
+                                                   ViewPortSize="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.ViewPortSize}"
+                                                   x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
                                 -->
                                 <wpf:SKElement Width="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Width, FallbackValue=500}"
                                                Height="{Binding Source={x:Static core:IoC.Settings}, Path=ActiveSettings.Height, FallbackValue=500}"
                                                x:Name="ViewPortElement" PaintSurface="ViewPortElement_OnPaintSurface"/>
+                                <!--
+                                -->
                                 <Image Source="/FrameControlEx;component/Resources/64ll02.png" Stretch="Fill" Visibility="{Binding SceneDeck.IsEmpty, Converter={StaticResource Converter}}"/>
                             </Grid>
                         </AdornerDecorator>

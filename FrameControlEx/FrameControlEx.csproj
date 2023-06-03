@@ -214,7 +214,9 @@
     <Compile Include="Views\BaseWindow.cs" />
     <Compile Include="Views\FilePicking\FilePickDialogService.cs" />
     <Compile Include="Views\FilePicking\FolderPicker.cs" />
+    <Compile Include="Views\Main\FrameBuffer.cs" />
     <Compile Include="Views\Main\SkiaViewPort.cs" />
+    <Compile Include="Views\Main\SkiaViewPort_OLD.cs" />
     <Compile Include="Views\Message\MessageDialogService.cs" />
     <Compile Include="Views\Message\MessageWindow.xaml.cs">
       <DependentUpon>MessageWindow.xaml</DependentUpon>

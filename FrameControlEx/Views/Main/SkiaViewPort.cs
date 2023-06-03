@@ -1,6 +1,5 @@
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -11,31 +10,32 @@ using SkiaSharp.Views.Desktop;
 using Rect = System.Windows.Rect;
 
 namespace FrameControlEx.Views.Main {
-    public class SkiaViewPort_OLD : FrameworkElement {
+    public class SkiaViewPort : FrameworkElement {
         public static readonly DependencyProperty ViewPortSizeProperty =
             DependencyProperty.Register(
                 "ViewPortSize",
                 typeof(Vec2i),
-                typeof(SkiaViewPort_OLD),
-                new FrameworkPropertyMetadata(default(Vec2i), FrameworkPropertyMetadataOptions.AffectsRender));
+                typeof(SkiaViewPort),
+                new FrameworkPropertyMetadata(
+                    default(Vec2i),
+                    FrameworkPropertyMetadataOptions.AffectsRender,
+                    (d, e) => ((SkiaViewPort) d).OnViewPortSizeChanged((Vec2i) e.OldValue, (Vec2i) e.NewValue),
+                    (d, e) => ((SkiaViewPort) d).OnViewPortSizeCoerced((Vec2i) e)));
 
-        private const double BitmapDpi = 96.0;
         private readonly bool designMode;
-        private WriteableBitmap bitmapA;
-        private WriteableBitmap bitmapB;
-        private IntPtr bitmapBufferA;
-        private IntPtr bitmapBufferB;
-        private volatile bool canDrawIntoA;
-        private volatile bool canDrawIntoB;
-        private readonly CASLock bmpLockA = new CASLock();
-        private readonly CASLock bmpLockB = new CASLock();
-        private SKImageInfo frameInfo;
+        private readonly FrameBuffer frameA;
+        private readonly FrameBuffer frameB;
+        private readonly CASLock stateExchangeLock;
 
-        private volatile int currFreshFrame;
-        private volatile int lastFreshFrame;
+        private volatile bool isTargetRenderA;
+        private volatile bool isTargetDrawA;
+
+        private SKImageInfo frameInfo;
 
         private const int FRAME_A = 1;
         private const int FRAME_B = 2;
+
+        private volatile int isInvalidatingVisual;
 
         public Vec2i ViewPortSize {
             get => (Vec2i) this.GetValue(ViewPortSizeProperty);
@@ -47,8 +47,46 @@ namespace FrameControlEx.Views.Main {
         [Category("Appearance")]
         public event EventHandler<SKPaintSurfaceEventArgs> PaintSurface;
 
-        public SkiaViewPort_OLD() {
+        public SkiaViewPort() {
             this.designMode = DesignerProperties.GetIsInDesignMode(this);
+            this.stateExchangeLock = new CASLock("StateExchange");
+            this.frameInfo = new SKImageInfo(0, 0, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+            this.frameA = new FrameBuffer("BufferA");
+            this.frameB = new FrameBuffer("BufferB");
+            this.isTargetRenderA = true;
+        }
+
+        private void OnViewPortSizeChanged(Vec2i oldSize, Vec2i newSize) {
+            if (oldSize.Equals(newSize)) {
+                return;
+            }
+        }
+
+        private object OnViewPortSizeCoerced(Vec2i size) {
+            if (size.X < 0 || size.Y < 0) {
+                size = new Vec2i(Math.Max(0, size.X), Math.Max(0, size.Y));
+            }
+
+            this.frameInfo = new SKImageInfo(size.X, size.Y, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+            if (this.frameA.Lock(false)) {
+                try {
+                    this.frameA.UpdateBitmap(this.frameInfo);
+                }
+                finally {
+                    this.frameA.Unlock();
+                }
+            }
+
+            if (this.frameB.Lock(false)) {
+                try {
+                    this.frameB.UpdateBitmap(this.frameInfo);
+                }
+                finally {
+                    this.frameB.Unlock();
+                }
+            }
+
+            return size;
         }
 
         /// <param name="dc">The drawing instructions for a specific element. This context is provided to the layout system.</param>
@@ -56,130 +94,102 @@ namespace FrameControlEx.Views.Main {
         /// <remarks />
         protected override void OnRender(DrawingContext dc) {
             base.OnRender(dc);
-            if (this.designMode || this.Visibility != Visibility.Visible || PresentationSource.FromVisual(this) == null)
-                return;
-            Vec2i size = this.ViewPortSize;
-            if (size.X <= 0 || size.Y <= 0) {
+            this.isInvalidatingVisual = 0;
+            if (this.designMode || this.Visibility != Visibility.Visible || PresentationSource.FromVisual(this) == null) {
                 return;
             }
 
-            if (this.currFreshFrame == FRAME_A && this.bmpLockA.Lock(false)) {
-                this.OnRenderBitmapA(dc, in size);
-                this.bmpLockA.Unlock();
-            }
-            else if (this.currFreshFrame == FRAME_B && this.bmpLockB.Lock(false)) {
-                this.OnRenderBitmapB(dc, in size);
-                this.bmpLockB.Unlock();
-            }
-            else if (this.lastFreshFrame == FRAME_B && this.bmpLockA.Lock(false)) {
-                this.OnRenderBitmapA(dc, in size);
-                this.bmpLockA.Unlock();
-            }
-            else if (this.lastFreshFrame == FRAME_A && this.bmpLockB.Lock(false)) {
-                this.OnRenderBitmapB(dc, in size);
-                this.bmpLockB.Unlock();
-            }
-            else if (this.bmpLockA.Lock(false)) {
-                this.OnRenderBitmapA(dc, in size);
-                this.bmpLockA.Unlock();
-            }
-            else if (this.bmpLockB.Lock(false)) {
-                this.OnRenderBitmapB(dc, in size);
-                this.bmpLockB.Unlock();
-            }
-        }
-
-        protected void OnRenderBitmapA(DrawingContext dc, in Vec2i size) {
-            this.canDrawIntoA = false;
-            this.RenderBitmapToContext(dc, ref this.bitmapA, ref this.bitmapBufferA, in size);
-            this.canDrawIntoA = this.bitmapA != null;
-        }
-
-        protected void OnRenderBitmapB(DrawingContext dc, in Vec2i size) {
-            this.canDrawIntoB = false;
-            this.RenderBitmapToContext(dc, ref this.bitmapB, ref this.bitmapBufferB, in size);
-            this.canDrawIntoB = this.bitmapB != null;
-        }
-
-        protected void RenderBitmapToContext(DrawingContext dc, ref WriteableBitmap bitmap, ref IntPtr backBuffer, in Vec2i size) {
-            WriteableBitmap bmp = bitmap;
-            SKImageInfo frame = this.frameInfo;
-            if (frame.Width < 1 || frame.Height < 1) {
-                this.frameInfo = frame = new SKImageInfo(size.X, size.Y, SKImageInfo.PlatformColorType, SKAlphaType.Premul);
+            SKImageInfo info = this.frameInfo;
+            if (info.Width <= 0 || info.Height <= 0) {
+                return;
             }
 
-            if (bmp == null || frame.Width != bmp.PixelWidth || frame.Height != bmp.PixelHeight) {
-                bmp = bitmap = new WriteableBitmap(size.X, size.Y, 96d, 96d, PixelFormats.Pbgra32, null);
-                bmp.Lock();
-                backBuffer = bmp.BackBuffer;
-                using (SKSurface surface = SKSurface.Create(frame, backBuffer, bmp.BackBufferStride)) {
-                    this.OnPaintSurface(new SKPaintSurfaceEventArgs(surface, frame, frame));
+            FrameBuffer frame = null;
+            try {
+                if (this.isTargetRenderA) {
+                    if (this.frameA.Lock(false)) {
+                        frame = this.frameA;
+                    }
                 }
-
-                bmp.AddDirtyRect(new Int32Rect(0, 0, size.X, size.Y));
-                bmp.Unlock();
+                else {
+                    if (this.frameB.Lock(false)) {
+                        frame = this.frameB;
+                    }
+                }
             }
-            else {
-                bmp.Lock();
-                bmp.AddDirtyRect(new Int32Rect(0, 0, size.X, size.Y));
-                bmp.Unlock();
-                dc.DrawImage(bmp, new Rect(0.0, 0.0, this.ActualWidth, this.ActualHeight));
+            finally {
+            }
+
+            if (frame == null) {
+                return;
+            }
+
+            try {
+                WriteableBitmap bitmap = frame.Bitmap;
+                bitmap.Lock();
+                bitmap.AddDirtyRect(new Int32Rect(0, 0, info.Width, info.Height));
+                bitmap.Unlock();
+                dc.DrawImage(bitmap, new Rect(0.0, 0.0, this.ActualWidth, this.ActualHeight));
+            }
+            finally {
+                frame.Unlock();
             }
         }
 
         public void DrawToNextBitmapAsync() {
-            if (this.currFreshFrame == FRAME_A) {
-                if (this.bmpLockB.Lock(false)) {
-                    this.DrawToBitmapAsync(ref this.bitmapBufferB, in this.frameInfo);
-                    this.bmpLockB.Unlock();
-                    this.lastFreshFrame = Interlocked.Exchange(ref this.currFreshFrame, FRAME_B);
-                }
-                else if (this.bmpLockA.Lock(true)) {
-                    this.DrawToBitmapAsync(ref this.bitmapBufferA, in this.frameInfo);
-                    this.bmpLockA.Unlock();
-                }
-                else {
-                    return;
-                }
-            }
-            else if (this.currFreshFrame == FRAME_B) {
-                if (this.bmpLockA.Lock(false)) {
-                    this.DrawToBitmapAsync(ref this.bitmapBufferA, in this.frameInfo);
-                    this.bmpLockA.Unlock();
-                    this.lastFreshFrame = Interlocked.Exchange(ref this.currFreshFrame, FRAME_A);
-                }
-                else if (this.bmpLockB.Lock(true)) {
-                    this.DrawToBitmapAsync(ref this.bitmapBufferB, in this.frameInfo);
-                    this.bmpLockB.Unlock();
+            FrameBuffer frame = null;
+            try {
+                if (this.isTargetDrawA) {
+                    if (this.isTargetRenderA) {
+                        if (Interlocked.CompareExchange(ref this.isInvalidatingVisual, 1, 0) == 0)
+                            this.Dispatcher.InvokeAsync(this.InvalidateVisual);
+                        return;
+                    }
+
+                    if (this.frameA.Lock(false)) {
+                        this.isTargetRenderA = false;
+                        this.isTargetDrawA = false;
+                        frame = this.frameA;
+                    }
                 }
                 else {
-                    return;
+                    if (!this.isTargetRenderA) {
+                        if (Interlocked.CompareExchange(ref this.isInvalidatingVisual, 1, 0) == 0)
+                            this.Dispatcher.InvokeAsync(this.InvalidateVisual);
+                        return;
+                    }
+
+                    if (this.frameB.Lock(false)) {
+                        this.isTargetRenderA = true;
+                        this.isTargetDrawA = true;
+                        frame = this.frameB;
+                    }
                 }
             }
-            else if (this.bmpLockA.Lock(false)) {
-                this.DrawToBitmapAsync(ref this.bitmapBufferA, in this.frameInfo);
-                this.lastFreshFrame = this.currFreshFrame;
-                this.currFreshFrame = FRAME_B;
-                this.bmpLockA.Unlock();
+            finally {
             }
-            else if (this.bmpLockB.Lock(true)) {
-                this.DrawToBitmapAsync(ref this.bitmapBufferB, in this.frameInfo);
-                this.lastFreshFrame = this.currFreshFrame;
-                this.currFreshFrame = FRAME_A;
-                this.bmpLockB.Unlock();
+
+            if (frame != null) {
+                try {
+                    if (!frame.GetBackBuffer(out IntPtr buffer)) {
+                        return;
+                    }
+
+                    using (SKSurface surface = SKSurface.Create(this.frameInfo, buffer, this.frameInfo.RowBytes)) {
+                        if (surface == null) {
+                            return;
+                        }
+
+                        this.OnPaintSurface(new SKPaintSurfaceEventArgs(surface, this.frameInfo, this.frameInfo));
+                    }
+                }
+                finally {
+                    this.isTargetRenderA = !this.isTargetRenderA;
+                    frame.Unlock();
+                }
             }
 
             this.Dispatcher.Invoke(this.InvalidateVisual);
-        }
-
-        public void DrawToBitmapAsync(ref IntPtr bitmap, in SKImageInfo frame) {
-            using (SKSurface surface = SKSurface.Create(frame, bitmap, frame.Width * frame.BytesPerPixel)) {
-                if (surface == null) {
-                    return;
-                }
-
-                this.OnPaintSurface(new SKPaintSurfaceEventArgs(surface, frame, frame));
-            }
         }
 
         /// <param name="e">The event arguments that contain the drawing surface and information.</param>

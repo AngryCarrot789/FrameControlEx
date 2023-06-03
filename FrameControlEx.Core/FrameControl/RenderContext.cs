@@ -39,7 +39,7 @@ namespace FrameControlEx.Core.FrameControl {
             this.FrameInfo = rawFrameInfo;
         }
 
-        public void RenderScene(SceneModel scene) {
+        public void RenderScene(SceneModel scene, bool isAsync = false) {
             if (scene.ClearScreenOnRender) {
                 this.Canvas.Clear(scene.BackgroundColour);
             }
@@ -47,6 +47,10 @@ namespace FrameControlEx.Core.FrameControl {
             IEnumerable<SourceModel> items = scene.SourceDeck.Sources;
             if (scene.IsRenderOrderReversed) {
                 items = items.Reverse();
+            }
+
+            if (isAsync) {
+                items = items.ToList();
             }
 
             foreach (SourceModel source in items) {
