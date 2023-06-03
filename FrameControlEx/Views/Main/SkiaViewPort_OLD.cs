@@ -11,12 +11,12 @@ using SkiaSharp.Views.Desktop;
 using Rect = System.Windows.Rect;
 
 namespace FrameControlEx.Views.Main {
-    public class SkiaViewPort_OLD : FrameworkElement {
+    public class SkiaViewPort : FrameworkElement {
         public static readonly DependencyProperty ViewPortSizeProperty =
             DependencyProperty.Register(
                 "ViewPortSize",
                 typeof(Vec2i),
-                typeof(SkiaViewPort_OLD),
+                typeof(SkiaViewPort),
                 new FrameworkPropertyMetadata(default(Vec2i), FrameworkPropertyMetadataOptions.AffectsRender));
 
         private const double BitmapDpi = 96.0;
@@ -47,7 +47,7 @@ namespace FrameControlEx.Views.Main {
         [Category("Appearance")]
         public event EventHandler<SKPaintSurfaceEventArgs> PaintSurface;
 
-        public SkiaViewPort_OLD() {
+        public SkiaViewPort() {
             this.designMode = DesignerProperties.GetIsInDesignMode(this);
         }
 
